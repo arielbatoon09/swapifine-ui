@@ -1,0 +1,18 @@
+{
+  "cwd": "D:\\Development Project\\SWAPIFINE\\swapifine-ui",
+  "type": [
+    "pwa"
+  ],
+  "name": "Swapifine",
+  "framework": "vue",
+  "template": "blank",
+  "bundler": "vite",
+  "cssPreProcessor": "scss",
+  "theming": {
+    "customColor": true,
+    "color": "#29abe2",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false
+}
