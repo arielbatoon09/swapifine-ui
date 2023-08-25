@@ -13,7 +13,9 @@ import 'framework7/css/bundle';
 // Import Icons and App Custom Styles
 import '../css/icons.css';
 import '../css/app.scss';
+import '../css/welcome.scss';
 import '../css/auth.scss';
+import '../css/homepage.scss';
 
 // Import App Component
 import App from '../components/app.vue';

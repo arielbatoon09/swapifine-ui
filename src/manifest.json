@@ -1,12 +1,12 @@
 {
-  "name": "Swapifine",
+  "name": "Swapifine - Swap Marketplace",
   "short_name": "Swapifine",
-  "description": "Swapifine",
+  "description": "Discover, Trade, Thrive - Welcome to Swap Marketplace!",
   "lang": "en-US",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#29abe2",
-  "theme_color": "#29abe2",
+  "background_color": "#EBEBEB",
+  "theme_color": "#EBEBEB",
   "icons": [
     {
       "src": "/icons/128x128.png",

@@ -1,9 +1,7 @@
 .auth-container {
     background: #FFF;
     @media only screen and (min-width: 1024px) {
-        .auth-container {
-          background: #f8fafb;
-        }
+        background: #f8fafb;
       }
     .auth-btn{
         margin-top: -14px;
@@ -23,5 +21,10 @@
     .auth-form{
         list-style: none;
         margin-top: -18px;
+
+        .item-floating-label{
+            background: #FFF;
+        }
+        
     }
 }

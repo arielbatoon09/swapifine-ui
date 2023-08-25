@@ -60,3 +60,13 @@ body {
     cursor: pointer;
     text-align: center;
 }
+.profile-avatar{
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+}
+.profile-avatar:hover{
+    filter: contrast(80%);
+    transition: all 0.2s ease-in;
+}
