@@ -1,17 +1,19 @@
 <script setup>
-import { f7Page } from 'framework7-vue'; 
+import { f7Page } from 'framework7-vue';
+import WelcomeIllustration from '../assets/marketplace-illustration.svg';
+import SwapifineLogo from '../assets/swapifine-logo.png';
 
 </script>
 
 <template>
   <f7-page name="welcome" class="welcome-container">
     <div class="welcome-image">
-      <img class="welcome-illustration" src="assets/marketplace-illustration.svg" alt="...">
+      <img class="welcome-illustration" :src="WelcomeIllustration" alt="...">
     </div>
     <div class="welcome-content">
       <div class="welcome-info">
         <div class="welcome-logo">
-          <img src="assets/swapifine-logo.png" alt="...">
+          <img :src="SwapifineLogo" alt="...">
           <h1>Swapi<span>fine</span></h1>
           <p>A future marketplace experience that is seamless, sophisticated, and caters to both swapping and selling.</p>
         </div>

@@ -16,6 +16,19 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+.text-clr-primary{
+    color: #003D66;
+}
+.text-clr-secondary{
+    color: #29ABE2;
+}
+.bg-clr-primary{
+    background: #003D66;
+}
+.bg-clr-secondary{
+    background: #29ABE2;
+}
+
 .primary-button {
     width: 100%;
     background: #003D66;
@@ -46,10 +59,4 @@ body {
     font-weight: 500;
     cursor: pointer;
     text-align: center;
-    transition: all 0.2s ease-out;
-}
-.secondary-button:hover{
-    background: #003D66;
-    color: #FFF;
-    transition: all 0.2s ease-in;
 }

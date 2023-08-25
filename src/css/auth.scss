@@ -1,0 +1,27 @@
+.auth-container {
+    background: #FFF;
+    @media only screen and (min-width: 1024px) {
+        .auth-container {
+          background: #f8fafb;
+        }
+      }
+    .auth-btn{
+        margin-top: -14px;
+        background: #003D66;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        outline: none;
+        transition: all 0.2s ease-out;
+    }
+    .auth-btn:hover{
+        background: #05446F;
+        transition: all 0.2s ease-in;
+    }
+    .auth-btn > a{
+        color: #FFF;
+    }
+    .auth-form{
+        list-style: none;
+        margin-top: -18px;
+    }
+}
