@@ -13,6 +13,7 @@ import 'framework7/css/bundle';
 // Import Icons and App Custom Styles
 import '../css/icons.css';
 import '../css/app.scss';
+import './tailwindcss.js';
 
 // Import App Component
 import App from '../components/app.vue';

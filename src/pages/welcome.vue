@@ -1,4 +1,5 @@
 <script setup>
+import { f7Page } from 'framework7-vue'; 
 
 </script>
 
