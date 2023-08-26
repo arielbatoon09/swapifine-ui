@@ -1,0 +1,38 @@
+.sidebar{
+    background: #003D66;
+    color: #FFF;
+    border-radius: 0 20px 20px 0;
+
+    .sidebar-menu-icon{
+        color: #77a1be;
+    }
+    .sidebar-menu-active {
+        color: #EBEBEB;
+        position: relative;
+    
+        &::before {
+            content: '';
+            position: absolute;
+            background: #003D66;
+            width: 68px;
+            height: 68px;
+            border-radius: 0 50% 50% 0;
+            top: 50%;
+            left: -10px;
+            transform: translateY(-50%);
+            z-index: -1;
+            animation: fadeAnimation 0.2s ease-in-out;
+        }
+    }
+    
+    @keyframes fadeAnimation {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    
+       
+}

@@ -15,6 +15,9 @@ import '../css/icons.css';
 import '../css/app.scss';
 import '../css/welcome.scss';
 import '../css/auth.scss';
+
+// Styling for User Homepage
+import '../css/sidebar.scss';
 import '../css/homepage.scss';
 
 // Import App Component

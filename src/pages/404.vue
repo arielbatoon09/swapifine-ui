@@ -13,10 +13,10 @@ import PageNotFound from '../assets/page-not-found.svg';
           <p class="mb-5 max-w-screen-md text-center text-gray-500 md:text-lg">The page you're looking for
             doesn't exist.
           </p>
-          <a href="/"
+          <f7-link href="/home" :animate="false" :ignore-cache="true"
             class="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base">Go
             home
-          </a>
+          </f7-link>
         </div>
       </div>
     </div>
