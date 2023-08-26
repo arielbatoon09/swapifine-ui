@@ -21,7 +21,7 @@ import BtnBack from '../../assets/btn-back.svg';
             <f7-list-input outline label="Email" floating-label type="email" clear-button></f7-list-input>
             <f7-list-input outline label="Password" floating-label type="password" clear-button></f7-list-input>
             <f7-block>
-              <f7-list-button class="list-none auth-btn">Log in</f7-list-button>
+              <f7-list-button class="list-none auth-btn" href="/home">Log in</f7-list-button>
             </f7-block>
           </form>
 
