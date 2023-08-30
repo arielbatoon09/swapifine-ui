@@ -1,11 +1,32 @@
 <script setup>
+import { useAuthStore } from '../../stores/auth';
+import { ref, onMounted } from 'vue';
 import BtnBack from '../../assets/btn-back.svg';
-import { ref } from 'vue';
 
-const email = ref('');
+const authStore = useAuthStore();
 
-const doSignUp = () => {
-  alert(email.value);
+// Form Getters
+const form = ref({
+  fullname: '',
+  email: '',
+  password: '',
+});
+
+// Render Page
+onMounted(async () => {
+  try {
+    // code
+  } catch (error) {
+    console.log("Error", error);
+  }
+})
+
+const handleSignUp = async () => {
+  try {
+    await authStore.register(form.value.fullname, form.value.email, form.value.password);
+  } catch (error) {
+    console.log("Error", error);
+  }
 }
 </script>
 
@@ -24,14 +45,13 @@ const doSignUp = () => {
           </f7-block>
           <!-- Form -->
           <form class="auth-form">
-            <f7-list-input outline label="Full Name" floating-label type="text" clear-button></f7-list-input>
-            <f7-list-input outline label="Email" floating-label type="email" clear-button
-              v-model:value="email"></f7-list-input>
-            <f7-list-input outline label="Password" floating-label type="password" clear-button></f7-list-input>
+            <f7-list-input v-model:value="form.fullname" outline label="Full Name" floating-label type="text" clear-button></f7-list-input>
+            <f7-list-input v-model:value="form.email" outline label="Email" floating-label type="email" clear-button></f7-list-input>
+            <f7-list-input v-model:value="form.password" outline label="Password" floating-label type="password" clear-button></f7-list-input>
             <f7-list-input outline label="Confirm Password" floating-label type="password" clear-button>
             </f7-list-input>
             <f7-block>
-              <f7-list-button class="list-none auth-btn" @click="doSignUp">Sign up</f7-list-button>
+              <f7-list-button class="list-none auth-btn" @click="handleSignUp">Sign up</f7-list-button>
             </f7-block>
           </form>
 

@@ -1,13 +1,39 @@
 <script setup>
+import { onMounted, defineProps } from 'vue';
+import { f7 } from 'framework7-vue';
+import { useAuthStore } from '../stores/auth';
 import SidebarComponent from '../components/Sidebar.vue';
 import FooterComponent from '../components/Footer.vue';
-import { defineProps } from 'vue';
 import SwapifineLogo from '../assets/swapifine-logo.png';
 import DefaultProfile from '../assets/profile/default-profile.png';
+
+const authStore = useAuthStore();
 
 const props = defineProps({
   currentPage: String
 });
+
+// Render Data
+onMounted(async () => {
+  try {
+    await authStore.fetchUser();
+    if(!authStore.isAuthenticated){
+      f7.views.main.router.navigate('/');
+    }
+  } catch (error) {
+    console.log("Error", error);
+  }
+})
+
+
+
+const handleLogout = async () => {
+  try {
+    await authStore.logout();
+  } catch (error) {
+    console.log("Error:", error);
+  }
+}
 </script>
 
 <template>
@@ -25,9 +51,12 @@ const props = defineProps({
         </div>
         <!-- Profile-Display -->
         <div class="flex flex-row items-center gap-3">
+          <!-- Sample Name Return -->
+          <h1>{{ authStore.user?.fullname }}</h1>
           <f7-link href="/search" :ignore-cache="true" class="hover:bg-gray-100 p-2 rounded-full"><f7-icon
               material="search"></f7-icon></f7-link>
           <img :src="DefaultProfile" class="profile-avatar">
+          <f7-list-button class="list-none" @click="handleLogout">Logout</f7-list-button>
         </div>
       </header>
       <!-- Main-Content -->

@@ -1,7 +1,7 @@
 <script setup>
 import Mainlayout from '../../Layout/MainLayout.vue';
-
 const currentPage = 'home';
+
 </script>
 
 <template>
