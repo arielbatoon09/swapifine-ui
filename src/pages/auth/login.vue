@@ -1,6 +1,33 @@
 <script setup>
+import { useAuthStore } from '../../stores/auth';
+import { ref, onMounted } from 'vue';
 import BtnBack from '../../assets/btn-back.svg';
 
+const authStore = useAuthStore();
+
+// Form Getters
+const form = ref({
+  email: '',
+  password: '',
+});
+
+// Render Page
+onMounted(async () => {
+  try {
+
+  } catch (error) {
+    console.log("Error", error);
+  }
+})
+
+// Process Data
+const handleLogin = async () => {
+  try {
+    await authStore.login(form.value.email, form.value.password);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
 </script>
 
 <template>
@@ -10,7 +37,7 @@ import BtnBack from '../../assets/btn-back.svg';
       <div class="mx-auto max-w-screen-2xl lg:mt-24 lg:px-8">
         <f7-list class="lg:bg-white mx-auto max-w-lg lg:rounded-lg lg:border">
           <f7-block>
-            <f7-link back :ignore-cache="true" class="mb-3">
+            <f7-link back class="mb-3">
               <img :src="BtnBack" alt="">
             </f7-link>
             <h3 class="auth-title text-clr-primary text-3xl font-semibold w-5/6">Welcome back! Glad to see you, Again!
@@ -18,10 +45,12 @@ import BtnBack from '../../assets/btn-back.svg';
           </f7-block>
           <!-- Form -->
           <form class="auth-form">
-            <f7-list-input outline label="Email" floating-label type="email" clear-button></f7-list-input>
-            <f7-list-input outline label="Password" floating-label type="password" clear-button></f7-list-input>
+            <f7-list-input v-model:value="form.email" outline label="Email" floating-label type="email"
+              clear-button></f7-list-input>
+            <f7-list-input v-model:value="form.password" outline label="Password" floating-label type="password"
+              clear-button></f7-list-input>
             <f7-block>
-              <f7-list-button class="list-none auth-btn" href="/home">Log in</f7-list-button>
+              <f7-list-button @click="handleLogin" class="list-none auth-btn">Log in</f7-list-button>
             </f7-block>
           </form>
 
