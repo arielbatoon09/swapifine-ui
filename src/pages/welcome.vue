@@ -1,5 +1,5 @@
 <script setup>
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '../js/auth.store';
 import { onMounted } from 'vue';
 import { f7, f7Page } from 'framework7-vue';
 import WelcomeIllustration from '../assets/marketplace-illustration.svg';
@@ -10,11 +10,6 @@ const authStore = useAuthStore();
 // Render Data
 onMounted(async () => {
   try {
-    await authStore.fetchUser();
-    console.log(authStore.isAuthenticated);
-    // if(authStore.isAuthenticated){
-    //   f7.views.main.router.navigate('/home');
-    // }
 
   } catch (error) {
     console.log("Error", error);

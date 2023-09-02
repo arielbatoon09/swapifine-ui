@@ -1,4 +1,4 @@
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '../js/auth.store';
 import useCookies from 'vue-cookies'
 import { f7 } from 'framework7-vue';
 // Onboarding Pages
@@ -66,7 +66,6 @@ const routes = [
 function beforeEnter(context) {
   const authStore = useAuthStore();
   const routeTo = context.to.route.protectedRoute;
-  console.log(routeTo);
   if (routeTo) { // Check if the route is protected
     if (!authStore.isAuthenticated) {
       f7.views.main.router.navigate('/');

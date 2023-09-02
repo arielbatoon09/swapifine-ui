@@ -1,5 +1,5 @@
 <script setup>
-import { useAuthStore } from '../../stores/auth';
+import { useAuthStore } from '../../js/auth.store';
 import { ref, onMounted } from 'vue';
 import BtnBack from '../../assets/btn-back.svg';
 
