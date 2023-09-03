@@ -28,7 +28,7 @@ onMounted(async () => {
         <div class="welcome-logo">
           <img :src="SwapifineLogo" alt="...">
           <h1>Swapi<span>fine</span></h1>
-          <p>Discover, Trade, Thrive - Welcome to Swap Marketplace!</p>
+          <p>Discover, Trade, Thrive <br> Welcome to Swap Marketplace!</p>
         </div>
         <div class="welcome-buttons">
           <a href="/login"><button class="primary-button">Login</button></a>

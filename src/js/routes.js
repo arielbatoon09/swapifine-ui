@@ -5,6 +5,7 @@ import { f7 } from 'framework7-vue';
 import WelcomePage from '../pages/welcome.vue';
 import RegisterPage from '../pages/auth/signup.vue';
 import LoginPage from '../pages/auth/login.vue';
+import VerifyEmailPage from '../pages/auth/verify-email.vue';
 import NotFoundPage from '../pages/404.vue';
 // User Pages
 import HomePage from '../pages/home/home.vue';
@@ -24,12 +25,17 @@ const routes = [
   {
     path: '/signup',
     component: isLoggedIn ? HomePage : RegisterPage,
-    protectedRoute: false,
+    protectedRoute: isLoggedIn,
   },
   {
     path: '/login',
     component: isLoggedIn ? HomePage : LoginPage,
     protectedRoute: isLoggedIn,
+  },
+  {
+    path: '/verify-email',
+    component: VerifyEmailPage,
+    protectedRoute: false,
   },
   {
     path: '/home',

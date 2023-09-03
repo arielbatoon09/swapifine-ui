@@ -41,7 +41,10 @@ export const useAuthStore = defineStore('auth', {
                     confirmPassword: confirmPassword,
                 });
 
+                await this.fetchUser();
+                useCookies.set('isLoggedIn', true);
                 // Return response data
+                console.log(response.data);
                 return response.data;
 
             } catch (error) {

@@ -50,12 +50,12 @@ const handleSignUp = async () => {
       // Show the toast
       if (!toastWithButton.value) {
         toastWithButton.value = f7.toast.create({
-          text: 'Successfuly Registered!',
+          text: 'Sent verification link to your email!',
           position: 'top',
           closeButton: true,
           closeButtonText: 'Okay',
           closeButtonColor: 'green',
-          closeTimeout: 2000,
+          closeTimeout: 3000,
         });
       }
       
@@ -63,7 +63,7 @@ const handleSignUp = async () => {
       toastWithButton.value.open();
 
       // Redirect the user to Login page
-      f7.views.main.router.navigate('/login');
+      f7.views.main.router.navigate('/verify-email');
     }
 
     // Null Error
