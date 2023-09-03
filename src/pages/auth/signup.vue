@@ -28,8 +28,10 @@ const handleSignUp = async () => {
   try {
     // Init Loading Request
     isRequest.value = true;
+
     // Init Form Value
     const { fullname, email, password, confirmPassword } = form.value;
+    
     // Pass the data argument to register store function
     const response = await authStore.register(fullname, email, password, confirmPassword);
 

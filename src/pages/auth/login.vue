@@ -1,5 +1,6 @@
 <script setup>
 import { useAuthStore } from '../../js/auth.store';
+import useCookies from 'vue-cookies'
 import { ref } from 'vue';
 import { f7 } from 'framework7-vue';
 import BtnBack from '../../assets/btn-back.svg';
@@ -22,24 +23,17 @@ const error = ref({
 const handleLogin = async () => {
   try {
     // Init Loading Request
-    isRequest.value = true;    
+    isRequest.value = true;
+    
     // Init Form Value
     const { email, password } = form.value;
+
     // Pass the data argument to login store function
     const response = await authStore.login(email, password);
 
     // Cancel loading state if the response is true
     if (response) {
       isRequest.value = false;
-    }
-
-    // Success State
-    if (response.status == 'success') {
-      form.value.email = null;
-      form.value.password = null;
-
-      // Redirect the user to Home page
-      f7.views.main.router.navigate('/home');
     }
 
     // Null Error
@@ -53,7 +47,7 @@ const handleLogin = async () => {
       case 'invalidCredentials':
         error.value.invalidCredentials = response.message;
         break;
-    }    
+    }
 
   } catch (error) {
     console.error("Error:", error);
@@ -76,17 +70,18 @@ const handleLogin = async () => {
           </f7-block>
           <!-- Form -->
           <form class="auth-form">
-              <!-- Email -->
+            <!-- Email -->
             <f7-list-input v-model:value="form.email" outline label="Email" floating-label type="email"
               :error-message="error.invalidCredentials" error-message-force clear-button></f7-list-input>
-              <!-- Password -->
+            <!-- Password -->
             <f7-list-input v-model:value="form.password" outline label="Password" floating-label type="password"
               :error-message="error.invalidCredentials" error-message-force clear-button></f7-list-input>
-              <!-- Remember Me -->
+            <!-- Remember Me -->
             <f7-list-item checkbox title="Remember me" name="remember" class="auth-remember"></f7-list-item>
-              <!-- Submit button -->
+            <!-- Submit button -->
             <f7-block>
-              <f7-button preloader :loading="isRequest" @click="handleLogin" class="auth-btn" large fill>Log in</f7-button>
+              <f7-button preloader :loading="isRequest" @click="handleLogin" class="auth-btn" large fill>Log
+                in</f7-button>
               <a href="#" class="auth-forgot flex justify-center mt-3">Forgot Password?</a>
             </f7-block>
           </form>

@@ -56,12 +56,14 @@ export const useAuthStore = defineStore('auth', {
                     password: password
                 });
 
-                // Get User Data
-                await this.fetchUser();
-                // Save Cookie for isLoggedIn
-                useCookies.set('isLoggedIn', true);
-                // Return response data
+                if (response.data.status === 'success') {
+                    await this.fetchUser();
+                    useCookies.set('isLoggedIn', true);
+                    f7.views.main.router.navigate('/home');
+                }
+                
                 return response.data;
+
 
             } catch (error) {
                 console.error(error);
