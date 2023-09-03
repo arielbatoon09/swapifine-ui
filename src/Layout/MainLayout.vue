@@ -24,7 +24,7 @@ onMounted(async () => {
     if(authStore.user.email_verified_at == null) {
       f7.views.main.router.navigate('/verify-email');
     }
-    
+
   } catch (error) {
     console.log("Error", error);
   }
@@ -55,7 +55,7 @@ const handleLogout = async () => {
         <!-- Profile-Display -->
         <div class="flex flex-row items-center gap-3">
           <!-- Sample Name Return -->
-          <h1>{{ authStore.user?.fullname }}</h1>
+          <!-- <h1>{{ authStore.user?.fullname }}</h1> -->
           <f7-link href="/search" :ignore-cache="true" class="hover:bg-gray-100 p-2 rounded-full"><f7-icon
               material="search"></f7-icon></f7-link>
           <img :src="DefaultProfile" class="profile-avatar">
