@@ -6,6 +6,7 @@
     .auth-btn{
         margin-top: -14px;
         background: #003D66;
+        padding: 28px;
         border: 1px solid transparent;
         border-radius: 8px;
         outline: none;
@@ -25,6 +26,16 @@
         .item-floating-label{
             background: #FFF;
         }
-        
+        .auth-remember{
+            margin-top: -5px;
+        }
+        .auth-forgot{
+            color: #003D66;
+            &:hover{
+                color: #05446F;
+            }
+        }
     }
+
+
 }

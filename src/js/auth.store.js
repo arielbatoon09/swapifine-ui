@@ -31,20 +31,19 @@ export const useAuthStore = defineStore('auth', {
                 console.error(error);
             }
         },
-        async register(fullname, email, password) {
+        async register(fullname, email, password, confirmPassword) {
             try {
                 await this.getToken();
                 const response = await axios.post('/api/register', {
                     fullname: fullname,
                     email: email,
-                    password: password
+                    password: password,
+                    confirmPassword: confirmPassword,
                 });
-                if (response.data.status === 'success') {
-                    console.log(response.data);
-                    f7.views.main.router.navigate('/login');
-                }else{
-                    console.log('error');
-                }
+
+                // Return response data
+                return response.data;
+
             } catch (error) {
                 console.error(error);
             }
@@ -56,11 +55,14 @@ export const useAuthStore = defineStore('auth', {
                     email: email,
                     password: password
                 });
-                if (response.data.status === 'success') {
-                    await this.fetchUser();
-                    useCookies.set('isLoggedIn', true);
-                    f7.views.main.router.navigate('/home');
-                }
+
+                // Get User Data
+                await this.fetchUser();
+                // Save Cookie for isLoggedIn
+                useCookies.set('isLoggedIn', true);
+                // Return response data
+                return response.data;
+
             } catch (error) {
                 console.error(error);
             }

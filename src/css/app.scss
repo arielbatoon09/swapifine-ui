@@ -71,3 +71,11 @@ body {
     filter: contrast(80%);
     transition: all 0.2s ease-in;
 }
+
+// center toast
+@media (min-width: 1024px){
+    .md .toast.toast-horizontal-left {
+        left: 50%;
+        margin-left: calc(-1 * 300px / 2);
+    }
+}
