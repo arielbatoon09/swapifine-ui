@@ -8,11 +8,13 @@ import LoginPage from '../pages/auth/login.vue';
 import VerifyEmailPage from '../pages/auth/verify-email.vue';
 import NotFoundPage from '../pages/404.vue';
 // User Pages
-import HomePage from '../pages/home/home.vue';
-import ChatPage from '../pages/chat/message.vue';
-import NotificationPage from '../pages/notification/notification.vue';
-import StorePage from '../pages/store/store.vue';
-import Searchpage from '../pages/search.vue';
+import HomePage from '../pages/Authenticated/HomePage.vue';
+import ChatPage from '../pages/Authenticated/ChatPage.vue';
+import NotificationPage from '../pages/Authenticated/NotificationPage.vue';
+import StorePage from '../pages/Authenticated/StorePage.vue';
+import PostItemPage from '../pages/Authenticated/PostItemPage.vue';
+import SearchPage from '../pages/Authenticated/SearchPage.vue';
+import ProfilePage from '../pages/Authenticated/ProfilePage.vue';
 
 const isLoggedIn = useCookies.get('isLoggedIn');
 
@@ -59,7 +61,17 @@ const routes = [
   },
   {
     path: '/search',
-    component: Searchpage,
+    component: SearchPage,
+    protectedRoute: true,
+  },
+  {
+    path: '/post',
+    component: PostItemPage,
+    protectedRoute: true,
+  },
+  {
+    path: '/profile',
+    component: ProfilePage,
     protectedRoute: true,
   },
   {

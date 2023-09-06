@@ -1,38 +1,50 @@
 .sidebar{
-    background: #003D66;
-    color: #FFF;
-    border-radius: 0 20px 20px 0;
-
     .sidebar-menu{
-        color: #77a1be;
-    }
-    .sidebar-menu-active {
-        color: #EBEBEB;
-        position: relative;
-    
-        &::before {
-            content: '';
-            position: absolute;
-            background: #003D66;
-            width: 68px;
-            height: 68px;
-            border-radius: 0 50% 50% 0;
-            top: 50%;
-            left: -10px;
-            transform: translateY(-50%);
-            z-index: -1;
-            animation: fadeAnimation 0.2s ease-in-out;
-        }
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 34px;
     }
     
-    @keyframes fadeAnimation {
-        0% {
-            opacity: 0;
+    .sidebar-item{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+
+        svg{
+            color: #333D47;
+            width: 24px;
         }
-        100% {
-            opacity: 1;
+        span{
+            font-size: 16px;
+            color: #333D47;
         }
     }
-    
+
+    .sidebar-list{
+        width: 100%;
+        display: flex;
+        padding: 12px;
+        border-radius: 10px;
+        &:hover, &:active, &:focus{
+            background: #F2F8FB;
+            padding: 12px;
+            border-radius: 10px;
+        }
+    }
+    .sidebar-list-active{
+        background: #F2F8FB;
+        padding: 12px;
+        border-radius: 10px;
+    }
+    .sidebar-profile-action{
+
+        .chevron-right > svg{
+            color: #333D47;
+            width: 10px;
+        }
+    }
        
 }
