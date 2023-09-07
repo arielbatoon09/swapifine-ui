@@ -53,7 +53,6 @@ const handleLogout = async () => {
           <f7-link href="/search" :ignore-cache="true" class="hover:bg-gray-100 rounded-full"><f7-icon
               material="search"></f7-icon>
             </f7-link>
-          <!-- <f7-list-button class="list-none" @click="handleLogout">Logout</f7-list-button> -->
         </div>
       </header>
       <!-- Main-Content -->

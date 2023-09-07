@@ -1,5 +1,5 @@
 <script setup>
-import Mainlayout from '../../Layout/MainLayout.vue';
+import Mainlayout from '../../Layout/AuthenticatedLayout.vue';
 
 const currentPage = 'chat';
 </script>

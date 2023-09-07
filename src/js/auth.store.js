@@ -42,7 +42,7 @@ export const useAuthStore = defineStore('auth', {
                 });
 
                 await this.fetchUser();
-                useCookies.set('isLoggedIn', true);
+                useCookies.set('isLoggedIn', true, '0');
                 // Return response data
                 console.log(response.data);
                 return response.data;
@@ -61,7 +61,7 @@ export const useAuthStore = defineStore('auth', {
 
                 if (response.data.status === 'success') {
                     await this.fetchUser();
-                    useCookies.set('isLoggedIn', true);
+                    useCookies.set('isLoggedIn', true, '0');
                     f7.views.main.router.navigate('/home');
                 }
                 

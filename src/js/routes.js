@@ -2,7 +2,7 @@ import { useAuthStore } from '../js/auth.store';
 import useCookies from 'vue-cookies'
 import { f7 } from 'framework7-vue';
 // Onboarding Pages
-import WelcomePage from '../pages/welcome.vue';
+import WelcomePage from '../pages/WelcomePage.vue';
 import RegisterPage from '../pages/auth/signup.vue';
 import LoginPage from '../pages/auth/login.vue';
 import VerifyEmailPage from '../pages/auth/verify-email.vue';
