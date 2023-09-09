@@ -1,7 +1,9 @@
 <script setup>
-import { ref } from 'vue';
+import { f7 } from 'framework7-vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import AuthenticatedLayout from '../../Layout/AuthenticatedLayout.vue';
-import CategoryCarousel from '../../components/category-carousel.vue';
+import CategoryCarousel from '../../components/CategoryCarousel.vue';
 import PostIllustration from '../../assets/illustrations/post_illustration.svg';
 import MyLocationIllustration from '../../assets/illustrations/my_location_illustration.svg';
 import SampleProduct1 from '../../assets/products/sample1.png';
@@ -12,10 +14,26 @@ const currentPage = 'home';
 const isClicked = ref(false);
 
 const sampleData = ref([
-  '1', '2', '3', '4', '5',
-  '6', '7', '8'
+  '1', '2', '3', '4'
 ]);
 
+onMounted(async () => {
+    const response = await axios.get('/api/post/item');
+    console.log(response);
+});
+
+// Redirection to Post item Page
+const goToPostItem = () => {
+  if (window.innerWidth <= 1023) {
+    f7.views.main.router.navigate('/post/item', {
+      animate: true,
+    });
+  } else {
+    f7.views.main.router.navigate('/post/item', {
+      animate: false,
+    });
+  }
+};
 </script>
 
 <template>
@@ -28,7 +46,7 @@ const sampleData = ref([
       <!-- CTA: Post Item and Set Location -->
       <section class="flex flex-row flex-wrap lg:flex-nowrap gap-4 mb-4">
         <!-- Post Item CTA -->
-        <div
+        <div @click="goToPostItem"
           class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
           <img :src="PostIllustration" width="100" height="100">
           <div class="flex-1">
@@ -66,16 +84,17 @@ const sampleData = ref([
       </section>
       <!-- Recently viewed -->
       <section class="mb-6">
-        <h2 class="text-lg font-medium mb-2">Recently Viewed</h2>
+        <h2 class="text-xl font-medium mb-2">Recently Viewed</h2>
         <div class="border border-gray-300 rounded-lg px-6 py-8">
           You didn't check any items yet. Last few items you viewed will appear here...
         </div>
       </section>
       <!-- General Items 1 -->
       <section class="mb-6">
-        <h2 class="text-lg font-medium mb-2">Vehicles</h2>
+        <h2 class="cursor-pointer text-xl font-medium mb-2 hover:underline">Vehicles</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div v-for="(vehicle, index) in sampleData" :key="index" class="w-full cursor-pointer border border-gray-200 rounded-lg hover:shadow">
+          <div v-for="(vehicle, index) in sampleData" :key="index"
+            class="w-full border border-gray-200 rounded-lg hover:shadow">
             <!-- Post-Image-Slider -->
             <div class="w-full h-52 overflow-hidden rounded-t-lg">
               <swiper-container :pagination="true" class="demo-swiper-multiple" :space-between="0" :slides-per-view="1">
@@ -87,18 +106,17 @@ const sampleData = ref([
                 </swiper-slide>
               </swiper-container>
             </div>
-
             <!-- About Post Item -->
             <div class="item-post px-3 py-4">
-
               <!-- Profile -->
-              <div class="flex flex-row items-center gap-4">
+              <div class="flex flex-row items-center gap-2">
                 <div class="w-10 h-10 rounded-full overflow-hidden">
                   <img class="w-full h-full object-cover" :src="TestProfile" />
                 </div>
-
+                <!-- Post User Profile -->
                 <div class="profile">
-                  <p class="profile-name">Ariel Batoon</p>
+                  <p class="profile-name hover:underline">Ariel Batoon</p>
+                  <!-- Verified Indicator -->
                   <div class="flex flex-row items-center gap-1">
                     <span class="profile-verified-label">Verified</span>
                     <svg class="verified w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
@@ -111,12 +129,11 @@ const sampleData = ref([
                   </div>
                 </div>
               </div>
-
               <!-- Item Description -->
               <div class="post-description pt-4">
                 <!-- Item Title and React -->
                 <div class="flex items-center justify-between">
-                  <h3 class="text-lg">Ryzen 5 5600G</h3>
+                  <h3 class="cursor-pointer text-lg font-medium hover:underline">Ryzen 5 5600G with 24inch IPS</h3>
                   <!-- Add-To-Favorites -->
                   <svg v-if="!isClicked" @click="isClicked = true"
                     class="cursor-pointer w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
@@ -131,23 +148,53 @@ const sampleData = ref([
                       d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
                   </svg>
                 </div>
-                <!-- Address -->
+                <!-- Item Distance -->
                 <div class="flex items-center gap-1 mt-1">
                   <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
                     <path
                       d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                   </svg>
-                  <span>65 km away</span>
+                  <p class="text-clr-primary cursor-pointer hover:underline">65 km away</p>
                 </div>
-                <!-- Other Info -->
-                <div class="mt-2 pb-4">
-                  <span>Cebu City, Central Visayas</span>
+                <!-- Item Location -->
+                <div class="flex items-center gap-1 mt-2 pb-4">
+                  <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                    <path
+                      d="M7 0a7 7 0 0 0-1 13.92V19a1 1 0 1 0 2 0v-5.08A7 7 0 0 0 7 0Zm0 5.5A1.5 1.5 0 0 0 5.5 7a1 1 0 0 1-2 0A3.5 3.5 0 0 1 7 3.5a1 1 0 0 1 0 2Z" />
+                  </svg>
+                  <p>Cebu City, Central Visayas</p>
+                </div>
+                <!-- CTA View Item -->
+                <div class="cursor-pointer bg-blue-100 py-2 rounded-md text-center">
+                  <span class="text-blue-500">View Item</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- Advertising Slider -->
+      <section class="mb-12">
+        <swiper-container :pagination="true" :space-between="50" :speed="900">
+          <swiper-slide>
+            <div class="bg-gray-400 py-32 px-12">
+              Test
+            </div>
+          </swiper-slide>
+          <swiper-slide>
+            <div class="bg-red-400 py-32 px-12">
+              Test
+            </div>
+          </swiper-slide>
+          <swiper-slide>
+            <div class="bg-green-400 py-32 px-12">
+              Test
+            </div>
+          </swiper-slide>
+        </swiper-container>
       </section>
     </AuthenticatedLayout>
   </f7-page>

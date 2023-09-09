@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios';
-import { ref } from 'vue';
+import { f7 } from 'framework7-vue';
+import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
 import SwapifineLogo from '../../assets/swapifine-logo.png';
 import MailIllustration from '../../assets/mail_illustration.svg';
@@ -9,6 +10,19 @@ const authStore = useAuthStore();
 const isRequest = ref(false);
 const isLogoutRequest = ref(false);
 const showSentMessage = ref(false);
+
+// Render Data
+onMounted(async () => {
+    try {
+        await authStore.fetchUser();
+
+        if (authStore.user.email_verified_at) {
+            f7.views.main.router.navigate('/');
+        }
+    } catch (error) {
+        console.log("Error", error);
+    }
+});
 
 const handleEmailVerification = async () => {
     try {
@@ -57,10 +71,12 @@ const handleLogout = async () => {
                         link we just
                         emailed to you. If you didn't receive the email, we will gladly send you another.</p>
                 </div>
-                <f7-button preloader :loading="isRequest" @click="handleEmailVerification" large fill class="primary-button mt-6">
+                <f7-button preloader :loading="isRequest" @click="handleEmailVerification" large fill
+                    class="primary-button mt-6">
                     Resend Verification Email
                 </f7-button>
-                <f7-button preloader :loading="isLogoutRequest" @click="handleLogout" large class="mt-1 text-gray-700 hover:text-gray-600 hover:underline">Logout</f7-button>
+                <f7-button preloader :loading="isLogoutRequest" @click="handleLogout" large
+                    class="mt-1 text-gray-700 hover:text-gray-600 hover:underline">Logout</f7-button>
                 <p v-show="showSentMessage" class="mt-3 text-green-600">Sent another email verification link.</p>
                 <p class="text-gray-600 text-center mt-4">Please note that <b class="text-clr-primary">unverified
                         accounts</b> will be deleted within 30

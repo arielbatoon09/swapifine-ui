@@ -4,7 +4,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600;700&family=Poppins:wght@200;300;400;500;600;700;800&display=swap');
 
-*{
+* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -17,20 +17,40 @@ body {
     color: #333D47;
 }
 
+.h-600 {
+    @media only screen and (min-width: 1024px) {
+        height: 600px;
+    }
+
+}
+
+.item-input-outline .item-content .item-label,
+.item-input-outline.item-content .item-label,
+.input-outline .item-label,
+.item-input-outline .item-content .item-floating-label,
+.item-input-outline.item-content .item-floating-label,
+.input-outline .item-floating-label {
+    background: #FFF;
+    color: #333D47;
+}
+
 .wrapper-layout {
     background: #FFF;
 }
 
-.text-clr-primary{
+.text-clr-primary {
     color: #003D66;
 }
-.text-clr-secondary{
+
+.text-clr-secondary {
     color: #29ABE2;
 }
-.bg-clr-primary{
+
+.bg-clr-primary {
     background: #003D66;
 }
-.bg-clr-secondary{
+
+.bg-clr-secondary {
     background: #29ABE2;
 }
 
@@ -48,10 +68,12 @@ body {
     text-align: center;
     transition: all 0.2s ease-out;
 }
-.primary-button:hover{
+
+.primary-button:hover {
     background: #05446F;
     transition: all 0.2s ease-in;
 }
+
 .secondary-button {
     width: 100%;
     background: transparent;
@@ -65,20 +87,22 @@ body {
     cursor: pointer;
     text-align: center;
 }
-.profile-avatar{
+
+.profile-avatar {
     width: 42px;
     height: 42px;
     cursor: pointer;
     border-radius: 50%;
     transition: all 0.2s ease-out;
 }
-.profile-avatar:hover{
+
+.profile-avatar:hover {
     filter: contrast(80%);
     transition: all 0.2s ease-in;
 }
 
 // center toast
-@media (min-width: 1024px){
+@media (min-width: 1024px) {
     .md .toast.toast-horizontal-left {
         left: 50%;
         margin-left: calc(-1 * 300px / 2);

@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, defineProps } from 'vue';
 import { f7 } from 'framework7-vue';
 import { useAuthStore } from '../js/auth.store';
+import { onMounted, defineProps } from 'vue';
 import Header from '../components/Header.vue';
 import Footer from '../components/Footer.vue';
 
@@ -11,10 +11,13 @@ const props = defineProps({
   currentPage: String
 });
 
+
+
 // Render Data
 onMounted(async () => {
   try {
     await authStore.fetchUser();
+
     if (!authStore.isAuthenticated) {
       f7.views.main.router.navigate('/');
     }
@@ -23,18 +26,11 @@ onMounted(async () => {
       f7.views.main.router.navigate('/verify-email');
     }
 
+
   } catch (error) {
     console.log("Error", error);
   }
 });
-
-const handleLogout = async () => {
-  try {
-    await authStore.logout();
-  } catch (error) {
-    console.log("Error:", error);
-  }
-}
 </script>
 
 <template>

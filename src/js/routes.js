@@ -65,7 +65,7 @@ const routes = [
     protectedRoute: true,
   },
   {
-    path: '/post',
+    path: '/post/item',
     component: PostItemPage,
     protectedRoute: true,
   },

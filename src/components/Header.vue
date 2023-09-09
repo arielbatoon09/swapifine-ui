@@ -1,7 +1,26 @@
 <script setup>
+import { f7 } from 'framework7-vue';
+import { useAuthStore } from '../js/auth.store';
 import SwapifineLogo from '../assets/swapifine-logo-text.png';
 import TestProfile from '../assets/profile/test_profile.jpg';
 
+const authStore = useAuthStore();
+
+// Redirection to Home Page
+const goToHome = () => {
+  f7.views.main.router.navigate('/home', {
+    animate: false,
+  });
+};
+
+// Logout Trigger
+const handleLogout = async () => {
+  try {
+    await authStore.logout();
+  } catch (error) {
+    console.log("Error:", error);
+  }
+}
 </script>
 <template>
     <!-- Desktop Header -->
@@ -9,7 +28,7 @@ import TestProfile from '../assets/profile/test_profile.jpg';
         <div class="max-w-screen-2xl mx-auto flex flex-row justify-between items-center">
             <!-- Logo -->
             <div>
-                <a href="/"><img :src="SwapifineLogo" alt="..."></a>
+                <div @click="goToHome" class="cursor-pointer"><img :src="SwapifineLogo" alt="..."></div>
             </div>
             <!-- Global Search -->
             <div class="w-1/2 mx-8 relative flex">
@@ -111,7 +130,7 @@ import TestProfile from '../assets/profile/test_profile.jpg';
                     </svg>
                 </div>
                 <!-- Hamburger -->
-                <div class="cursor-pointer hover:bg-gray-100 active:bg-gray-100 focus:bg-gray-100 p-2 rounded-full">
+                <div @click="handleLogout" class="cursor-pointer hover:bg-gray-100 active:bg-gray-100 focus:bg-gray-100 p-2 rounded-full">
                     <svg class="w-[24px] h-[24px] text-gray-800 dark:text-white" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
