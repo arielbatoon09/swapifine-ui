@@ -17,11 +17,6 @@ const sampleData = ref([
   '1', '2', '3', '4'
 ]);
 
-onMounted(async () => {
-    const response = await axios.get('/api/post/item');
-    console.log(response);
-});
-
 // Redirection to Post item Page
 const goToPostItem = () => {
   if (window.innerWidth <= 1023) {
@@ -67,7 +62,7 @@ const goToPostItem = () => {
           <img :src="MyLocationIllustration" width="100" height="100">
           <div class="flex-1">
             <h4 class="font-bold text-xl">Set Location</h4>
-            <p class="text-lg mt-1">To check the distance between items!</p>
+            <p class="text-lg mt-1">To check your distance between items!</p>
           </div>
           <div class="hidden lg:block">
             <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"

@@ -1,10 +1,39 @@
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
+import { usePostStore } from '../../js/post.store';
 import SubAuthenticatedLayout from '../../Layout/SubAuthenticatedLayout.vue';
 
+const postStore = usePostStore();
 const selectedImages = ref([]);
 const fileInput = ref(null);
 const selectedImagesCount = ref(0);
+
+const form = ref({
+  category_id: 2,
+  location_id: 1,
+  item_name: '',
+  item_description: '',
+  item_price: '',
+  item_quantity: '',
+  condition: '',
+  item_for_type: '',
+  delivery_type: '',
+  payment_type: '',
+
+});
+
+const handlePostItem = async () => {
+  try {
+
+    const { category_id, location_id,  item_name, item_description, item_price, item_quantity, condition, item_for_type, delivery_type, payment_type } = form.value;
+    const response = await postStore.postNewItem(category_id, location_id,  item_name, item_description, item_price, item_quantity, condition, item_for_type, delivery_type, payment_type);
+
+    console.log(response);
+
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
 
 const handleImageChange = (event) => {
   const files = Array.from(event.target.files);
@@ -33,6 +62,7 @@ const removeImage = (index) => {
 const uploadImages = () => {
   // Handle image upload logic here
 };
+
 </script>
 
 <template>
@@ -123,9 +153,10 @@ const uploadImages = () => {
                   <p class="text-gray-600">Be as descriptive as possible.</p>
                 </f7-block>
                 <f7-list>
-                  <f7-list-input outline label="Title" floating-label type="text" clear-button></f7-list-input>
-                  <f7-list-input outline label="Description" floating-label type="textarea" clear-button></f7-list-input>
-                  <f7-list-input outline label="Cash Value" floating-label type="text" clear-button></f7-list-input>
+                  <f7-list-input v-model:value="form.item_name" outline label="Item Name" floating-label type="text" clear-button></f7-list-input>
+                  <f7-list-input v-model:value="form.item_description" outline label="Description" floating-label type="textarea" clear-button></f7-list-input>
+                  <f7-list-input v-model:value="form.item_price" outline label="₱ Cash Value" floating-label type="text" clear-button></f7-list-input>
+                  <f7-list-input v-model:value="form.item_quantity" outline label="Quantity" floating-label type="text" clear-button></f7-list-input>
                 </f7-list>
                 <!-- Next Step -->
                 <f7-block class="flex gap-4 step-cta">
@@ -149,22 +180,23 @@ const uploadImages = () => {
                     <option value="Male">Tools</option>
                     <option value="Female">Furniture</option>
                   </f7-list-input>
-                  <f7-list-input outline label="Conditions" floating-label type="select">
-                    <option value="Male">Tools</option>
-                    <option value="Female">Furniture</option>
+                  <f7-list-input v-model:value="form.condition" outline label="Condition" floating-label type="select">
+                    <option value="New">New</option>
+                    <option value="Old">Old</option>
                   </f7-list-input>
-                  <f7-list-input outline label="Item for" floating-label type="select">
-                    <option value="Male">For Sale</option>
-                    <option value="Female">For Swap</option>
+                  <f7-list-input v-model:value="form.item_for_type" outline label="Item for" floating-label type="select">
+                    <option value="For Sale">For Sale</option>
+                    <option value="For Swap">For Swap</option>
                   </f7-list-input>
-                  <f7-list-input outline label="Delivery Preference" floating-label type="select">
-                    <option value="Male">Person-To-Person</option>
-                    <option value="Female">Book Delivery</option>
+                  <f7-list-input v-model:value="form.delivery_type" outline label="Delivery Preference" floating-label type="select">
+                    <option value="Person-To-Person">Person-To-Person</option>
+                    <option value="Book Delivery">Book Delivery</option>
                   </f7-list-input>
-                  <f7-list-input outline label="Payment Method" floating-label type="select">
-                    <option value="Male">Credits</option>
-                    <option value="Male">GCash</option>
-                    <option value="Female">COD</option>
+                  <f7-list-input v-model:value="form.payment_type" outline label="Payment Method" floating-label type="select">
+                    <option value="Credits">Credits (Swapifine Money)</option>
+                    <option value="COD">COD (Cash on Delivery)</option>
+                    <option value="E-Wallet">E-Wallet (Gcash, Paymaya, Etc.)</option>
+
                   </f7-list-input>
                 </f7-list>
                 <!-- Next Step -->
@@ -174,7 +206,7 @@ const uploadImages = () => {
                   </f7-link>
                   <!-- Publish Button -->
                   <f7-link>
-                    <f7-button large fill class="primary-button">Publish</f7-button>
+                    <f7-button @click="handlePostItem" large fill class="primary-button">Publish</f7-button>
                   </f7-link>
                 </f7-block>
               </f7-tab>

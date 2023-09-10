@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
+import { f7 } from 'framework7-vue';
 import useCookies from 'vue-cookies'
 import axios from 'axios';
-import { f7 } from 'framework7-vue';
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
