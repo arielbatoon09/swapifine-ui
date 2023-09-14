@@ -2,13 +2,11 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import TestProfile from '../assets/icon-test.svg';
 
+const slidesPerView = ref(4); // Default for Desktop
 const slides = ref([
-  'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
+  'All', 'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
   'Free Stuff', 'Instruments', 'Hobbies', 'Office Supplies', 'Pet Supplies'
 ]);
-
-// Define the initial slidesPerView value based on screen size
-let slidesPerView = ref(4); // Default for Desktop
 
 const updateSlidesPerView = () => {
   if (window.innerWidth <= 767) {

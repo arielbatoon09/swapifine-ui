@@ -13,17 +13,8 @@ import 'framework7/css/bundle';
 // Import Axios
 import './axios';
 
-// Import Icons and App Custom Styles
-import '../css/icons.css';
-import '../css/app.scss';
-import '../css/welcome.scss';
-import '../css/auth.scss';
-
-// Styling for User Homepage
-import '../css/sidebar.scss';
-import '../css/header.scss';
-import '../css/footer.scss';
-import '../css/homepage.scss';
+// Styling
+import '../css/main.scss';
 
 // Import App Component
 import App from '../components/app.vue';

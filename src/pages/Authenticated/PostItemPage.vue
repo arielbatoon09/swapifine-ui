@@ -44,7 +44,7 @@ const handlePostItem = async () => {
 
     // Get Value of form data
     const { category_id, location_id, item_name, item_description, item_price, item_quantity, condition,
-      item_for_type, delivery_type, payment_type, img_file_path } = form.value;
+      item_for_type, delivery_type, payment_type } = form.value;
 
     // Create an array to store file data
     const files = [];
@@ -66,9 +66,6 @@ const handlePostItem = async () => {
     const response = await postStore.postNewItem(category_id, location_id, item_name, item_description,
       item_price, item_quantity, condition, item_for_type, delivery_type, payment_type, files);
 
-    // const response = await postStore.postNewItem(category_id, location_id, item_name, item_description,
-    // item_price, item_quantity, condition, item_for_type, delivery_type, payment_type, img_file_path.map(file => file.name));
-
     // Cancel loading state if the response is true
     if (response) {
       isRequest.value = false;
@@ -76,6 +73,17 @@ const handlePostItem = async () => {
 
     // Success State
     if (response.status == 'success') {
+      form.value.category_id = null;
+      form.value.location_id = null;
+      form.value.item_name = null;
+      form.value.item_description = null;
+      form.value.item_price = null;
+      form.value.item_quantity = null;
+      form.value.condition = null;
+      form.value.item_for_type = null;
+      form.value.delivery_type = null;
+      form.value.payment_type = null;
+      form.value.files = null;
 
       // Show the toast
       if (!toastWithButton.value) {
@@ -93,7 +101,7 @@ const handlePostItem = async () => {
       toastWithButton.value.open();
 
       // Redirect the user to Login page
-      // f7.views.main.router.navigate('/');
+      f7.views.main.router.navigate('/');
     }
 
     console.log(response);
@@ -128,6 +136,7 @@ const handleImageChange = (event) => {
 const removeImage = (index) => {
   // Remove the selected image from the array
   selectedImages.value.splice(index, 1);
+  form.img_file_path.splice(index, 1);
   selectedImagesCount.value = selectedImages.value.length;
 };
 </script>
