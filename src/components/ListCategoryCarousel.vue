@@ -4,7 +4,7 @@ import TestProfile from '../assets/icon-test.svg';
 
 const slidesPerView = ref(4); // Default for Desktop
 const slides = ref([
-  'All', 'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
+  'View All', 'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
   'Free Stuff', 'Instruments', 'Hobbies', 'Office Supplies', 'Pet Supplies'
 ]);
 

@@ -1,7 +1,7 @@
 <script setup>
 import { f7 } from 'framework7-vue';
 import AuthenticatedLayout from '../../Layout/AuthenticatedLayout.vue';
-import CategoryCarousel from '../../components/CategoryCarousel.vue';
+import ListCategoryCarousel from '../../components/ListCategoryCarousel.vue';
 import CategoryPostCarousel from '../../components/CategoryPostCarousel.vue';
 import PostIllustration from '../../assets/illustrations/post_illustration.svg';
 import MyLocationIllustration from '../../assets/illustrations/my_location_illustration.svg';
@@ -29,9 +29,9 @@ const goToPostItem = () => {
       <section class="mt-12 mb-8">
         <h2 class="text-3xl font-semibold">Nice to see you, Ariel 👋</h2>
       </section>
-      <!-- CTA: Post Item and Set Location -->
+      <!-- Start - CTA: Post Item and Set Location -->
       <section class="flex flex-row flex-wrap lg:flex-nowrap gap-4 mb-4">
-        <!-- Post Item CTA -->
+        <!-- Start - Post Item CTA -->
         <div @click="goToPostItem"
           class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
           <img :src="PostIllustration" width="100" height="100">
@@ -47,7 +47,8 @@ const goToPostItem = () => {
             </svg>
           </div>
         </div>
-        <!-- Set Location CTA -->
+
+        <!-- Start - Set Location CTA -->
         <div
           class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
           <img :src="MyLocationIllustration" width="100" height="100">
@@ -64,26 +65,28 @@ const goToPostItem = () => {
           </div>
         </div>
       </section>
-      <!-- Categories -->
+      <!-- End - CTA: Post Item and Set Location -->
+
+      <!-- Start - List of Categories -->
       <section class="mb-12">
-        <CategoryCarousel />
+        <ListCategoryCarousel />
       </section>
-      <!-- Recently viewed -->
+      <!-- End - List of Categories -->
+
+      <!-- Start - Recently viewed -->
       <section class="mb-6">
         <h2 class="text-xl font-medium mb-2">Recently Viewed</h2>
         <div class="border border-gray-300 rounded-lg px-6 py-8">
           You didn't check any items yet. Last few items you viewed will appear here...
         </div>
       </section>
-      <!-- Top Category and Items -->
-      <section class="mb-6">
-        <div class="w-24">
-          <h2 class="cursor-pointer text-xl font-medium mb-2 hover:underline">Vehicles</h2>
-        </div>
-        <CategoryPostCarousel />
-      </section>
+      <!-- End - Recently viewed -->
 
-      <!-- Advertising Slider -->
+      <!-- Start - Top Category and Items -->
+      <CategoryPostCarousel />
+      <!-- End - Top Category and Items -->
+
+      <!-- Start - Advertising Carousel -->
       <section class="mb-12">
         <swiper-container :pagination="true" :space-between="50" :speed="900">
           <swiper-slide>
@@ -103,6 +106,7 @@ const goToPostItem = () => {
           </swiper-slide>
         </swiper-container>
       </section>
+      <!-- End - Advertising Carousel -->
     </AuthenticatedLayout>
   </f7-page>
 </template>
