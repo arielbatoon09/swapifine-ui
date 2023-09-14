@@ -1,15 +1,19 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { f7 } from 'framework7-vue';
 import { usePostStore } from '../../js/post.store';
 import SubAuthenticatedLayout from '../../Layout/SubAuthenticatedLayout.vue';
 
 const postStore = usePostStore();
 const selectedImages = ref([]);
-const fileInput = ref(null);
 const selectedImagesCount = ref(0);
+const fileInput = ref(null);
+const toastWithButton = ref(null);
+const isRequest = ref(false);
+const categories = ref([]);
 
 const form = ref({
-  category_id: 2,
+  category_id: null,
   location_id: 1,
   item_name: '',
   item_description: '',
@@ -19,14 +23,78 @@ const form = ref({
   item_for_type: '',
   delivery_type: '',
   payment_type: '',
+  img_file_path: [],
 
+});
+
+onMounted(async () => {
+  try {
+    // Assign Category list data to categories variable
+    categories.value = await postStore.getCategoryList();
+
+  } catch (error) {
+
+  }
 });
 
 const handlePostItem = async () => {
   try {
+    // Init Loading Request
+    isRequest.value = true;
 
-    const { category_id, location_id,  item_name, item_description, item_price, item_quantity, condition, item_for_type, delivery_type, payment_type } = form.value;
-    const response = await postStore.postNewItem(category_id, location_id,  item_name, item_description, item_price, item_quantity, condition, item_for_type, delivery_type, payment_type);
+    // Get Value of form data
+    const { category_id, location_id, item_name, item_description, item_price, item_quantity, condition,
+      item_for_type, delivery_type, payment_type, img_file_path } = form.value;
+
+    // Create an array to store file data
+    const files = [];
+
+    // Convert File objects to base64 encoded strings
+    for (const file of form.img_file_path) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      await new Promise((resolve) => {
+        reader.onload = (e) => {
+          files.push({ name: file.name, data: e.target.result });
+          resolve();
+        };
+      });
+    }
+
+    // Distribute data to postNewItem store
+    const response = await postStore.postNewItem(category_id, location_id, item_name, item_description,
+      item_price, item_quantity, condition, item_for_type, delivery_type, payment_type, files);
+
+    // const response = await postStore.postNewItem(category_id, location_id, item_name, item_description,
+    // item_price, item_quantity, condition, item_for_type, delivery_type, payment_type, img_file_path.map(file => file.name));
+
+    // Cancel loading state if the response is true
+    if (response) {
+      isRequest.value = false;
+    }
+
+    // Success State
+    if (response.status == 'success') {
+
+      // Show the toast
+      if (!toastWithButton.value) {
+        toastWithButton.value = f7.toast.create({
+          text: 'Posted item successfully!',
+          position: 'top',
+          closeButton: true,
+          closeButtonText: 'Okay',
+          closeButtonColor: 'green',
+          closeTimeout: 3000,
+        });
+      }
+
+      // Open the toast
+      toastWithButton.value.open();
+
+      // Redirect the user to Login page
+      // f7.views.main.router.navigate('/');
+    }
 
     console.log(response);
 
@@ -42,7 +110,10 @@ const handleImageChange = (event) => {
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   const selectedFiles = files.filter((file) => allowedTypes.includes(file.type));
 
-  // Display selected images in real-time as Base64 data URLs
+  // Set the value to form.img_file_path
+  form.img_file_path = files;
+
+  // Display selected images
   selectedFiles.forEach((file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -51,6 +122,7 @@ const handleImageChange = (event) => {
     };
     reader.readAsDataURL(file);
   });
+
 };
 
 const removeImage = (index) => {
@@ -58,11 +130,6 @@ const removeImage = (index) => {
   selectedImages.value.splice(index, 1);
   selectedImagesCount.value = selectedImages.value.length;
 };
-
-const uploadImages = () => {
-  // Handle image upload logic here
-};
-
 </script>
 
 <template>
@@ -94,7 +161,7 @@ const uploadImages = () => {
                   <h2 class="text-xl font-medium">Add Item Images</h2>
                   <p class="text-gray-600">Photos · {{ selectedImagesCount }} / 10</p>
                   <!-- Conditionally render the uploaded images or the upload container -->
-                  <swiper-container v-if="selectedImagesCount > 0" :pagination="true" class="w-full h-auto mt-4"
+                  <swiper-container v-if="selectedImagesCount > 0" :pagination="true" class="w-full h-72 mt-4"
                     :space-between="50" :key="selectedImagesCount">
                     <swiper-slide v-for="(image, index) in selectedImages" :key="index"
                       class="flex items-center justify-center bg-gray-200 relative-group">
@@ -132,7 +199,10 @@ const uploadImages = () => {
                     </label>
                     <!-- Wrap the file input in a div -->
                     <div style="display: none;">
-                      <input type="file" id="images" name="images[]" multiple accept="image/*" ref="fileInput"
+                      <!-- <input type="file" id="images" name="images[]" multiple accept="image/*" ref="fileInput"
+                        @change="handleImageChange" />
+                    </div> -->
+                      <input type="file" id="images" name="images[]" multiple ref="fileInput"
                         @change="handleImageChange" />
                     </div>
                   </div>
@@ -153,10 +223,14 @@ const uploadImages = () => {
                   <p class="text-gray-600">Be as descriptive as possible.</p>
                 </f7-block>
                 <f7-list>
-                  <f7-list-input v-model:value="form.item_name" outline label="Item Name" floating-label type="text" clear-button></f7-list-input>
-                  <f7-list-input v-model:value="form.item_description" outline label="Description" floating-label type="textarea" clear-button></f7-list-input>
-                  <f7-list-input v-model:value="form.item_price" outline label="₱ Cash Value" floating-label type="text" clear-button></f7-list-input>
-                  <f7-list-input v-model:value="form.item_quantity" outline label="Quantity" floating-label type="text" clear-button></f7-list-input>
+                  <f7-list-input v-model:value="form.item_name" outline label="Item Name" floating-label type="text"
+                    clear-button></f7-list-input>
+                  <f7-list-input v-model:value="form.item_description" outline label="Description" floating-label
+                    type="textarea" clear-button></f7-list-input>
+                  <f7-list-input v-model:value="form.item_price" outline label="₱ Cash Value" floating-label type="text"
+                    clear-button></f7-list-input>
+                  <f7-list-input v-model:value="form.item_quantity" outline label="Quantity" floating-label type="text"
+                    clear-button></f7-list-input>
                 </f7-list>
                 <!-- Next Step -->
                 <f7-block class="flex gap-4 step-cta">
@@ -176,9 +250,9 @@ const uploadImages = () => {
                   <p class="text-gray-600">Attract more interest by including more details.</p>
                 </f7-block>
                 <f7-list>
-                  <f7-list-input outline label="Category" floating-label type="select">
-                    <option value="Male">Tools</option>
-                    <option value="Female">Furniture</option>
+                  <f7-list-input v-model:value="form.category_id" outline label="Category" floating-label type="select">
+                    <option v-for="category in categories" :value="category.id" :key="category.id">{{
+                      category.category_name }}</option>
                   </f7-list-input>
                   <f7-list-input v-model:value="form.condition" outline label="Condition" floating-label type="select">
                     <option value="New">New</option>
@@ -188,11 +262,13 @@ const uploadImages = () => {
                     <option value="For Sale">For Sale</option>
                     <option value="For Swap">For Swap</option>
                   </f7-list-input>
-                  <f7-list-input v-model:value="form.delivery_type" outline label="Delivery Preference" floating-label type="select">
+                  <f7-list-input v-model:value="form.delivery_type" outline label="Delivery Preference" floating-label
+                    type="select">
                     <option value="Person-To-Person">Person-To-Person</option>
                     <option value="Book Delivery">Book Delivery</option>
                   </f7-list-input>
-                  <f7-list-input v-model:value="form.payment_type" outline label="Payment Method" floating-label type="select">
+                  <f7-list-input v-model:value="form.payment_type" outline label="Payment Method" floating-label
+                    type="select">
                     <option value="Credits">Credits (Swapifine Money)</option>
                     <option value="COD">COD (Cash on Delivery)</option>
                     <option value="E-Wallet">E-Wallet (Gcash, Paymaya, Etc.)</option>
@@ -206,7 +282,8 @@ const uploadImages = () => {
                   </f7-link>
                   <!-- Publish Button -->
                   <f7-link>
-                    <f7-button @click="handlePostItem" large fill class="primary-button">Publish</f7-button>
+                    <f7-button preloader :loading="isRequest" @click="handlePostItem" large fill
+                      class="primary-button">Publish</f7-button>
                   </f7-link>
                 </f7-block>
               </f7-tab>

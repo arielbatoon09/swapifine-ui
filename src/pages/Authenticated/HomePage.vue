@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import axios from 'axios';
 import AuthenticatedLayout from '../../Layout/AuthenticatedLayout.vue';
 import CategoryCarousel from '../../components/CategoryCarousel.vue';

@@ -62,7 +62,7 @@ const handleLogout = async () => {
         <div class="bg-gray-100 flex flex-col justify-center items-center min-h-screen">
             <img :src="SwapifineLogo" alt="Swapifine Logo" width="82" class="mb-6">
             <div
-                class="bg-white rounded-lg shadow-md p-8 w-full w-full md:w-1/2 lg:w-1/4 flex flex-col justify-center items-center">
+                class="bg-white rounded-lg shadow-md p-8 w-full md:w-1/2 lg:w-1/3 flex flex-col justify-center items-center">
                 <img :src="MailIllustration" class="mb-6" width="72">
                 <div class="text-center">
                     <h1 class="text-2xl font-semibold text-gray-800 mb-4">Verify Your Email Address</h1>

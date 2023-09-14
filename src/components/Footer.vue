@@ -15,4 +15,5 @@ import SwapifineLogo from '../assets/swapifine-logo-text.png';
       </div>
     </div>
   </footer>
+
 </template>

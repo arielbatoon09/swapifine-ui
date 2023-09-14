@@ -38,7 +38,7 @@ onMounted(async () => {
     <!-- Header Container -->
     <Header />
     <!-- Main Container -->
-    <main class="max-w-screen-2xl mx-auto px-2 mt-24 lg:mt-32">
+    <main class="max-w-screen-2xl mx-auto px-4 mt-24 lg:mt-32">
       <!-- Main Content -->
       <slot />
     </main>
