@@ -22,6 +22,15 @@ export const usePostStore = defineStore('post', {
                 console.error(error);
             }
         },
+        async GetAllPostItem() {
+            try {
+                const response = await axios.get('/api/browse');
+                return response.data;
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
         async postNewItem(category_id, location_id,  item_name, item_description, item_price, 
             item_quantity, condition, item_for_type, delivery_type, payment_type, img_file_path) {
             try {

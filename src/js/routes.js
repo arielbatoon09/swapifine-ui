@@ -13,6 +13,7 @@ import ChatPage from '../pages/Authenticated/ChatPage.vue';
 import NotificationPage from '../pages/Authenticated/NotificationPage.vue';
 import StorePage from '../pages/Authenticated/StorePage.vue';
 import PostItemPage from '../pages/Authenticated/PostItemPage.vue';
+import BrowseItemPage from '../pages/Authenticated/BrowsePostPage.vue';
 import SearchPage from '../pages/Authenticated/SearchPage.vue';
 import ProfilePage from '../pages/Authenticated/ProfilePage.vue';
 
@@ -67,6 +68,11 @@ const routes = [
   {
     path: '/post/item',
     component: PostItemPage,
+    protectedRoute: true,
+  },
+  {
+    path: '/browse',
+    component: BrowseItemPage,
     protectedRoute: true,
   },
   {

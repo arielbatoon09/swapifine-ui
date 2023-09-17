@@ -1,10 +1,11 @@
 <script setup>
+import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import TestProfile from '../assets/icon-test.svg';
+import TestIcon from '../assets/icon-test.svg';
 
-const slidesPerView = ref(4); // Default for Desktop
+const slidesPerView = ref(4);
 const slides = ref([
-  'View All', 'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
+  'All List', 'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
   'Free Stuff', 'Instruments', 'Hobbies', 'Office Supplies', 'Pet Supplies'
 ]);
 
@@ -35,6 +36,19 @@ onBeforeUnmount(() => {
   }
 });
 
+// Redirection to Post item Page
+const goToBrowse = () => {
+  if (window.innerWidth <= 1023) {
+    f7.views.main.router.navigate('/browse', {
+      animate: true,
+    });
+  } else {
+    f7.views.main.router.navigate('/browse', {
+      animate: false,
+    });
+  }
+};
+
 </script>
 <template>
   <!-- Categories -->
@@ -55,10 +69,10 @@ onBeforeUnmount(() => {
     </div>
     <!-- Slider Item Categories -->
     <swiper-container class="space-x-4 mt-5" :slides-per-view="slidesPerView">
-      <swiper-slide v-for="(slide, index) in slides" :key="index"
+      <swiper-slide @click="goToBrowse" v-for="(slide, index) in slides" :key="index"
         class="cursor-pointer border border-gray-200 rounded-lg px-4 py-6 w-full md:w-1/2 lg:w-1/4 shadow hover:border-gray-700">
         <div class="flex flex-row items-center gap-4">
-          <img class="bg-blue-200 p-2 rounded-md" :src="TestProfile">
+          <img class="bg-blue-200 p-2 rounded-md" :src="TestIcon">
           <span class="font-medium text-lg">{{ slide }}</span>
         </div>
       </swiper-slide>

@@ -11,12 +11,6 @@ const sampleData = ref([
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'
 ]);
 
-const goToNextSlide = () => {
-  if (swiper) {
-    swiper.slideNext(); // Use the swiper variable to navigate to the next slide
-  }
-};
-
 const updateSlidesPerView = () => {
     if (window.innerWidth <= 767) {
         slidesPerView.value = 1; // Mobile
@@ -52,7 +46,7 @@ onBeforeUnmount(() => {
             <h2 class="cursor-pointer text-xl font-medium mb-2 hover:underline">Vehicles</h2>
         </div>
         <swiper-container :pagination="false" :allowTouchMove="false" :navigation="true" :space-between="18"
-            :slides-per-view="slidesPerView" >
+            :slides-per-view="slidesPerView">
             <swiper-slide v-for="(vehicle, index) in sampleData" :key="index"
                 class="w-full border border-gray-200 rounded-lg hover:shadow">
                 <!-- Post-Image-Slider -->
@@ -98,17 +92,16 @@ onBeforeUnmount(() => {
                             </h3>
                             <!-- Add-To-Favorites -->
                             <svg v-if="!isClicked" @click="isClicked = true"
-                                class="cursor-pointer w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 20">
+                                class="cursor-pointer w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                <path
+                                    d="M17.947 2.053a5.209 5.209 0 0 0-3.793-1.53A6.414 6.414 0 0 0 10 2.311 6.482 6.482 0 0 0 5.824.5a5.2 5.2 0 0 0-3.8 1.521c-1.915 1.916-2.315 5.392.625 8.333l7 7a.5.5 0 0 0 .708 0l7-7a6.6 6.6 0 0 0 2.123-4.508 5.179 5.179 0 0 0-1.533-3.793Z" />
+                            </svg>
+                            <svg v-else @click="isClicked = false" class="cursor-pointer w-[24px] h-[24px] text-clr-primary"
+                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="1.5"
-                                    d="m11.479 1.712 2.367 4.8a.532.532 0 0 0 .4.292l5.294.769a.534.534 0 0 1 .3.91l-3.83 3.735a.534.534 0 0 0-.154.473l.9 5.272a.535.535 0 0 1-.775.563l-4.734-2.49a.536.536 0 0 0-.5 0l-4.73 2.487a.534.534 0 0 1-.775-.563l.9-5.272a.534.534 0 0 0-.154-.473L2.158 8.48a.534.534 0 0 1 .3-.911l5.294-.77a.532.532 0 0 0 .4-.292l2.367-4.8a.534.534 0 0 1 .96.004Z" />
-                            </svg>
-                            <svg v-else @click="isClicked = false"
-                                class="cursor-pointer w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path
-                                    d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                                    d="M11 4C5.5-1.5-1.5 5.5 4 11l7 7 7-7c5.458-5.458-1.542-12.458-7-7Z" />
                             </svg>
                         </div>
                         <!-- Item Distance -->
@@ -137,27 +130,27 @@ onBeforeUnmount(() => {
                 </div>
             </swiper-slide>
         </swiper-container>
-</section>
+    </section>
 </template>
 
 <style scoped>
 /* Custom styles for navigation buttons */
 .swiper-button-next,
 .swiper-button-prev {
-  width: 32px;
-  height: 32px;
-  background: #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 0.5rem 1rem rgba(16, 28, 38, 0.05);
-  color: #000000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0.5rem 1rem rgba(16, 28, 38, 0.05);
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Custom styles for navigation button icons */
 .swiper-button-next svg,
 .swiper-button-prev svg {
-  width: 20%;
+    width: 20%;
 }
 </style>

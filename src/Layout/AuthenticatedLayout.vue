@@ -1,7 +1,7 @@
 <script setup>
 import { f7 } from 'framework7-vue';
 import { useAuthStore } from '../js/auth.store';
-import { onMounted, defineProps } from 'vue';
+import { onMounted } from 'vue';
 import Header from '../components/Header.vue';
 import Footer from '../components/Footer.vue';
 
