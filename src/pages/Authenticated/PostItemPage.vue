@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { f7 } from 'framework7-vue';
 import { usePostStore } from '../../js/post.store';
-import SubAuthenticatedLayout from '../../Layout/SubAuthenticatedLayout.vue';
+import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 
 const postStore = usePostStore();
 const selectedImages = ref([]);
@@ -143,7 +143,7 @@ const removeImage = (index) => {
 
 <template>
   <f7-page class="post-container">
-    <SubAuthenticatedLayout>
+    <SecondaryLayout>
       <!-- Header -->
       <template v-slot:header-title>
         <h1 class="font-semibold text-lg">Post new item</h1>
@@ -300,7 +300,7 @@ const removeImage = (index) => {
           </div>
         </div>
       </div>
-    </SubAuthenticatedLayout>
+    </SecondaryLayout>
   </f7-page>
 </template>
 

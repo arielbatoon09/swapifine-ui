@@ -1,12 +1,12 @@
 <script setup>
-import Mainlayout from '../../Layout/AuthenticatedLayout.vue';
+import PrimaryLayout from '../../Layout/PrimaryLayout.vue';
 const currentPage = 'profile';
 
 </script>
 <template>
   <f7-page>
-    <Mainlayout :currentPage="currentPage">
+    <PrimaryLayout :currentPage="currentPage">
       Profile Centre
-    </Mainlayout>
+    </PrimaryLayout>
   </f7-page>
 </template>

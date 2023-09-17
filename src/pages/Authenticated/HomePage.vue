@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import AuthenticatedLayout from '../../Layout/AuthenticatedLayout.vue';
+import PrimaryLayout from '../../Layout/PrimaryLayout.vue';
 import ListCategoryCarousel from '../../components/ListCategoryCarousel.vue';
 import CategoryPostCarousel from '../../components/CategoryPostCarousel.vue';
 import PostIllustration from '../../assets/illustrations/post_illustration.svg';
@@ -24,7 +24,7 @@ const goToPostItem = () => {
 
 <template>
   <f7-page class="homepage-container">
-    <AuthenticatedLayout :currentPage="currentPage" class="pb-12">
+    <PrimaryLayout :currentPage="currentPage" class="pb-12">
       <!-- Welcome Message -->
       <section class="mt-12 mb-8">
         <h2 class="text-3xl font-semibold">Nice to see you, Ariel 👋</h2>
@@ -107,7 +107,7 @@ const goToPostItem = () => {
         </swiper-container>
       </section>
       <!-- End - Advertising Carousel -->
-    </AuthenticatedLayout>
+    </PrimaryLayout>
   </f7-page>
 </template>
 

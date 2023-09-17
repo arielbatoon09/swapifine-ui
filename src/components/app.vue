@@ -23,10 +23,10 @@ export default {
       colors: {
         primary: '#29abe2',
       },
-      // view: {
-      //     browserHistory: true,
-      //     browserHistorySeparator: '',
-      // },
+      view: {
+          browserHistory: true,
+          browserHistorySeparator: '',
+      },
 
       store: store,
       routes: routes,

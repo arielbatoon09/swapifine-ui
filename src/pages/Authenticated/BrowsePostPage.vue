@@ -1,10 +1,8 @@
 <script setup>
+import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { usePostStore } from '../../js/post.store';
-import { f7 } from 'framework7-vue';
-import SubAuthenticatedLayout from '../../Layout/SubAuthenticatedLayout.vue';
-import SampleProduct1 from '../../assets/products/sample1.png';
-import SampleProduct2 from '../../assets/products/sample2.jpg';
+import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 import TestIcon from '../../assets/icon-test.svg';
 
@@ -12,7 +10,8 @@ const currentPage = 'browse';
 const postStore = usePostStore();
 const isClicked = ref(false);
 const postData = ref([]);
-const slidesPerView = ref(8);
+const slidesPerView = ref(6);
+const isLoadingItem = ref(false);
 let resizeListener = null;
 
 const slides = ref([
@@ -30,11 +29,28 @@ const updateSlidesPerView = () => {
     }
 };
 
+// Redirection to View item Details Page
+const goToPostDetails = async (id) => {
+    if (window.innerWidth <= 1023) {
+    f7.views.main.router.navigate(`/view/item/${id}`, {
+      animate: true,
+    });
+  } else {
+    f7.views.main.router.navigate(`/view/item/${id}`, {
+      animate: false,
+    });
+  }
+}
+
 onMounted(async () => {
-    // Get All the Post
+    // Init Preloader
+    isLoadingItem.value = true;
+    // Get All Posted Items
     const response = await postStore.GetAllPostItem();
     postData.value = response.data;
     console.log(postData.value);
+    // Cancel Preloader state
+    isLoadingItem.value = false;
 
     updateSlidesPerView();
     resizeListener = window.addEventListener('resize', updateSlidesPerView);
@@ -50,7 +66,7 @@ onBeforeUnmount(() => {
 
 <template>
     <f7-page class="browse-container">
-        <SubAuthenticatedLayout :currentPage="currentPage">
+        <SecondaryLayout :currentPage="currentPage">
             <!-- Header -->
             <template v-slot:header-title>
                 <h1 class="font-semibold text-lg">Browse Items</h1>
@@ -110,8 +126,9 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
             </div>
+
             <!-- Item Lists -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 mb-12">
+            <div v-if="!isLoadingItem" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 mb-12">
                 <div v-for="post in postData" class="w-full border border-gray-200 rounded-lg hover:shadow">
                     <!-- Post-Image-Slider -->
                     <div class="w-full h-52 overflow-hidden rounded-t-lg">
@@ -149,7 +166,7 @@ onBeforeUnmount(() => {
                         <div class="post-description pt-4">
                             <!-- Item Title and React -->
                             <div class="flex items-center justify-between">
-                                <h3 class="cursor-pointer text-lg font-medium hover:underline">{{ post.item_name }}
+                                <h3 class="cursor-pointer text-lg font-medium hover:underline truncate">{{ post.item_name }}
                                 </h3>
                                 <!-- Add-To-Favorites -->
                                 <svg v-if="!isClicked" @click="isClicked = true"
@@ -185,14 +202,17 @@ onBeforeUnmount(() => {
                                 <p>Cebu City, Central Visayas</p>
                             </div>
                             <!-- CTA View Item -->
-                            <div class="cursor-pointer bg-blue-100 py-2 rounded-md text-center">
+                            <div @click="goToPostDetails(post.id)" class="cursor-pointer bg-blue-100 py-2 rounded-md text-center">
                                 <span class="text-blue-500">View Item</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </SubAuthenticatedLayout>
+            <div v-else class="mt-6 mb-12 flex items-center justify-center">
+                <f7-preloader />
+            </div>
+        </SecondaryLayout>
     </f7-page>
 </template>
 

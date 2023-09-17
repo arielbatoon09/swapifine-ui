@@ -12,7 +12,6 @@ const props = defineProps({
 });
 
 
-
 // Render Data
 onMounted(async () => {
   try {
