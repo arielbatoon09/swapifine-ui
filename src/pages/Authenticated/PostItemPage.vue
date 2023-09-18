@@ -17,12 +17,10 @@ const form = ref({
   location_id: 1,
   item_name: '',
   item_description: '',
-  item_price: '',
-  item_quantity: '',
+  item_stocks: '',
   condition: '',
   item_for_type: '',
-  delivery_type: '',
-  payment_type: '',
+  item_cash_value: '',
   img_file_path: [],
 
 });
@@ -43,7 +41,7 @@ const handlePostItem = async () => {
     isRequest.value = true;
 
     // Get Value of form data
-    const { category_id, location_id, item_name, item_description, item_price, item_quantity, condition,
+    const { category_id, location_id, item_name, item_description, item_cash_value, item_stocks, condition,
       item_for_type, delivery_type, payment_type } = form.value;
 
     // Create an array to store file data
@@ -64,7 +62,7 @@ const handlePostItem = async () => {
 
     // Distribute data to postNewItem store
     const response = await postStore.postNewItem(category_id, location_id, item_name, item_description,
-      item_price, item_quantity, condition, item_for_type, delivery_type, payment_type, files);
+      item_stocks, condition, item_for_type, item_cash_value, files);
 
     // Cancel loading state if the response is true
     if (response) {
@@ -77,12 +75,10 @@ const handlePostItem = async () => {
       form.value.location_id = null;
       form.value.item_name = null;
       form.value.item_description = null;
-      form.value.item_price = null;
-      form.value.item_quantity = null;
+      form.value.item_stocks = null;
       form.value.condition = null;
       form.value.item_for_type = null;
-      form.value.delivery_type = null;
-      form.value.payment_type = null;
+      form.value.item_cash_value = null;
       form.value.files = null;
 
       // Show the toast
@@ -100,8 +96,8 @@ const handlePostItem = async () => {
       // Open the toast
       toastWithButton.value.open();
 
-      // Redirect the user to Login page
-      f7.views.main.router.navigate('/');
+      // Redirect the user to home page
+      f7.views.main.router.navigate('/home');
     }
 
     console.log(response);
@@ -236,9 +232,7 @@ const removeImage = (index) => {
                     clear-button></f7-list-input>
                   <f7-list-input v-model:value="form.item_description" outline label="Description" floating-label
                     type="textarea" clear-button></f7-list-input>
-                  <f7-list-input v-model:value="form.item_price" outline label="₱ Cash Value" floating-label type="text"
-                    clear-button></f7-list-input>
-                  <f7-list-input v-model:value="form.item_quantity" outline label="Quantity" floating-label type="text"
+                  <f7-list-input v-model:value="form.item_stocks" outline label="Stocks (Qty)" floating-label type="text"
                     clear-button></f7-list-input>
                 </f7-list>
                 <!-- Next Step -->
@@ -265,23 +259,17 @@ const removeImage = (index) => {
                   </f7-list-input>
                   <f7-list-input v-model:value="form.condition" outline label="Condition" floating-label type="select">
                     <option value="New">New</option>
-                    <option value="Old">Old</option>
+                    <option value="Used - Like New">Used - Like New</option>
+                    <option value="Used - Good">Used - Good</option>
+                    <option value="Used - Fair">Used - Fair</option>
                   </f7-list-input>
                   <f7-list-input v-model:value="form.item_for_type" outline label="Item for" floating-label type="select">
                     <option value="For Sale">For Sale</option>
                     <option value="For Swap">For Swap</option>
+                    <option value="For Swap and Sale">For Swap and Sale</option>
                   </f7-list-input>
-                  <f7-list-input v-model:value="form.delivery_type" outline label="Delivery Preference" floating-label
-                    type="select">
-                    <option value="Person-To-Person">Person-To-Person</option>
-                    <option value="Book Delivery">Book Delivery</option>
-                  </f7-list-input>
-                  <f7-list-input v-model:value="form.payment_type" outline label="Payment Method" floating-label
-                    type="select">
-                    <option value="Credits">Credits (Swapifine Money)</option>
-                    <option value="COD">COD (Cash on Delivery)</option>
-                    <option value="E-Wallet">E-Wallet (Gcash, Paymaya, Etc.)</option>
-
+                  <f7-list-input v-model:value="form.item_cash_value" outline label="₱ Cash Value" floating-label type="text"
+                    clear-button>
                   </f7-list-input>
                 </f7-list>
                 <!-- Next Step -->

@@ -5,9 +5,10 @@ import axios from 'axios';
 export const usePostStore = defineStore('post', {
     state: () => ({
         postItem: null,
+        getPost: null,
     }),
     getters: {
-        user: (state) => state.postItem,
+        getItemDetails: (state) => state.getPost,
     },
     actions: {
         async getToken() {
@@ -31,8 +32,20 @@ export const usePostStore = defineStore('post', {
                 console.error(error);
             }
         },
-        async postNewItem(category_id, location_id,  item_name, item_description, item_price, 
-            item_quantity, condition, item_for_type, delivery_type, payment_type, img_file_path) {
+        async GetPostDetails(id) {
+            try {
+                const response = await axios.post(`/api/view/item`, {
+                    id: id,
+                });
+
+                return this.getPost = response.data.data;
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async postNewItem(category_id, location_id,  item_name, item_description, 
+            item_stocks, condition, item_for_type, item_cash_value, img_file_path) {
             try {
                 await this.getToken();
 
@@ -41,12 +54,10 @@ export const usePostStore = defineStore('post', {
                     location_id: location_id,
                     item_name: item_name,
                     item_description: item_description,
-                    item_price: item_price,
-                    item_quantity: item_quantity,
+                    item_stocks: item_stocks,
                     condition: condition,
                     item_for_type: item_for_type,
-                    delivery_type: delivery_type,
-                    payment_type: payment_type,
+                    item_cash_value: item_cash_value,
                     img_file_path: img_file_path,
                 });
 

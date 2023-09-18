@@ -10,15 +10,12 @@ const currentPage = 'home';
 
 // Redirection to Post item Page
 const goToPostItem = () => {
-  if (window.innerWidth <= 1023) {
-    f7.views.main.router.navigate('/post/item', {
-      animate: true,
-    });
-  } else {
-    f7.views.main.router.navigate('/post/item', {
-      animate: false,
-    });
-  }
+  const route = '/post/item';
+    const animate = window.innerWidth <= 1023;
+
+    f7.views.main.router.navigate(route, {
+    animate: animate,
+  });
 };
 </script>
 

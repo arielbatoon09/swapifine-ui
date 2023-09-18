@@ -8,10 +8,11 @@ import TestIcon from '../../assets/icon-test.svg';
 
 const currentPage = 'browse';
 const postStore = usePostStore();
-const isClicked = ref(false);
 const postData = ref([]);
+const isClicked = ref(false);
 const slidesPerView = ref(6);
 const isLoadingItem = ref(false);
+const viewID = ref(6);
 let resizeListener = null;
 
 const slides = ref([
@@ -31,15 +32,14 @@ const updateSlidesPerView = () => {
 
 // Redirection to View item Details Page
 const goToPostDetails = async (id) => {
-    if (window.innerWidth <= 1023) {
-    f7.views.main.router.navigate(`/view/item/${id}`, {
-      animate: true,
-    });
-  } else {
-    f7.views.main.router.navigate(`/view/item/${id}`, {
-      animate: false,
-    });
-  }
+    viewID.value = id;
+    await postStore.GetPostDetails(id);
+    const route = `/view/item/${viewID.value}`;
+    const animate = window.innerWidth <= 1023;
+
+    f7.views.main.router.navigate(route, {
+    animate: animate,
+  });
 }
 
 onMounted(async () => {
@@ -132,21 +132,20 @@ onBeforeUnmount(() => {
                 <div v-for="post in postData" class="w-full border border-gray-200 rounded-lg hover:shadow">
                     <!-- Post-Image-Slider -->
                     <div class="w-full h-52 overflow-hidden rounded-t-lg">
-                        <swiper-container :pagination="true" class="demo-swiper-multiple" :space-between="0"
-                            :slides-per-view="1">
+                        <swiper-container :pagination="true" :space-between="0" :slides-per-view="1">
                             <swiper-slide v-for="image in post.images" :id="image.id">
-                                <img class="w-full h-52" :src="image.img_file_path" alt="">
+                                <img @click="goToPostDetails(post.id)" class="w-full h-52 cursor-pointer hover:brightness-75 delay-75" :src="image.img_file_path" alt="">
                             </swiper-slide>
                         </swiper-container>
                     </div>
                     <!-- About Post Item -->
                     <div class="item-post px-3 py-4">
-                        <!-- Profile -->
+                        <!-- Vendor Profile -->
                         <div class="flex flex-row items-center gap-2">
                             <div class="w-10 h-10 rounded-full overflow-hidden">
                                 <img class="w-full h-full object-cover" :src="TestProfile" />
                             </div>
-                            <!-- Post User Profile -->
+                            <!-- Vendor User Info -->
                             <div class="profile">
                                 <p class="cursor-pointer profile-name hover:underline text-lg">{{ post.fullname }}</p>
                                 <!-- Verified Indicator -->
@@ -166,7 +165,7 @@ onBeforeUnmount(() => {
                         <div class="post-description pt-4">
                             <!-- Item Title and React -->
                             <div class="flex items-center justify-between">
-                                <h3 class="cursor-pointer text-lg font-medium hover:underline truncate">{{ post.item_name }}
+                                <h3 @click="goToPostDetails(post.id)" class="cursor-pointer text-lg font-medium hover:underline truncate">{{ post.item_name }}
                                 </h3>
                                 <!-- Add-To-Favorites -->
                                 <svg v-if="!isClicked" @click="isClicked = true"
@@ -202,9 +201,9 @@ onBeforeUnmount(() => {
                                 <p>Cebu City, Central Visayas</p>
                             </div>
                             <!-- CTA View Item -->
-                            <div @click="goToPostDetails(post.id)" class="cursor-pointer bg-blue-100 py-2 rounded-md text-center">
+                            <!-- <div @click="goToPostDetails(post.id)" class="cursor-pointer bg-blue-100 py-2 rounded-md text-center">
                                 <span class="text-blue-500">View Item</span>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>

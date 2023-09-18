@@ -24,8 +24,8 @@ export default {
         primary: '#29abe2',
       },
       view: {
-          browserHistory: true,
-          browserHistorySeparator: '',
+          // browserHistory: true,
+          // browserHistorySeparator: '',
       },
 
       store: store,

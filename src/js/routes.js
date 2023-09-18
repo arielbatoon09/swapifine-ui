@@ -72,7 +72,7 @@ const routes = [
     protectedRoute: true,
   },
   {
-    path: '/view/item/:id/',
+    path: '/view/item/:id',
     component: ViewItemDetailsPage,
     protectedRoute: true,
   },
