@@ -1,15 +1,28 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { f7 } from 'framework7-vue';
-import SampleProduct1 from '../assets/products/sample1.png';
-import SampleProduct2 from '../assets/products/sample2.jpg';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { usePostStore } from '../js/post.store';
 import TestProfile from '../assets/profile/test_profile.jpg';
 
+const postStore = usePostStore();
+const postData = ref([]);
 const isClicked = ref(false);
 const slidesPerView = ref(4);
-const sampleData = ref([
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'
-]);
+const isLoadingItem = ref(false);
+const viewID = ref(0);
+let resizeListener = null;
+
+// Redirection to View item Details Page
+const goToPostDetails = async (id) => {
+    viewID.value = id;
+    await postStore.GetPostDetails(id);
+    const route = `/view/item/${viewID.value}`;
+    const animate = window.innerWidth <= 1023;
+
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
+}
 
 const updateSlidesPerView = () => {
     if (window.innerWidth <= 767) {
@@ -21,18 +34,21 @@ const updateSlidesPerView = () => {
     }
 };
 
-// Listen for window resize events and update slidesPerView
-let resizeListener = null;
-
-onMounted(() => {
-    updateSlidesPerView(); // Set initial value
-
-    // Add window resize event listener
+onMounted(async () => {
+    updateSlidesPerView();
     resizeListener = window.addEventListener('resize', updateSlidesPerView);
+
+    // Init Preloader
+    isLoadingItem.value = true;
+
+    const response = await postStore.GetTop3PostCategory();
+    postData.value = response.data;
+
+    // Cancel Preloader state
+    isLoadingItem.value = false;
 });
 
 onBeforeUnmount(() => {
-    // Remove the window resize event listener when the component is unmounted
     if (resizeListener) {
         window.removeEventListener('resize', updateSlidesPerView);
     }
@@ -41,23 +57,21 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <section class="mb-6">
-        <div class="w-24">
-            <h2 class="cursor-pointer text-xl font-medium mb-2 hover:underline">Vehicles</h2>
+    <div v-if="!isLoadingItem" class="mb-6" v-for="top in postData">
+        <div class="w-50">
+            <h2 class="cursor-pointer text-xl font-medium mb-2 hover:underline">{{ top.category_name }}</h2>
         </div>
         <swiper-container :pagination="false" :allowTouchMove="false" :navigation="true" :space-between="18"
             :slides-per-view="slidesPerView">
-            <swiper-slide v-for="(vehicle, index) in sampleData" :key="index"
-                class="w-full border border-gray-200 rounded-lg hover:shadow">
+            <swiper-slide v-for="post in top.posts" class="w-full border border-gray-200 rounded-lg hover:shadow">
                 <!-- Post-Image-Slider -->
                 <div class="w-full h-52 overflow-hidden rounded-t-lg">
                     <swiper-container :pagination="true" class="demo-swiper-multiple" :space-between="0"
                         :slides-per-view="1">
-                        <swiper-slide>
-                            <img class="w-full h-52" :src="SampleProduct1" alt="">
-                        </swiper-slide>
-                        <swiper-slide>
-                            <img class="w-full h-52" :src="SampleProduct2" alt="">
+                        <swiper-slide v-for="image in post.images">
+                            <img @click="goToPostDetails(post.id)"
+                                class="w-full h-52 cursor-pointer hover:brightness-75 delay-75" :src="image.img_file_path"
+                                alt="">
                         </swiper-slide>
                     </swiper-container>
                 </div>
@@ -70,7 +84,8 @@ onBeforeUnmount(() => {
                         </div>
                         <!-- Post User Profile -->
                         <div class="profile">
-                            <p class="profile-name hover:underline">Ariel Batoon</p>
+                            <p class="profile-name cursor-pointer profile-name hover:underline text-lg">{{ post.fullname }}
+                            </p>
                             <!-- Verified Indicator -->
                             <div class="flex flex-row items-center gap-1">
                                 <span class="profile-verified-label">Verified</span>
@@ -88,20 +103,20 @@ onBeforeUnmount(() => {
                     <div class="post-description pt-4">
                         <!-- Item Title and React -->
                         <div class="flex items-center justify-between">
-                            <h3 class="cursor-pointer text-lg font-medium hover:underline">Ryzen 5 5600G with 24inch IPS
-                            </h3>
+                            <h3 @click="goToPostDetails(post.id)"
+                                class="cursor-pointer text-lg font-medium hover:underline">{{ post.item_name }}</h3>
                             <!-- Add-To-Favorites -->
-                            <svg v-if="!isClicked" @click="isClicked = true"
-                                class="cursor-pointer w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                                <path
-                                    d="M17.947 2.053a5.209 5.209 0 0 0-3.793-1.53A6.414 6.414 0 0 0 10 2.311 6.482 6.482 0 0 0 5.824.5a5.2 5.2 0 0 0-3.8 1.521c-1.915 1.916-2.315 5.392.625 8.333l7 7a.5.5 0 0 0 .708 0l7-7a6.6 6.6 0 0 0 2.123-4.508 5.179 5.179 0 0 0-1.533-3.793Z" />
-                            </svg>
-                            <svg v-else @click="isClicked = false" class="cursor-pointer w-[24px] h-[24px] text-clr-primary"
+                            <svg v-if="!isClicked" @click="isClicked = true" class="cursor-pointer w-[24px] h-[24px] text-clr-primary"
                                 aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="1.5"
                                     d="M11 4C5.5-1.5-1.5 5.5 4 11l7 7 7-7c5.458-5.458-1.542-12.458-7-7Z" />
+                            </svg>                            
+                            <svg v-else @click="isClicked = false"
+                                class="cursor-pointer w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                <path
+                                    d="M17.947 2.053a5.209 5.209 0 0 0-3.793-1.53A6.414 6.414 0 0 0 10 2.311 6.482 6.482 0 0 0 5.824.5a5.2 5.2 0 0 0-3.8 1.521c-1.915 1.916-2.315 5.392.625 8.333l7 7a.5.5 0 0 0 .708 0l7-7a6.6 6.6 0 0 0 2.123-4.508 5.179 5.179 0 0 0-1.533-3.793Z" />
                             </svg>
                         </div>
                         <!-- Item Distance -->
@@ -122,15 +137,14 @@ onBeforeUnmount(() => {
                             </svg>
                             <p>Cebu City, Central Visayas</p>
                         </div>
-                        <!-- CTA View Item -->
-                        <div class="cursor-pointer bg-blue-100 py-2 rounded-md text-center">
-                            <span class="text-blue-500">View Item</span>
-                        </div>
                     </div>
                 </div>
             </swiper-slide>
         </swiper-container>
-    </section>
+    </div>
+    <div v-else class="mt-6 mb-12 flex items-center justify-center">
+        <f7-preloader />
+    </div>
 </template>
 
 <style scoped>
@@ -152,5 +166,4 @@ onBeforeUnmount(() => {
 .swiper-button-next svg,
 .swiper-button-prev svg {
     width: 20%;
-}
-</style>
+}</style>

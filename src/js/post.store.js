@@ -32,6 +32,14 @@ export const usePostStore = defineStore('post', {
                 console.error(error);
             }
         },
+        async GetTop3PostCategory() {
+            try {
+                const response = await axios.get('/api/view/top-post');
+                return response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
         async GetPostDetails(id) {
             try {
                 const response = await axios.post(`/api/view/item`, {
@@ -44,7 +52,7 @@ export const usePostStore = defineStore('post', {
                 console.error(error);
             }
         },
-        async postNewItem(category_id, location_id,  item_name, item_description, 
+        async PostItem(category_id, location_id,  item_name, item_description, 
             item_stocks, condition, item_for_type, item_cash_value, img_file_path) {
             try {
                 await this.getToken();

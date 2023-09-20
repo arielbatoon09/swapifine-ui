@@ -12,23 +12,13 @@ const postData = ref([]);
 const isClicked = ref(false);
 const slidesPerView = ref(6);
 const isLoadingItem = ref(false);
-const viewID = ref(6);
+const viewID = ref(0);
 let resizeListener = null;
 
 const slides = ref([
     'All List', 'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
     'Free Stuff', 'Instruments', 'Hobbies', 'Office Supplies', 'Pet Supplies'
 ]);
-
-const updateSlidesPerView = () => {
-    if (window.innerWidth <= 767) {
-        slidesPerView.value = 2; // Mobile
-    } else if (window.innerWidth <= 1024) {
-        slidesPerView.value = 4; // Tablet
-    } else if (window.innerWidth >= 1025) {
-        slidesPerView.value = 6; // Desktop
-    }
-};
 
 // Redirection to View item Details Page
 const goToPostDetails = async (id) => {
@@ -42,18 +32,29 @@ const goToPostDetails = async (id) => {
   });
 }
 
+const updateSlidesPerView = () => {
+    if (window.innerWidth <= 767) {
+        slidesPerView.value = 2; // Mobile
+    } else if (window.innerWidth <= 1024) {
+        slidesPerView.value = 4; // Tablet
+    } else if (window.innerWidth >= 1025) {
+        slidesPerView.value = 6; // Desktop
+    }
+};
+
 onMounted(async () => {
+    updateSlidesPerView();
+    resizeListener = window.addEventListener('resize', updateSlidesPerView);
+
     // Init Preloader
     isLoadingItem.value = true;
+    
     // Get All Posted Items
     const response = await postStore.GetAllPostItem();
     postData.value = response.data;
-    console.log(postData.value);
+
     // Cancel Preloader state
     isLoadingItem.value = false;
-
-    updateSlidesPerView();
-    resizeListener = window.addEventListener('resize', updateSlidesPerView);
 });
 
 onBeforeUnmount(() => {
@@ -75,7 +76,7 @@ onBeforeUnmount(() => {
             <!-- Categories Filter -->
             <div class="categories-filter">
                 <div class="flex items-center mb-2">
-                    <p class="text-clr-primary font-medium text-lg">Categories</p>
+                    <p class="text-clr-primary font-medium text-lg">Top Categories</p>
                     <svg class="ml-2 w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8"

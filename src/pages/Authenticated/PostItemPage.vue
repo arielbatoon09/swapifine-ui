@@ -42,7 +42,7 @@ const handlePostItem = async () => {
 
     // Get Value of form data
     const { category_id, location_id, item_name, item_description, item_cash_value, item_stocks, condition,
-      item_for_type, delivery_type, payment_type } = form.value;
+      item_for_type } = form.value;
 
     // Create an array to store file data
     const files = [];
@@ -60,8 +60,8 @@ const handlePostItem = async () => {
       });
     }
 
-    // Distribute data to postNewItem store
-    const response = await postStore.postNewItem(category_id, location_id, item_name, item_description,
+    // Distribute data to PostItem store
+    const response = await postStore.PostItem(category_id, location_id, item_name, item_description,
       item_stocks, condition, item_for_type, item_cash_value, files);
 
     // Cancel loading state if the response is true
@@ -107,6 +107,31 @@ const handlePostItem = async () => {
   }
 }
 
+// const handleImageChange = (event) => {
+//   const files = Array.from(event.target.files);
+
+//   // Filter files to only include JPG, JPEG, and PNG
+//   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+//   const selectedFiles = files.filter((file) => allowedTypes.includes(file.type));
+//   console.log('selected: '+selectedFiles);
+
+//   // Set the value to form.img_file_path
+//   // form.img_file_path = files;
+//   form.img_file_path = selectedFiles;
+
+
+//   // Display selected images
+//   selectedFiles.forEach((file) => {
+//     const reader = new FileReader();
+//     reader.onload = (e) => {
+//       selectedImages.value.push({ file, url: e.target.result });
+//       selectedImagesCount.value = selectedImages.value.length;
+//     };
+//     reader.readAsDataURL(file);
+//   });
+
+// };
+
 const handleImageChange = (event) => {
   const files = Array.from(event.target.files);
 
@@ -114,8 +139,13 @@ const handleImageChange = (event) => {
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   const selectedFiles = files.filter((file) => allowedTypes.includes(file.type));
 
-  // Set the value to form.img_file_path
-  form.img_file_path = files;
+  // Initialize form.img_file_path as an empty array if it's not already an array
+  if (!Array.isArray(form.img_file_path)) {
+    form.img_file_path = [];
+  }
+
+  // Append selectedFiles to the existing form.img_file_path array
+  form.img_file_path = [...form.img_file_path, ...selectedFiles];
 
   // Display selected images
   selectedFiles.forEach((file) => {
@@ -126,8 +156,8 @@ const handleImageChange = (event) => {
     };
     reader.readAsDataURL(file);
   });
-
 };
+
 
 const removeImage = (index) => {
   // Remove the selected image from the array
