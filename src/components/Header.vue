@@ -47,7 +47,7 @@ const handleLogout = async () => {
             <!-- Navbar -->
             <nav class="flex flex-row items-center gap-6 relative">
                 <!-- Orders and Buy Credits -->
-                <div class="flex flex-row items-center gap-4">
+                <div class="flex flex-row items-center gap-2">
                     <div class="cursor-pointer flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-3 rounded-lg">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
