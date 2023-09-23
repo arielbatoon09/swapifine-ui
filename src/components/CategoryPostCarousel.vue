@@ -10,34 +10,31 @@ const isClicked = ref(false);
 const slidesPerView = ref(4);
 const isLoadingItem = ref(false);
 const viewID = ref(0);
+const recentViewed = ref([]);
+const existingArrayRecent = localStorage.getItem('RecentViewed');
 let resizeListener = null;
 
 // Redirection to View item Details Page
 const goToPostDetails = async (id) => {
     viewID.value = id;
+    doRecentView(id);
     await postStore.GetPostDetails(id);
     const route = `/view/item/${viewID.value}`;
     const animate = window.innerWidth <= 1023;
-
     f7.views.main.router.navigate(route, {
         animate: animate,
     });
 }
 
-const updateSlidesPerView = () => {
-    if (window.innerWidth <= 767) {
-        slidesPerView.value = 1; // Mobile
-    } else if (window.innerWidth <= 1023) {
-        slidesPerView.value = 2; // Tablet
-    } else {
-        slidesPerView.value = 4; // Desktop
-    }
+// Recent Viewed
+const doRecentView = (id) => {
+    const existingArray = [...recentViewed.value];
+    existingArray.push(id);
+    localStorage.setItem('RecentViewed', JSON.stringify(existingArray));
+    recentViewed.value = existingArray;
 };
 
 onMounted(async () => {
-    updateSlidesPerView();
-    resizeListener = window.addEventListener('resize', updateSlidesPerView);
-
     // Init Preloader
     isLoadingItem.value = true;
 
@@ -46,14 +43,17 @@ onMounted(async () => {
 
     // Cancel Preloader state
     isLoadingItem.value = false;
-});
 
-onBeforeUnmount(() => {
-    if (resizeListener) {
-        window.removeEventListener('resize', updateSlidesPerView);
-    }
+    // Get the RecentViewed Post
+    if (existingArrayRecent) {
+        try {
+            recentViewed.value = JSON.parse(existingArrayRecent);
+        } catch (error) {
+            console.error('Error parsing RecentViewed localStorage:', error);
+            recentViewed.value = [];
+        }
+    };
 });
-
 </script>
 
 <template>

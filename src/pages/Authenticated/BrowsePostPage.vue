@@ -2,6 +2,7 @@
 import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { usePostStore } from '../../js/post.store';
+import useCookies from 'vue-cookies'
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 import TestIcon from '../../assets/icon-test.svg';
@@ -13,6 +14,8 @@ const isClicked = ref(false);
 const slidesPerView = ref(6);
 const isLoadingItem = ref(false);
 const viewID = ref(0);
+const recentViewed = ref([]);
+const existingArrayRecent = localStorage.getItem('RecentViewed');
 let resizeListener = null;
 
 const slides = ref([
@@ -23,15 +26,25 @@ const slides = ref([
 // Redirection to View item Details Page
 const goToPostDetails = async (id) => {
     viewID.value = id;
+    doRecentView(id);
     await postStore.GetPostDetails(id);
     const route = `/view/item/${viewID.value}`;
     const animate = window.innerWidth <= 1023;
 
     f7.views.main.router.navigate(route, {
-    animate: animate,
-  });
-}
+        animate: animate,
+    });
+};
 
+// Recent Viewed
+const doRecentView = (id) => {
+    const existingArray = [...recentViewed.value];
+    existingArray.push(id);
+    localStorage.setItem('RecentViewed', JSON.stringify(existingArray));
+    recentViewed.value = existingArray;
+};
+
+// Update SlidesPerView
 const updateSlidesPerView = () => {
     if (window.innerWidth <= 767) {
         slidesPerView.value = 2; // Mobile
@@ -42,21 +55,33 @@ const updateSlidesPerView = () => {
     }
 };
 
+// OnMounted
 onMounted(async () => {
     updateSlidesPerView();
     resizeListener = window.addEventListener('resize', updateSlidesPerView);
 
     // Init Preloader
     isLoadingItem.value = true;
-    
+
     // Get All Posted Items
     const response = await postStore.GetAllPostItem();
     postData.value = response.data;
 
     // Cancel Preloader state
     isLoadingItem.value = false;
+
+    // Get the RecentViewed Post
+    if (existingArrayRecent) {
+        try {
+            recentViewed.value = JSON.parse(existingArrayRecent);
+        } catch (error) {
+            console.error('Error parsing RecentViewed localStorage:', error);
+            recentViewed.value = [];
+        }
+    };
 });
 
+// BeforeMount
 onBeforeUnmount(() => {
     if (resizeListener) {
         window.removeEventListener('resize', updateSlidesPerView);
@@ -135,7 +160,9 @@ onBeforeUnmount(() => {
                     <div class="w-full h-52 overflow-hidden rounded-t-lg">
                         <swiper-container :pagination="true" :space-between="0" :slides-per-view="1">
                             <swiper-slide v-for="image in post.images" :id="image.id">
-                                <img @click="goToPostDetails(post.id)" class="w-full h-52 cursor-pointer hover:brightness-75 delay-75" :src="image.img_file_path" alt="">
+                                <img @click="goToPostDetails(post.id)"
+                                    class="w-full h-52 cursor-pointer hover:brightness-75 delay-75"
+                                    :src="image.img_file_path" alt="">
                             </swiper-slide>
                         </swiper-container>
                     </div>
@@ -166,7 +193,8 @@ onBeforeUnmount(() => {
                         <div class="post-description pt-4">
                             <!-- Item Title and React -->
                             <div class="flex items-center justify-between">
-                                <h3 @click="goToPostDetails(post.id)" class="cursor-pointer text-lg font-medium hover:underline truncate">{{ post.item_name }}
+                                <h3 @click="goToPostDetails(post.id)"
+                                    class="cursor-pointer text-lg font-medium hover:underline truncate">{{ post.item_name }}
                                 </h3>
                                 <!-- Add-To-Favorites -->
                                 <svg v-if="!isClicked" @click="isClicked = true"
@@ -221,5 +249,4 @@ onBeforeUnmount(() => {
     background: #FFF;
     width: 100%;
     height: 100%;
-}
-</style>
+}</style>
