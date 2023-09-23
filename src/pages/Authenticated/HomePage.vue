@@ -14,7 +14,6 @@ const postStore = usePostStore();
 const postData = ref([]);
 const isClicked = ref(false);
 const slidesPerView = ref(4);
-const isLoadingItem = ref(false);
 const viewID = ref(0);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 let resizeListener = null;
@@ -61,14 +60,12 @@ onMounted(async () => {
   updateSlidesPerView();
   resizeListener = window.addEventListener('resize', updateSlidesPerView);
 
-  // Init Preloader
-  isLoadingItem.value = true;
-
-  const response = await postStore.GetTop3PostCategory();
-  postData.value = response.data;
-
-  // Cancel Preloader state
-  isLoadingItem.value = false;
+  // Get the recent viewed post
+  if(existingArrayRecent){
+    const response = await postStore.GetRecentViewedPost(existingArrayRecent);
+    postData.value = response.data;
+  }
+  
 });
 
 onBeforeUnmount(() => {
@@ -136,9 +133,8 @@ onBeforeUnmount(() => {
           <p v-show="existingArrayRecent" @click="clearRecentViewedPost"
             class="cursor-pointer text-red-500 hover:text-red-600">Clear Recents</p>
         </div>
-        <swiper-container :pagination="false" :allowTouchMove="false" :navigation="true" :space-between="18"
-          :slides-per-view="slidesPerView">
-          <swiper-slide v-for="post in postData" class="w-full border border-gray-200 rounded-lg hover:shadow">
+        <swiper-container :pagination="false" :allowTouchMove="false" :navigation="true" :space-between="18" :slides-per-view="slidesPerView">
+          <swiper-slide v-for="post in postData" :key="post.id" class="w-full border border-gray-200 rounded-lg hover:shadow">
             <!-- Post-Image-Slider -->
             <div class="w-full h-52 overflow-hidden rounded-t-lg">
               <swiper-container :pagination="true" class="demo-swiper-multiple" :space-between="0" :slides-per-view="1">
@@ -176,8 +172,9 @@ onBeforeUnmount(() => {
               <div class="post-description pt-4">
                 <!-- Item Title and React -->
                 <div class="flex items-center justify-between">
-                  <h3 @click="goToPostDetails(post.id)" class="cursor-pointer text-lg font-medium hover:underline">{{
-                    post.item_name }}</h3>
+                  <h3 @click="goToPostDetails(post.id)"
+                    class="cursor-pointer text-lg font-medium hover:underline truncate">{{
+                      post.item_name }}</h3>
                   <!-- Add-To-Favorites -->
                   <svg v-if="!isClicked" @click="isClicked = true"
                     class="cursor-pointer w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
@@ -213,10 +210,11 @@ onBeforeUnmount(() => {
             </div>
           </swiper-slide>
         </swiper-container>
-        <!-- <div class="border border-gray-300 rounded-lg px-6 py-8">
+        <div v-show="!existingArrayRecent" class="border border-gray-300 rounded-lg px-6 py-8">
           You didn't check any items yet. Last few items you viewed will appear here...
-        </div> -->
+        </div>
       </section>
+
       <!-- End - Recently viewed -->
 
       <!-- Start - Top Category and Items -->
@@ -224,7 +222,7 @@ onBeforeUnmount(() => {
       <!-- End - Top Category and Items -->
 
       <!-- Start - Advertising Carousel -->
-      <section class="mb-12">
+      <!-- <section class="mb-12">
         <swiper-container :pagination="true" :space-between="50" :speed="900">
           <swiper-slide>
             <div class="bg-gray-400 py-32 px-12">
@@ -242,7 +240,7 @@ onBeforeUnmount(() => {
             </div>
           </swiper-slide>
         </swiper-container>
-      </section>
+      </section> -->
       <!-- End - Advertising Carousel -->
     </PrimaryLayout>
   </f7-page>

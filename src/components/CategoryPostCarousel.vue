@@ -34,7 +34,20 @@ const doRecentView = (id) => {
     recentViewed.value = existingArray;
 };
 
+const updateSlidesPerView = () => {
+  if (window.innerWidth <= 767) {
+    slidesPerView.value = 1; // Mobile
+  } else if (window.innerWidth <= 1023) {
+    slidesPerView.value = 2; // Tablet
+  } else {
+    slidesPerView.value = 4; // Desktop
+  }
+};
+
 onMounted(async () => {
+    updateSlidesPerView();
+    resizeListener = window.addEventListener('resize', updateSlidesPerView);
+
     // Init Preloader
     isLoadingItem.value = true;
 
@@ -53,6 +66,12 @@ onMounted(async () => {
             recentViewed.value = [];
         }
     };
+});
+
+onBeforeUnmount(() => {
+  if (resizeListener) {
+    window.removeEventListener('resize', updateSlidesPerView);
+  }
 });
 </script>
 
@@ -104,17 +123,19 @@ onMounted(async () => {
                         <!-- Item Title and React -->
                         <div class="flex items-center justify-between">
                             <h3 @click="goToPostDetails(post.id)"
-                                class="cursor-pointer text-lg font-medium hover:underline">{{ post.item_name }}</h3>
+                                class="cursor-pointer text-lg font-medium hover:underline truncate">{{ post.item_name }}
+                            </h3>
                             <!-- Add-To-Favorites -->
-                            <svg v-if="!isClicked" @click="isClicked = true" class="cursor-pointer w-[24px] h-[24px] text-clr-primary"
-                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">
+                            <svg v-if="!isClicked" @click="isClicked = true"
+                                class="cursor-pointer w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="1.5"
                                     d="M11 4C5.5-1.5-1.5 5.5 4 11l7 7 7-7c5.458-5.458-1.542-12.458-7-7Z" />
-                            </svg>                            
-                            <svg v-else @click="isClicked = false"
-                                class="cursor-pointer w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                            </svg>
+                            <svg v-else @click="isClicked = false" class="cursor-pointer w-[24px] h-[24px] text-clr-primary"
+                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                viewBox="0 0 20 18">
                                 <path
                                     d="M17.947 2.053a5.209 5.209 0 0 0-3.793-1.53A6.414 6.414 0 0 0 10 2.311 6.482 6.482 0 0 0 5.824.5a5.2 5.2 0 0 0-3.8 1.521c-1.915 1.916-2.315 5.392.625 8.333l7 7a.5.5 0 0 0 .708 0l7-7a6.6 6.6 0 0 0 2.123-4.508 5.179 5.179 0 0 0-1.533-3.793Z" />
                             </svg>
@@ -144,6 +165,9 @@ onMounted(async () => {
     </div>
     <div v-else class="mt-6 mb-12 flex items-center justify-center">
         <f7-preloader />
+    </div>
+    <div v-show="!postData" class="border border-gray-300 rounded-lg px-6 py-8 mb-6">
+        There aren't any posted items available right now. Please try again!
     </div>
 </template>
 

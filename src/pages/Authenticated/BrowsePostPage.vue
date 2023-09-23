@@ -240,6 +240,9 @@ onBeforeUnmount(() => {
             <div v-else class="mt-6 mb-12 flex items-center justify-center">
                 <f7-preloader />
             </div>
+            <div v-show="!postData" class="border border-gray-300 rounded-lg px-6 py-8 mb-12">
+                There aren't any posted items available right now. Please try again!
+            </div>
         </SecondaryLayout>
     </f7-page>
 </template>
@@ -249,4 +252,5 @@ onBeforeUnmount(() => {
     background: #FFF;
     width: 100%;
     height: 100%;
-}</style>
+}
+</style>

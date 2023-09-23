@@ -34,7 +34,18 @@ export const usePostStore = defineStore('post', {
         },
         async GetTop3PostCategory() {
             try {
-                const response = await axios.get('/api/view/top-post');
+                const response = await axios.get('/api/browse/top-post');
+                return response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async GetRecentViewedPost(id) {
+            try {
+                const response = await axios.post('/api/browse/recent-post', {
+                    id: id,
+                });
+
                 return response.data;
             } catch (error) {
                 console.error(error);
