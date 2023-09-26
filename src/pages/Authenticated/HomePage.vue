@@ -1,15 +1,18 @@
 <script setup>
 import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useAuthStore } from '../../js/auth.store';
 import { usePostStore } from '../../js/post.store';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 import PrimaryLayout from '../../Layout/PrimaryLayout.vue';
 import ListCategoryCarousel from '../../components/ListCategoryCarousel.vue';
 import CategoryPostCarousel from '../../components/CategoryPostCarousel.vue';
+import BrowseItemIllustration from '../../assets/illustrations/browse-item-illustration.svg';
 import PostIllustration from '../../assets/illustrations/post_illustration.svg';
 import MyLocationIllustration from '../../assets/illustrations/my_location_illustration.svg';
 
 const currentPage = 'home';
+const authStore = useAuthStore();
 const postStore = usePostStore();
 const postData = ref([]);
 const isClicked = ref(false);
@@ -28,18 +31,6 @@ const goToPostItem = () => {
   });
 };
 
-// Redirection to View item Details Page
-const goToPostDetails = async (id) => {
-  viewID.value = id;
-  await postStore.GetPostDetails(id);
-  const route = `/view/item/${viewID.value}`;
-  const animate = window.innerWidth <= 1023;
-
-  f7.views.main.router.navigate(route, {
-    animate: animate,
-  });
-}
-
 const updateSlidesPerView = () => {
   if (window.innerWidth <= 767) {
     slidesPerView.value = 1; // Mobile
@@ -54,6 +45,26 @@ const updateSlidesPerView = () => {
 const clearRecentViewedPost = () => {
   localStorage.removeItem('RecentViewed');
   location.reload();
+};
+
+// Redirection to View item Details Page
+const goToPostDetails = async (id) => {
+  viewID.value = id;
+  await postStore.GetPostDetails(id);
+  const route = `/view/item/${viewID.value}`;
+  const animate = window.innerWidth <= 1023;
+
+  f7.views.main.router.navigate(route, {
+    animate: animate,
+  });
+};
+
+// Redirection to Post item Page
+const goToBrowse = () => {
+  const animate = window.innerWidth <= 1023;
+  f7.views.main.router.navigate('/browse', {
+    animate: animate,
+  });
 };
 
 onMounted(async () => {
@@ -80,11 +91,28 @@ onBeforeUnmount(() => {
     <PrimaryLayout :currentPage="currentPage" class="pb-12">
       <!-- Welcome Message -->
       <section class="mt-12 mb-8">
-        <h2 class="text-3xl font-semibold">Nice to see you, Ariel 👋</h2>
+        <h2 class="text-3xl font-semibold">Nice to see you, {{ authStore.user?.fullname }} 👋</h2>
       </section>
       <!-- Start - CTA: Post Item and Set Location -->
       <section class="flex flex-row flex-wrap lg:flex-nowrap gap-4 mb-4">
-        <!-- Start - Post Item CTA -->
+        <!-- Browse Item CTA -->
+        <div @click="goToBrowse"
+          class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
+          <img :src="BrowseItemIllustration" width="100" height="100">
+          <div class="flex-1">
+            <h4 class="font-bold text-xl">Browse Item</h4>
+            <p class="text-lg mt-1">Browse available items!</p>
+          </div>
+          <div class="hidden lg:block">
+            <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                d="m1 9 4-4-4-4" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Post Item CTA -->
         <div @click="goToPostItem"
           class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
           <img :src="PostIllustration" width="100" height="100">
@@ -101,13 +129,13 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <!-- Start - Set Location CTA -->
+        <!-- Set Location CTA -->
         <div
           class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
           <img :src="MyLocationIllustration" width="100" height="100">
           <div class="flex-1">
             <h4 class="font-bold text-xl">Set Location</h4>
-            <p class="text-lg mt-1">To check your distance between items!</p>
+            <p class="text-lg mt-1">Distance between items!</p>
           </div>
           <div class="hidden lg:block">
             <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
@@ -211,7 +239,7 @@ onBeforeUnmount(() => {
           </swiper-slide>
         </swiper-container>
         <div v-show="!existingArrayRecent" class="border border-gray-300 rounded-lg px-6 py-8">
-          You didn't check any items yet. Last few items you viewed will appear here...
+          You didn't check any items yet. Last few items you viewed will appear here!
         </div>
       </section>
 

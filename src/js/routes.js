@@ -14,7 +14,7 @@ import NotificationPage from '../pages/Authenticated/NotificationPage.vue';
 import StorePage from '../pages/Authenticated/StorePage.vue';
 import PostItemPage from '../pages/Authenticated/PostItemPage.vue';
 import BrowseItemPage from '../pages/Authenticated/BrowsePostPage.vue';
-import ViewItemDetailsPage from '../pages/Authenticated/ViewItemDetailsPage.vue';
+import ItemDetailsPage from '../pages/Authenticated/ItemDetailsPage.vue';
 import SearchPage from '../pages/Authenticated/SearchPage.vue';
 import ProfilePage from '../pages/Authenticated/ProfilePage.vue';
 
@@ -73,7 +73,7 @@ const routes = [
   },
   {
     path: '/view/item/:id',
-    component: ViewItemDetailsPage,
+    component: ItemDetailsPage,
     protectedRoute: true,
   },
   {

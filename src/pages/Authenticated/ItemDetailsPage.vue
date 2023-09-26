@@ -193,7 +193,7 @@ const postStore = usePostStore();
                                 <!-- Product CTA -->
                                 <div class="mt-6 lg:mt-14 flex gap-4 flex-wrap sm:flex-nowrap">
                                     <div class="w-full sm:w-auto">
-                                        <f7-button class="primary-button" large fill>Message</f7-button>
+                                        <f7-button class="primary-button" large fill>Send offer</f7-button>
                                     </div>
                                     <div
                                         class="cursor-pointer w-full sm:w-auto flex items-center justify-center gap-4 bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg">

@@ -14,10 +14,10 @@ export const usePostStore = defineStore('post', {
         async getToken() {
             await axios.get('/sanctum/csrf-cookie');
         },
-        async getCategoryList() {
+        async GetCategoryList() {
             try {
                 const response = await axios.get('/api/category/list');
-                return response.data;
+                return response.data.data;
                 
             } catch (error) {
                 console.error(error);

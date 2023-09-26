@@ -2,7 +2,6 @@
 import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { usePostStore } from '../../js/post.store';
-import useCookies from 'vue-cookies'
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 import TestIcon from '../../assets/icon-test.svg';
@@ -10,18 +9,15 @@ import TestIcon from '../../assets/icon-test.svg';
 const currentPage = 'browse';
 const postStore = usePostStore();
 const postData = ref([]);
+const categories = ref([]);
 const isClicked = ref(false);
 const slidesPerView = ref(6);
 const isLoadingItem = ref(false);
 const viewID = ref(0);
 const recentViewed = ref([]);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
+const filterModal = ref(false);
 let resizeListener = null;
-
-const slides = ref([
-    'All List', 'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
-    'Free Stuff', 'Instruments', 'Hobbies', 'Office Supplies', 'Pet Supplies'
-]);
 
 // Redirection to View item Details Page
 const goToPostDetails = async (id) => {
@@ -55,10 +51,17 @@ const updateSlidesPerView = () => {
     }
 };
 
+const toggleFilterModal = () => {
+    filterModal.value = !filterModal.value;
+}
+
 // OnMounted
 onMounted(async () => {
     updateSlidesPerView();
     resizeListener = window.addEventListener('resize', updateSlidesPerView);
+
+    // Get All Categories
+    categories.value = await postStore.GetCategoryList();
 
     // Init Preloader
     isLoadingItem.value = true;
@@ -66,6 +69,10 @@ onMounted(async () => {
     // Get All Posted Items
     const response = await postStore.GetAllPostItem();
     postData.value = response.data;
+
+    if (postData.value == 'No Data Found') {
+        postData.value = null;
+    }
 
     // Cancel Preloader state
     isLoadingItem.value = false;
@@ -99,7 +106,7 @@ onBeforeUnmount(() => {
             </template>
             <div class="-mt-6"></div>
             <!-- Categories Filter -->
-            <div class="categories-filter">
+            <div class="categories-filter relative">
                 <div class="flex items-center mb-2">
                     <p class="text-clr-primary font-medium text-lg">Top Categories</p>
                     <svg class="ml-2 w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
@@ -108,19 +115,21 @@ onBeforeUnmount(() => {
                             d="M1 5h12m0 0L9 1m4 4L9 9" />
                     </svg>
                 </div>
+                <!-- Top Categories Filter -->
                 <div class="w-full mb-3">
                     <swiper-container :pagination="false" :space-between="14" :slides-per-view="slidesPerView">
-                        <swiper-slide v-for="(slide, index) in slides" :key="index">
+                        <swiper-slide v-for="category in categories" :key="category.id">
                             <div
                                 class="cursor-pointer flex flex-row items-center gap-2 border-clr-primary hover:bg-gray-100 py-3 px-3 rounded-full">
                                 <img :src="TestIcon">
-                                <span>{{ slide }}</span>
+                                <span>{{ category.category_name }}</span>
                             </div>
                         </swiper-slide>
                     </swiper-container>
                 </div>
-                <!-- Custom Filter -->
-                <div class="flex items-center gap-2 cursor-pointer">
+
+                <!-- Custom Select Filter -->
+                <div @click="toggleFilterModal" class="flex items-center gap-2 cursor-pointer w-28">
                     <svg class="w-[20px] h-[20px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         fill="none" viewBox="0 0 20 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -128,7 +137,7 @@ onBeforeUnmount(() => {
                     </svg>
                     <p class="text-clr-primary hover:text-cyan-800 hover:underline">Select Filter</p>
                 </div>
-                <!-- Show Filtered List -->
+                <!-- Display Filtered List -->
                 <div class="mt-6">
                     <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-12 gap-2">
                         <div
@@ -151,8 +160,77 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
                 </div>
-            </div>
 
+                <!-- Select Filter Modal -->
+                <div v-show="filterModal"
+                    class="fixed top-0 left-0 flex items-center justify-center w-full h-full z-50 bg-gray-700 bg-opacity-70">
+                    <div class="flex flex-col justify-between bg-white bg-opacity-100 md:rounded-lg shadow-lg 
+                            h-screen w-full md:h-[550px] md:w-[600px] overflow-y-auto overflow-x-hidden">
+                        <!-- Header Filter Modal -->
+                        <div class="flex justify-between items-center mb-4 border-b border-gray-200 px-4 pb-4 pt-4">
+                            <div class="flex-1 -mr-6">
+                                <h2 class="text-lg font-semibold text-gray-600 text-center">Select Filter</h2>
+                                <p class="text-gray-500 text-center">Select to filter the posted items.</p>
+                            </div>
+
+                            <!-- Close Modal -->
+                            <div @click="toggleFilterModal"
+                                class="cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-full p-2">
+                                <svg class="w-[14px] h-[14px] text-gray-700" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="1" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- Body Filter Modal -->
+                        <div class="px-2 flex-1">
+                            <f7-list style="margin: -12px -12px;">
+                                <!-- Sort By Date -->
+                                <f7-list-input outline label="Sort by Date" floating-label type="select">
+                                    <option value="New">Latest Post</option>
+                                    <option value="New">Old Post</option>
+                                </f7-list-input>
+
+                                <!-- Filter by Category -->
+                                <f7-list-input outline label="Filter by category" floating-label type="select">
+                                    <option value="New">Vehicles</option>
+                                    <option value="Used - Like New">Clothes</option>
+                                    <option value="Used - Good">Tools</option>
+                                    <option value="Used - Fair">Equiptment</option>
+                                </f7-list-input>
+
+                                <!-- Item Condition -->
+                                <f7-list-input outline label="Item Condition" floating-label type="select">
+                                    <option value="New">New</option>
+                                    <option value="Used - Like New">Used - Like New</option>
+                                    <option value="Used - Good">Used - Good</option>
+                                    <option value="Used - Fair">Used - Fair</option>
+                                </f7-list-input>
+
+                                <!-- Item Condition -->
+                                <f7-list-input outline label="Item For" floating-label type="select">
+                                    <option value="New">For Sale</option>
+                                    <option value="Used - Like New">For Swap</option>
+                                    <option value="Used - Good">For Swap and Sale</option>
+                                </f7-list-input>
+
+                                <!-- Distance -->
+                                <f7-list-input outline label="Distance" floating-label type="select">
+                                    <option value="New">6 kilometers</option>
+                                    <option value="Used - Like New">7 kilometers</option>
+                                    <option value="Used - Good">8 kilometers</option>
+                                    <option value="Used - Fair">9 kilometers</option>
+                                </f7-list-input>
+                            </f7-list>
+                        </div>
+                        <!-- Footer Filter Modal -->
+                        <div class="p-2">
+                            <f7-button large fill class="primary-button">Search</f7-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Item Lists -->
             <div v-if="!isLoadingItem" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 mb-12">
                 <div v-for="post in postData" class="w-full border border-gray-200 rounded-lg hover:shadow">

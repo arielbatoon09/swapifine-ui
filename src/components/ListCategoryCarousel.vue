@@ -1,13 +1,13 @@
 <script setup>
 import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { usePostStore } from '../js/post.store';
 import TestIcon from '../assets/icon-test.svg';
 
+const postStore = usePostStore();
 const slidesPerView = ref(4);
-const slides = ref([
-  'All List', 'Vehicles', 'Apparel', 'Electronics', 'Entertainment', 'Tools',
-  'Free Stuff', 'Instruments', 'Hobbies', 'Office Supplies', 'Pet Supplies'
-]);
+const categories = ref([]);
+let resizeListener = null;
 
 const updateSlidesPerView = () => {
   if (window.innerWidth <= 767) {
@@ -19,36 +19,27 @@ const updateSlidesPerView = () => {
   }
 };
 
-// Listen for window resize events and update slidesPerView
-let resizeListener = null;
+// Redirection to Post item Page
+const goToBrowse = () => {
+  const animate = window.innerWidth <= 1023;
+  f7.views.main.router.navigate('/browse', {
+    animate: animate,
+  });
+};
 
-onMounted(() => {
-  updateSlidesPerView(); // Set initial value
-
-  // Add window resize event listener
+onMounted(async () => {
+  updateSlidesPerView();
   resizeListener = window.addEventListener('resize', updateSlidesPerView);
+
+  // Get All Categories
+  categories.value = await postStore.GetCategoryList();
 });
 
 onBeforeUnmount(() => {
-  // Remove the window resize event listener when the component is unmounted
   if (resizeListener) {
     window.removeEventListener('resize', updateSlidesPerView);
   }
 });
-
-// Redirection to Post item Page
-const goToBrowse = () => {
-  if (window.innerWidth <= 1023) {
-    f7.views.main.router.navigate('/browse', {
-      animate: true,
-    });
-  } else {
-    f7.views.main.router.navigate('/browse', {
-      animate: false,
-    });
-  }
-};
-
 </script>
 <template>
   <!-- Categories -->
@@ -69,11 +60,11 @@ const goToBrowse = () => {
     </div>
     <!-- Slider Item Categories -->
     <swiper-container class="space-x-4 mt-5" :slides-per-view="slidesPerView">
-      <swiper-slide @click="goToBrowse" v-for="(slide, index) in slides" :key="index"
+      <swiper-slide @click="goToBrowse" v-for="category in categories" :key="category.id"
         class="cursor-pointer border border-gray-200 rounded-lg px-4 py-6 w-full md:w-1/2 lg:w-1/4 shadow hover:border-gray-700">
         <div class="flex flex-row items-center gap-4">
           <img class="bg-blue-200 p-2 rounded-md" :src="TestIcon">
-          <span class="font-medium text-lg">{{ slide }}</span>
+          <span class="font-medium text-lg">{{ category.category_name }}</span>
         </div>
       </swiper-slide>
     </swiper-container>

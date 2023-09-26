@@ -28,7 +28,7 @@ const form = ref({
 onMounted(async () => {
   try {
     // Assign Category list data to categories variable
-    categories.value = await postStore.getCategoryList();
+    categories.value = await postStore.GetCategoryList();
 
   } catch (error) {
 
