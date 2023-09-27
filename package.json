@@ -31,10 +31,12 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.1",
+    "@vue-leaflet/vue-leaflet": "^0.10.1",
     "@vue/compiler-sfc": "^3.3.4",
     "autoprefixer": "^10.4.15",
     "cpy-cli": "^5.0.0",
     "cross-env": "^7.0.3",
+    "leaflet": "^1.9.4",
     "postcss": "^8.4.28",
     "postcss-preset-env": "^9.1.1",
     "sass": "^1.66.1",

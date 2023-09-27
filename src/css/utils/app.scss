@@ -50,8 +50,13 @@ body {
     background: #29ABE2;
 }
 
-.border-clr-primary{
+.border-clr-primary {
     border: 1px solid #003D66;
+}
+
+.fab-cta a:hover{
+    background: #05446F;
+    transition: all 0.2s ease-out;
 }
 
 .primary-button {

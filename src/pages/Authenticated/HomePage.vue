@@ -21,16 +21,6 @@ const viewID = ref(0);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 let resizeListener = null;
 
-// Redirection to Post item Page
-const goToPostItem = () => {
-  const route = '/post/item';
-  const animate = window.innerWidth <= 1023;
-
-  f7.views.main.router.navigate(route, {
-    animate: animate,
-  });
-};
-
 const updateSlidesPerView = () => {
   if (window.innerWidth <= 767) {
     slidesPerView.value = 1; // Mobile
@@ -59,10 +49,10 @@ const goToPostDetails = async (id) => {
   });
 };
 
-// Redirection to Post item Page
-const goToBrowse = () => {
+// Redirection to other Page
+const goToPage = (route) => {
   const animate = window.innerWidth <= 1023;
-  f7.views.main.router.navigate('/browse', {
+  f7.views.main.router.navigate(route, {
     animate: animate,
   });
 };
@@ -96,7 +86,7 @@ onBeforeUnmount(() => {
       <!-- Start - CTA: Post Item and Set Location -->
       <section class="flex flex-row flex-wrap lg:flex-nowrap gap-4 mb-4">
         <!-- Browse Item CTA -->
-        <div @click="goToBrowse"
+        <div @click="goToPage('/browse')"
           class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
           <img :src="BrowseItemIllustration" width="100" height="100">
           <div class="flex-1">
@@ -113,7 +103,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Post Item CTA -->
-        <div @click="goToPostItem"
+        <div @click="goToPage('/post/item')"
           class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
           <img :src="PostIllustration" width="100" height="100">
           <div class="flex-1">
@@ -130,7 +120,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Set Location CTA -->
-        <div
+        <div @click="goToPage('/location')"
           class="flex items-center justify-between gap-8 cursor-pointer hover:shadow border border-gray-300 rounded-lg px-6 py-6 w-full">
           <img :src="MyLocationIllustration" width="100" height="100">
           <div class="flex-1">

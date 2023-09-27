@@ -17,6 +17,7 @@ import BrowseItemPage from '../pages/Authenticated/BrowsePostPage.vue';
 import ItemDetailsPage from '../pages/Authenticated/ItemDetailsPage.vue';
 import SearchPage from '../pages/Authenticated/SearchPage.vue';
 import ProfilePage from '../pages/Authenticated/ProfilePage.vue';
+import LocationPage from '../pages/Authenticated/LocationPage.vue';
 
 const isLoggedIn = useCookies.get('isLoggedIn');
 
@@ -79,6 +80,11 @@ const routes = [
   {
     path: '/browse',
     component: BrowseItemPage,
+    protectedRoute: true,
+  },
+  {
+    path: '/location',
+    component: LocationPage,
     protectedRoute: true,
   },
   {

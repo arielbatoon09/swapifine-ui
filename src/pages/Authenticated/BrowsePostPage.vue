@@ -32,6 +32,14 @@ const goToPostDetails = async (id) => {
     });
 };
 
+// Redirection to other Page
+const goToPage = (route) => {
+  const animate = window.innerWidth <= 1023;
+  f7.views.main.router.navigate(route, {
+    animate: animate,
+  });
+};
+
 // Recent Viewed
 const doRecentView = (id) => {
     const existingArray = [...recentViewed.value];
@@ -59,7 +67,7 @@ const toggleFilterModal = () => {
 onMounted(async () => {
     updateSlidesPerView();
     resizeListener = window.addEventListener('resize', updateSlidesPerView);
-
+    
     // Get All Categories
     categories.value = await postStore.GetCategoryList();
 
