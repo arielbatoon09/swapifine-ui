@@ -1,145 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue';
-import { f7 } from 'framework7-vue';
-import { usePostStore } from '../../js/post.store';
-import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
+import { ref, computed, watch } from 'vue';
+import { f7 } from "framework7-vue";
+import SecondaryLayout from "../../Layout/SecondaryLayout.vue";
+import {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LControlLayers,
+} from "@vue-leaflet/vue-leaflet";
+import "leaflet/dist/leaflet.css";
 
-const postStore = usePostStore();
-const selectedImages = ref([]);
-const selectedImagesCount = ref(0);
-const fileInput = ref(null);
-const toastWithButton = ref(null);
-const isRequest = ref(false);
-const categories = ref([]);
-
-const form = ref({
-    category_id: null,
-    location_id: 1,
-    item_name: '',
-    item_description: '',
-    item_stocks: '',
-    condition: '',
-    item_for_type: '',
-    item_cash_value: '',
-    img_file_path: [],
-
-});
-
-onMounted(async () => {
-    try {
-        // Assign Category list data to categories variable
-        categories.value = await postStore.GetCategoryList();
-
-    } catch (error) {
-
-    }
-});
-
-const handlePostItem = async () => {
-    try {
-        // Init Loading Request
-        isRequest.value = true;
-
-        // Get Value of form data
-        const { category_id, location_id, item_name, item_description, item_cash_value, item_stocks, condition,
-            item_for_type } = form.value;
-
-        // Create an array to store file data
-        const files = [];
-
-        // Convert File objects to base64 encoded strings
-        for (const file of form.img_file_path) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-
-            await new Promise((resolve) => {
-                reader.onload = (e) => {
-                    files.push({ name: file.name, data: e.target.result });
-                    resolve();
-                };
-            });
-        }
-
-        // Distribute data to PostItem store
-        const response = await postStore.PostItem(category_id, location_id, item_name, item_description,
-            item_stocks, condition, item_for_type, item_cash_value, files);
-
-        // Cancel loading state if the response is true
-        if (response) {
-            isRequest.value = false;
-        }
-
-        // Success State
-        if (response.status == 'success') {
-            form.value.category_id = null;
-            form.value.location_id = null;
-            form.value.item_name = null;
-            form.value.item_description = null;
-            form.value.item_stocks = null;
-            form.value.condition = null;
-            form.value.item_for_type = null;
-            form.value.item_cash_value = null;
-            form.value.files = null;
-
-            // Show the toast
-            if (!toastWithButton.value) {
-                toastWithButton.value = f7.toast.create({
-                    text: 'Posted item successfully!',
-                    position: 'top',
-                    closeButton: true,
-                    closeButtonText: 'Okay',
-                    closeButtonColor: 'green',
-                    closeTimeout: 3000,
-                });
-            }
-
-            // Open the toast
-            toastWithButton.value.open();
-
-            // Redirect the user to home page
-            f7.views.main.router.navigate('/home');
-        }
-
-        console.log(response);
-
-    } catch (error) {
-        console.error("Error:", error);
-    }
-}
-
-const handleImageChange = (event) => {
-    const files = Array.from(event.target.files);
-
-    // Filter files to only include JPG, JPEG, and PNG
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    const selectedFiles = files.filter((file) => allowedTypes.includes(file.type));
-
-    // Initialize form.img_file_path as an empty array if it's not already an array
-    if (!Array.isArray(form.img_file_path)) {
-        form.img_file_path = [];
-    }
-
-    // Append selectedFiles to the existing form.img_file_path array
-    form.img_file_path = [...form.img_file_path, ...selectedFiles];
-
-    // Display selected images
-    selectedFiles.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            selectedImages.value.push({ file, url: e.target.result });
-            selectedImagesCount.value = selectedImages.value.length;
-        };
-        reader.readAsDataURL(file);
-    });
-};
-
-
-const removeImage = (index) => {
-    // Remove the selected image from the array
-    selectedImages.value.splice(index, 1);
-    form.img_file_path.splice(index, 1);
-    selectedImagesCount.value = selectedImages.value.length;
-};
+const kmList = ref([1, 2, 3, 4, 5]);
 </script>
 
 <template>
@@ -163,25 +34,33 @@ const removeImage = (index) => {
                                     </svg>
                                     <span>Choose a location where you currently staying.</span>
                                 </div>
-                                <h2 class="text-lg font-semibold text-gray-700">Change location</h2>
+                                <h2 class="text-lg font-semibold text-gray-700">
+                                    Change location
+                                </h2>
                             </f7-block>
-                            <f7-list class="-mt-7">
-                                <f7-list-input v-model:value="form.item_name" outline label="Location" floating-label
-                                    type="text" clear-button>
+                            <f7-list class="-mt-7 relative">
+                                <f7-list-input outline label="Location"
+                                    floating-label type="text" clear-button>
                                 </f7-list-input>
-                                <f7-list-input v-model:value="form.condition" outline label="Radius" floating-label
-                                    type="select">
-                                    <option value="New">New</option>
-                                    <option value="Used - Like New">Used - Like New</option>
-                                    <option value="Used - Good">Used - Good</option>
-                                    <option value="Used - Fair">Used - Fair</option>
+                                <f7-list-input outline label="Radius" floating-label type="select">
+                                    <option v-for="kilometer in kmList" value="New">{{ kilometer }} {{ kilometer == 1 ?
+                                        'kilometer' : 'kilometers' }}</option>
                                 </f7-list-input>
                             </f7-list>
-                            <!-- Next Step -->
-                            <f7-block class="flex gap-4 cta-btn">
+                            <f7-block class="flex flex-col gap-4 cta-btn">
                                 <f7-link>
                                     <f7-button large fill class="primary-button">Apply</f7-button>
                                 </f7-link>
+                                <!-- Suggestions -->
+                                <!-- <ul v-if="showSuggestions"
+                                    class="absolute -top-24 left-4 bg-white shadow-md rounded text-gray-700 border border-gray-200 w-3/4 overflow-y-auto" style="z-index: 99999 !important">
+                                    <li v-for="(suggestion, index) in suggestions.slice(0, 10)" :key="index" @click="selectSuggestion(suggestion), showSuggestions = false" class="p-4 cursor-pointer hover:bg-gray-200">
+                                        {{ suggestion }}</li>
+                                </ul> -->
+                                <!-- Map -->
+                                <div style="height: 230px; width: 100%;">
+
+                                </div>
                             </f7-block>
                         </div>
                     </div>
@@ -193,7 +72,7 @@ const removeImage = (index) => {
 
 <style scoped lang="scss">
 .post-container {
-    background: #FFF;
+    background: #fff;
     width: 100%;
     height: 100%;
 
@@ -218,7 +97,7 @@ const removeImage = (index) => {
         }
 
         &::-webkit-scrollbar-thumb {
-            background-color: #003D66;
+            background-color: #003d66;
         }
     }
 }

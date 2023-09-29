@@ -4,6 +4,10 @@ import { createPinia } from 'pinia';
 // Import Framework7
 import Framework7 from 'framework7/lite-bundle';
 
+// Leaflet
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
 // Import Framework7-Vue Plugin
 import Framework7Vue, { registerComponents } from 'framework7-vue/bundle';
 
@@ -25,8 +29,8 @@ Framework7.use(Framework7Vue);
 // Init
 const pinia = createPinia();
 const app = createApp(App);
-app.use(pinia);
 
+app.use(pinia);
 
 // Register Framework7 Vue components
 registerComponents(app);
