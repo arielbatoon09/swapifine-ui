@@ -3,6 +3,7 @@ import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
 import { usePostStore } from '../../js/post.store';
+import { useLocationStore } from '../../js/location.store';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 import PrimaryLayout from '../../Layout/PrimaryLayout.vue';
 import ListCategoryCarousel from '../../components/ListCategoryCarousel.vue';
@@ -14,12 +15,28 @@ import MyLocationIllustration from '../../assets/illustrations/my_location_illus
 const currentPage = 'home';
 const authStore = useAuthStore();
 const postStore = usePostStore();
+const locationStore = useLocationStore();
 const postData = ref([]);
 const isClicked = ref(false);
 const slidesPerView = ref(4);
 const viewID = ref(0);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 let resizeListener = null;
+
+const initRender = async () => {
+  updateSlidesPerView();
+  resizeListener = window.addEventListener('resize', updateSlidesPerView);
+
+  // Get the recent viewed post
+  if (existingArrayRecent) {
+    const response = await postStore.GetRecentViewedPost(existingArrayRecent);
+    postData.value = response.data;
+  }
+
+  // Init the distance inside the postData.value
+  populateDistance();
+  
+};
 
 const updateSlidesPerView = () => {
   if (window.innerWidth <= 767) {
@@ -57,16 +74,48 @@ const goToPage = (route) => {
   });
 };
 
-onMounted(async () => {
-  updateSlidesPerView();
-  resizeListener = window.addEventListener('resize', updateSlidesPerView);
+const calculateDistance = (userLatitude, userLongitude, postLatitude, postLongitude) => {
+  // Convert latitude and longitude from degrees to radians
+  const radLat1 = (Math.PI / 180) * userLatitude;
+  const radLon1 = (Math.PI / 180) * userLongitude;
+  const radLat2 = (Math.PI / 180) * postLatitude;
+  const radLon2 = (Math.PI / 180) * postLongitude;
 
-  // Get the recent viewed post
-  if(existingArrayRecent){
-    const response = await postStore.GetRecentViewedPost(existingArrayRecent);
-    postData.value = response.data;
-  }
-  
+  // Radius of the Earth in kilometers (mean value)
+  const Radius = 6371.0;
+
+  // Haversine formula
+  const dLon = radLon2 - radLon1;
+  const dLat = radLat2 - radLat1;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(radLat1) * Math.cos(radLat2) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const calculatedDistance = Radius * c;
+
+  // Round the calculated distance to the nearest whole number
+  const roundedDistance = Math.round(calculatedDistance);
+
+  // distance.value = roundedDistance;
+  return roundedDistance;
+};
+
+const populateDistance = async () => {
+    // Get the User Location Data
+    const getLocationAuthUser = await locationStore.GetUserLocation();
+    if (postData.value) {
+        postData.value.forEach((post) => {
+            post.distance = calculateDistance(
+                getLocationAuthUser.latitude,
+                getLocationAuthUser.longitude,
+                post.post_latitude,
+                post.post_longitude
+            );
+        });
+    }
+};
+
+onMounted(async () => {
+  // Mount and Render
+  initRender();
 });
 
 onBeforeUnmount(() => {
@@ -151,8 +200,10 @@ onBeforeUnmount(() => {
           <p v-show="existingArrayRecent" @click="clearRecentViewedPost"
             class="cursor-pointer text-red-500 hover:text-red-600">Clear Recents</p>
         </div>
-        <swiper-container :pagination="false" :allowTouchMove="false" :navigation="true" :space-between="18" :slides-per-view="slidesPerView">
-          <swiper-slide v-for="post in postData" :key="post.id" class="w-full border border-gray-200 rounded-lg hover:shadow">
+        <swiper-container :pagination="false" :allowTouchMove="false" :navigation="true" :space-between="18"
+          :slides-per-view="slidesPerView">
+          <swiper-slide v-for="post in postData" :key="post.id"
+            class="w-full border border-gray-200 rounded-lg hover:shadow">
             <!-- Post-Image-Slider -->
             <div class="w-full h-52 overflow-hidden rounded-t-lg">
               <swiper-container :pagination="true" class="demo-swiper-multiple" :space-between="0" :slides-per-view="1">
@@ -213,7 +264,7 @@ onBeforeUnmount(() => {
                     <path
                       d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                   </svg>
-                  <p class="text-clr-primary cursor-pointer hover:underline">65 km away</p>
+                  <p class="text-clr-primary cursor-pointer hover:underline">{{ post.distance }} km away</p>
                 </div>
                 <!-- Item Location -->
                 <div class="flex items-center gap-1 mt-2 pb-4">
@@ -222,7 +273,7 @@ onBeforeUnmount(() => {
                     <path
                       d="M7 0a7 7 0 0 0-1 13.92V19a1 1 0 1 0 2 0v-5.08A7 7 0 0 0 7 0Zm0 5.5A1.5 1.5 0 0 0 5.5 7a1 1 0 0 1-2 0A3.5 3.5 0 0 1 7 3.5a1 1 0 0 1 0 2Z" />
                   </svg>
-                  <p>Cebu City, Central Visayas</p>
+                  <p>{{ post.post_address }}</p>
                 </div>
               </div>
             </div>

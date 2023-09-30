@@ -2,9 +2,11 @@
 import { onMounted, ref } from 'vue';
 import { f7 } from 'framework7-vue';
 import { usePostStore } from '../../js/post.store';
+import { useLocationStore } from '../../js/location.store';
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 
 const postStore = usePostStore();
+const locationStore = useLocationStore();
 const selectedImages = ref([]);
 const selectedImagesCount = ref(0);
 const fileInput = ref(null);
@@ -14,7 +16,7 @@ const categories = ref([]);
 
 const form = ref({
   category_id: null,
-  location_id: 1,
+  location_id: null,
   item_name: '',
   item_description: '',
   item_stocks: '',
@@ -29,6 +31,11 @@ onMounted(async () => {
   try {
     // Assign Category list data to categories variable
     categories.value = await postStore.GetCategoryList();
+    // Get and Set Location
+    const getLocationID = await locationStore.GetUserLocation();
+    form.value.location_id = getLocationID.id;
+
+    console.log(form.value.location_id);
 
   } catch (error) {
 
@@ -41,8 +48,7 @@ const handlePostItem = async () => {
     isRequest.value = true;
 
     // Get Value of form data
-    const { category_id, location_id, item_name, item_description, item_cash_value, item_stocks, condition,
-      item_for_type } = form.value;
+    const { category_id, location_id, item_name, item_description, item_cash_value, item_stocks, condition, item_for_type } = form.value;
 
     // Create an array to store file data
     const files = [];
@@ -106,8 +112,6 @@ const handlePostItem = async () => {
     console.error("Error:", error);
   }
 }
-
-// const handleImageChange = (event) => {
 //   const files = Array.from(event.target.files);
 
 //   // Filter files to only include JPG, JPEG, and PNG

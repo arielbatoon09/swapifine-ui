@@ -2,9 +2,11 @@
 import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { usePostStore } from '../js/post.store';
+import { useLocationStore } from '../js/location.store';
 import TestProfile from '../assets/profile/test_profile.jpg';
 
 const postStore = usePostStore();
+const locationStore = useLocationStore();
 const postData = ref([]);
 const isClicked = ref(false);
 const slidesPerView = ref(4);
@@ -14,45 +16,19 @@ const recentViewed = ref([]);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 let resizeListener = null;
 
-// Redirection to View item Details Page
-const goToPostDetails = async (id) => {
-    viewID.value = id;
-    doRecentView(id);
-    await postStore.GetPostDetails(id);
-    const route = `/view/item/${viewID.value}`;
-    const animate = window.innerWidth <= 1023;
-    f7.views.main.router.navigate(route, {
-        animate: animate,
-    });
-}
-
-// Recent Viewed
-const doRecentView = (id) => {
-    const existingArray = [...recentViewed.value];
-    existingArray.push(id);
-    localStorage.setItem('RecentViewed', JSON.stringify(existingArray));
-    recentViewed.value = existingArray;
-};
-
-const updateSlidesPerView = () => {
-  if (window.innerWidth <= 767) {
-    slidesPerView.value = 1; // Mobile
-  } else if (window.innerWidth <= 1023) {
-    slidesPerView.value = 2; // Tablet
-  } else {
-    slidesPerView.value = 4; // Desktop
-  }
-};
-
-onMounted(async () => {
+const initRender = async () => {
     updateSlidesPerView();
     resizeListener = window.addEventListener('resize', updateSlidesPerView);
 
     // Init Preloader
     isLoadingItem.value = true;
 
+    // Get Top3 Category Posts
     const response = await postStore.GetTop3PostCategory();
     postData.value = response.data;
+
+    // Init the distance inside the postData.value
+    populateDistance();
 
     if (postData.value == 'No Data Found') {
         postData.value == null;
@@ -70,12 +46,101 @@ onMounted(async () => {
             recentViewed.value = [];
         }
     };
+};
+
+// Redirection to View item Details Page
+const goToPostDetails = async (id) => {
+    viewID.value = id;
+    doRecentView(id);
+    await postStore.GetPostDetails(id);
+    const route = `/view/item/${viewID.value}`;
+    const animate = window.innerWidth <= 1023;
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
+};
+
+// Redirection to other Page
+const goToPage = (route) => {
+    const animate = window.innerWidth <= 1023;
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
+};
+
+// Recent Viewed
+const doRecentView = (id) => {
+    const existingArray = [...recentViewed.value];
+    existingArray.push(id);
+    localStorage.setItem('RecentViewed', JSON.stringify(existingArray));
+    recentViewed.value = existingArray;
+};
+
+const updateSlidesPerView = () => {
+    if (window.innerWidth <= 767) {
+        slidesPerView.value = 1; // Mobile
+    } else if (window.innerWidth <= 1023) {
+        slidesPerView.value = 2; // Tablet
+    } else {
+        slidesPerView.value = 4; // Desktop
+    }
+};
+
+const calculateDistance = (userLatitude, userLongitude, postLatitude, postLongitude) => {
+    // console.log(userLatitude + ' ' + userLongitude + ' ' + postLatitude + ' ' + postLongitude);
+    // Convert latitude and longitude from degrees to radians
+    const radLat1 = (Math.PI / 180) * userLatitude;
+    const radLon1 = (Math.PI / 180) * userLongitude;
+    const radLat2 = (Math.PI / 180) * postLatitude;
+    const radLon2 = (Math.PI / 180) * postLongitude;
+
+    // Radius of the Earth in kilometers (mean value)
+    const Radius = 6371.0;
+
+    // Haversine formula
+    const dLon = radLon2 - radLon1;
+    const dLat = radLat2 - radLat1;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(radLat1) * Math.cos(radLat2) * Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const calculatedDistance = Radius * c;
+
+    // Round the calculated distance to the nearest whole number
+    const roundedDistance = Math.round(calculatedDistance);
+
+    // distance.value = roundedDistance;
+    return roundedDistance;
+};
+
+const populateDistance = async () => {
+    // Get the User Location Data
+    const getLocationAuthUser = await locationStore.GetUserLocation();
+
+    if (postData.value) {
+        postData.value.forEach((post) => {
+            if (post.posts && post.posts.length > 0) {
+                // Calculate distance for each nested post
+                post.posts.forEach((nestedPost) => {
+                    nestedPost.distance = calculateDistance(
+                        getLocationAuthUser.latitude,
+                        getLocationAuthUser.longitude,
+                        nestedPost.post_latitude,
+                        nestedPost.post_longitude
+                    );
+                });
+            }
+        });
+    }
+};
+
+onMounted(async () => {
+    // Mount and Render
+    initRender();
 });
 
 onBeforeUnmount(() => {
-  if (resizeListener) {
-    window.removeEventListener('resize', updateSlidesPerView);
-  }
+    if (resizeListener) {
+        window.removeEventListener('resize', updateSlidesPerView);
+    }
 });
 </script>
 
@@ -151,7 +216,8 @@ onBeforeUnmount(() => {
                                 <path
                                     d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                             </svg>
-                            <p class="text-clr-primary cursor-pointer hover:underline">65 km away</p>
+                            <p @click="goToPage('/location')" class="text-clr-primary cursor-pointer hover:underline">{{
+                                post.distance }} km away</p>
                         </div>
                         <!-- Item Location -->
                         <div class="flex items-center gap-1 mt-2 pb-4">
@@ -160,7 +226,7 @@ onBeforeUnmount(() => {
                                 <path
                                     d="M7 0a7 7 0 0 0-1 13.92V19a1 1 0 1 0 2 0v-5.08A7 7 0 0 0 7 0Zm0 5.5A1.5 1.5 0 0 0 5.5 7a1 1 0 0 1-2 0A3.5 3.5 0 0 1 7 3.5a1 1 0 0 1 0 2Z" />
                             </svg>
-                            <p>Cebu City, Central Visayas</p>
+                            <p>{{ post.post_address }}</p>
                         </div>
                     </div>
                 </div>
@@ -191,4 +257,5 @@ onBeforeUnmount(() => {
 .swiper-button-next svg,
 .swiper-button-prev svg {
     width: 20%;
-}</style>
+}
+</style>

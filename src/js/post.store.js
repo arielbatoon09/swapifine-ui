@@ -63,7 +63,7 @@ export const usePostStore = defineStore('post', {
                 console.error(error);
             }
         },
-        async PostItem(category_id, location_id,  item_name, item_description, 
+        async PostItem(category_id, location_id, item_name, item_description, 
             item_stocks, condition, item_for_type, item_cash_value, img_file_path) {
             try {
                 await this.getToken();

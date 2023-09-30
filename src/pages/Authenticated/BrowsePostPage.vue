@@ -2,12 +2,14 @@
 import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { usePostStore } from '../../js/post.store';
+import { useLocationStore } from '../../js/location.store';
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 import TestIcon from '../../assets/icon-test.svg';
 
 const currentPage = 'browse';
 const postStore = usePostStore();
+const locationStore = useLocationStore();
 const postData = ref([]);
 const categories = ref([]);
 const isClicked = ref(false);
@@ -18,6 +20,42 @@ const recentViewed = ref([]);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 const filterModal = ref(false);
 let resizeListener = null;
+
+const initRender = async () => {
+    // Update slides per view and Resize Event listener
+    updateSlidesPerView();
+    resizeListener = window.addEventListener('resize', updateSlidesPerView);
+
+    // Get All Categories
+    categories.value = await postStore.GetCategoryList();
+
+    // Init Preloader
+    isLoadingItem.value = true;
+
+    // Get All Posted Items
+    const postResponse = await postStore.GetAllPostItem();
+    postData.value = postResponse.data;
+
+    // Init the distance inside the postData.value
+    populateDistance();
+
+    if (postData.value == 'No Data Found') {
+        postData.value = null;
+    }
+
+    // Cancel Preloader state
+    isLoadingItem.value = false;
+
+    // Get the RecentViewed Post
+    if (existingArrayRecent) {
+        try {
+            recentViewed.value = JSON.parse(existingArrayRecent);
+        } catch (error) {
+            console.error('Error parsing RecentViewed localStorage:', error);
+            recentViewed.value = [];
+        }
+    };
+};
 
 // Redirection to View item Details Page
 const goToPostDetails = async (id) => {
@@ -34,10 +72,10 @@ const goToPostDetails = async (id) => {
 
 // Redirection to other Page
 const goToPage = (route) => {
-  const animate = window.innerWidth <= 1023;
-  f7.views.main.router.navigate(route, {
-    animate: animate,
-  });
+    const animate = window.innerWidth <= 1023;
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
 };
 
 // Recent Viewed
@@ -61,39 +99,52 @@ const updateSlidesPerView = () => {
 
 const toggleFilterModal = () => {
     filterModal.value = !filterModal.value;
-}
+};
+
+const calculateDistance = (userLatitude, userLongitude, postLatitude, postLongitude) => {
+    // Convert latitude and longitude from degrees to radians
+    const radLat1 = (Math.PI / 180) * userLatitude;
+    const radLon1 = (Math.PI / 180) * userLongitude;
+    const radLat2 = (Math.PI / 180) * postLatitude;
+    const radLon2 = (Math.PI / 180) * postLongitude;
+
+    // Radius of the Earth in kilometers (mean value)
+    const Radius = 6371.0;
+
+    // Haversine formula
+    const dLon = radLon2 - radLon1;
+    const dLat = radLat2 - radLat1;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(radLat1) * Math.cos(radLat2) * Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const calculatedDistance = Radius * c;
+
+    // Round the calculated distance to the nearest whole number
+    const roundedDistance = Math.round(calculatedDistance);
+
+    // distance.value = roundedDistance;
+    return roundedDistance;
+};
+
+// Function to populate distance information in post data
+const populateDistance = async () => {
+    // Get the User Location Data
+    const getLocationAuthUser = await locationStore.GetUserLocation();
+    if (postData.value) {
+        postData.value.forEach((post) => {
+            post.distance = calculateDistance(
+                getLocationAuthUser.latitude,
+                getLocationAuthUser.longitude,
+                post.post_latitude,
+                post.post_longitude
+            );
+        });
+    }
+};
 
 // OnMounted
 onMounted(async () => {
-    updateSlidesPerView();
-    resizeListener = window.addEventListener('resize', updateSlidesPerView);
-    
-    // Get All Categories
-    categories.value = await postStore.GetCategoryList();
-
-    // Init Preloader
-    isLoadingItem.value = true;
-
-    // Get All Posted Items
-    const response = await postStore.GetAllPostItem();
-    postData.value = response.data;
-
-    if (postData.value == 'No Data Found') {
-        postData.value = null;
-    }
-
-    // Cancel Preloader state
-    isLoadingItem.value = false;
-
-    // Get the RecentViewed Post
-    if (existingArrayRecent) {
-        try {
-            recentViewed.value = JSON.parse(existingArrayRecent);
-        } catch (error) {
-            console.error('Error parsing RecentViewed localStorage:', error);
-            recentViewed.value = [];
-        }
-    };
+    // Mount and Render
+    initRender();
 });
 
 // BeforeMount
@@ -127,8 +178,8 @@ onBeforeUnmount(() => {
                 <div class="w-full mb-3">
                     <swiper-container :pagination="false" :space-between="14" :slides-per-view="slidesPerView">
                         <swiper-slide v-for="category in categories" :key="category.id">
-                            <div
-                                class="cursor-pointer flex flex-row items-center gap-2 border-clr-primary hover:bg-gray-100 py-3 px-3 rounded-full">
+                            <div class="cursor-pointer flex flex-row flex-nowrap whitespace-nowrap items-center gap-2 border-clr-primary 
+                                hover:bg-gray-100 py-3 px-3 rounded-full">
                                 <img :src="TestIcon">
                                 <span>{{ category.category_name }}</span>
                             </div>
@@ -299,26 +350,22 @@ onBeforeUnmount(() => {
                             </div>
                             <!-- Item Distance -->
                             <div class="flex items-center gap-1 mt-1">
-                                <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true"
+                                <svg class="w-[18px] h-[18px] text-clr-primary" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
                                     <path
                                         d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                                 </svg>
-                                <p class="text-clr-primary cursor-pointer hover:underline">65 km away</p>
+                                <p @click="goToPage('/location')" class="text-clr-primary cursor-pointer hover:underline">{{ post.distance }} km away</p>
                             </div>
                             <!-- Item Location -->
                             <div class="flex items-center gap-1 mt-2 pb-4">
-                                <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true"
+                                <svg class="w-[18px] h-[18px] text-clr-primary" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
                                     <path
                                         d="M7 0a7 7 0 0 0-1 13.92V19a1 1 0 1 0 2 0v-5.08A7 7 0 0 0 7 0Zm0 5.5A1.5 1.5 0 0 0 5.5 7a1 1 0 0 1-2 0A3.5 3.5 0 0 1 7 3.5a1 1 0 0 1 0 2Z" />
                                 </svg>
-                                <p>Cebu City, Central Visayas</p>
+                                <p>{{ post.post_address }}</p>
                             </div>
-                            <!-- CTA View Item -->
-                            <!-- <div @click="goToPostDetails(post.id)" class="cursor-pointer bg-blue-100 py-2 rounded-md text-center">
-                                <span class="text-blue-500">View Item</span>
-                            </div> -->
                         </div>
                     </div>
                 </div>
