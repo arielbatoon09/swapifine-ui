@@ -35,8 +35,6 @@ onMounted(async () => {
     const getLocationID = await locationStore.GetUserLocation();
     form.value.location_id = getLocationID.id;
 
-    console.log(form.value.location_id);
-
   } catch (error) {
 
   }

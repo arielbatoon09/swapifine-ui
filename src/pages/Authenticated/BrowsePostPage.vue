@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { usePostStore } from '../../js/post.store';
 import { useLocationStore } from '../../js/location.store';
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
@@ -16,6 +16,7 @@ const isClicked = ref(false);
 const slidesPerView = ref(6);
 const isLoadingItem = ref(false);
 const viewID = ref(0);
+const filteredDistancePost = ref([]);
 const recentViewed = ref([]);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 const filterModal = ref(false);
@@ -37,7 +38,10 @@ const initRender = async () => {
     postData.value = postResponse.data;
 
     // Init the distance inside the postData.value
-    populateDistance();
+    await populateDistance();
+
+    // Init the Group Distance Filter
+    await filterAndPopulateDistance();
 
     if (postData.value == 'No Data Found') {
         postData.value = null;
@@ -51,7 +55,6 @@ const initRender = async () => {
         try {
             recentViewed.value = JSON.parse(existingArrayRecent);
         } catch (error) {
-            console.error('Error parsing RecentViewed localStorage:', error);
             recentViewed.value = [];
         }
     };
@@ -125,11 +128,20 @@ const calculateDistance = (userLatitude, userLongitude, postLatitude, postLongit
     return roundedDistance;
 };
 
+// Check if the Distance is NaN
+const displayDistance = (distance) => {
+    if (!isNaN(distance)) {
+        return `${distance} km away`;
+    } else {
+        return 'Set your location';
+    }
+};
+
 // Function to populate distance information in post data
 const populateDistance = async () => {
     // Get the User Location Data
     const getLocationAuthUser = await locationStore.GetUserLocation();
-    if (postData.value) {
+    if (postData.value != 'No Data Found') {
         postData.value.forEach((post) => {
             post.distance = calculateDistance(
                 getLocationAuthUser.latitude,
@@ -138,7 +150,26 @@ const populateDistance = async () => {
                 post.post_longitude
             );
         });
+    };
+};
+
+// Filter post to specfically view the local areas
+const filterAndPopulateDistance = async () => {
+    // Populate distances for all posts
+    await populateDistance();
+
+    // Filter posts below 10 kilometers
+    if (postData.value !== 'No Data Found') {
+        filteredDistancePost.value = postData.value.filter((post) => {
+            return !isNaN(post.distance) && post.distance < 10;
+        });
+
+        // Check if there are posts available within the user's distance
+        return filteredDistancePost.value.length > 0;
     }
+
+    // No data found
+    return false;
 };
 
 // OnMounted
@@ -292,7 +323,7 @@ onBeforeUnmount(() => {
             </div>
             <!-- Item Lists -->
             <div v-if="!isLoadingItem" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 mb-12">
-                <div v-for="post in postData" class="w-full border border-gray-200 rounded-lg hover:shadow">
+                <div v-for="post in filteredDistancePost" class="w-full border border-gray-200 rounded-lg hover:shadow">
                     <!-- Post-Image-Slider -->
                     <div class="w-full h-52 overflow-hidden rounded-t-lg">
                         <swiper-container :pagination="true" :space-between="0" :slides-per-view="1">
@@ -355,7 +386,9 @@ onBeforeUnmount(() => {
                                     <path
                                         d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                                 </svg>
-                                <p @click="goToPage('/location')" class="text-clr-primary cursor-pointer hover:underline">{{ post.distance }} km away</p>
+                                <p @click="goToPage('/location')" class="text-clr-primary cursor-pointer hover:underline">
+                                    {{ displayDistance(post.distance) }}
+                                </p>
                             </div>
                             <!-- Item Location -->
                             <div class="flex items-center gap-1 mt-2 pb-4">
@@ -373,8 +406,8 @@ onBeforeUnmount(() => {
             <div v-else class="mt-6 mb-12 flex items-center justify-center">
                 <f7-preloader />
             </div>
-            <div v-show="!postData" class="border border-gray-300 rounded-lg px-6 py-8 mb-12">
-                There aren't any posted items available right now. Please try again!
+            <div v-if="!postData" class="border border-gray-300 rounded-lg px-6 py-8 mb-12">
+                There's no available post right now. Please try again!
             </div>
         </SecondaryLayout>
     </f7-page>

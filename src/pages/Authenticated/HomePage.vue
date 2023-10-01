@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
 import { usePostStore } from '../../js/post.store';
 import { useLocationStore } from '../../js/location.store';
@@ -98,19 +98,28 @@ const calculateDistance = (userLatitude, userLongitude, postLatitude, postLongit
   return roundedDistance;
 };
 
-const populateDistance = async () => {
-    // Get the User Location Data
-    const getLocationAuthUser = await locationStore.GetUserLocation();
-    if (postData.value) {
-        postData.value.forEach((post) => {
-            post.distance = calculateDistance(
-                getLocationAuthUser.latitude,
-                getLocationAuthUser.longitude,
-                post.post_latitude,
-                post.post_longitude
-            );
-        });
+// Check if the Distance is NaN
+const displayDistance = (distance) => {
+    if (!isNaN(distance)) {
+      return `${distance} km away`;
+    } else {
+      return 'Set your location';
     }
+};
+
+const populateDistance = async () => {
+  // Get the User Location Data
+  const getLocationAuthUser = await locationStore.GetUserLocation();
+  if (postData.value != 'No Data Found') {
+    postData.value.forEach((post) => {
+      post.distance = calculateDistance(
+        getLocationAuthUser.latitude,
+        getLocationAuthUser.longitude,
+        post.post_latitude,
+        post.post_longitude
+      );
+    });
+  }
 };
 
 onMounted(async () => {
@@ -264,7 +273,9 @@ onBeforeUnmount(() => {
                     <path
                       d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                   </svg>
-                  <p @click="goToPage('/location')" class="text-clr-primary cursor-pointer hover:underline">{{ post.distance }} km away</p>
+                  <p @click="goToPage('/location')" class="text-clr-primary cursor-pointer hover:underline">
+                    {{ displayDistance(post.distance) }}
+                  </p>
                 </div>
                 <!-- Item Location -->
                 <div class="flex items-center gap-1 mt-2 pb-4">
@@ -280,37 +291,14 @@ onBeforeUnmount(() => {
           </swiper-slide>
         </swiper-container>
         <div v-show="!existingArrayRecent" class="border border-gray-300 rounded-lg px-6 py-8">
-          You didn't check any items yet. Last few items you viewed will appear here!
+          You didn't check any items yet. Recent viewed will appear here!
         </div>
       </section>
-
       <!-- End - Recently viewed -->
 
       <!-- Start - Top Category and Items -->
       <CategoryPostCarousel />
       <!-- End - Top Category and Items -->
-
-      <!-- Start - Advertising Carousel -->
-      <!-- <section class="mb-12">
-        <swiper-container :pagination="true" :space-between="50" :speed="900">
-          <swiper-slide>
-            <div class="bg-gray-400 py-32 px-12">
-              Test
-            </div>
-          </swiper-slide>
-          <swiper-slide>
-            <div class="bg-red-400 py-32 px-12">
-              Test
-            </div>
-          </swiper-slide>
-          <swiper-slide>
-            <div class="bg-green-400 py-32 px-12">
-              Test
-            </div>
-          </swiper-slide>
-        </swiper-container>
-      </section> -->
-      <!-- End - Advertising Carousel -->
     </PrimaryLayout>
   </f7-page>
 </template>

@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { usePostStore } from '../js/post.store';
 import { useLocationStore } from '../js/location.store';
 import TestProfile from '../assets/profile/test_profile.jpg';
@@ -30,7 +30,7 @@ const initRender = async () => {
     // Init the distance inside the postData.value
     populateDistance();
 
-    if (postData.value == 'No Data Found') {
+    if (postData.status == 'No Data Found') {
         postData.value == null;
     }
 
@@ -42,7 +42,6 @@ const initRender = async () => {
         try {
             recentViewed.value = JSON.parse(existingArrayRecent);
         } catch (error) {
-            console.error('Error parsing RecentViewed localStorage:', error);
             recentViewed.value = [];
         }
     };
@@ -111,11 +110,20 @@ const calculateDistance = (userLatitude, userLongitude, postLatitude, postLongit
     return roundedDistance;
 };
 
+// Check if the Distance is NaN
+const displayDistance = (distance) => {
+    if (!isNaN(distance)) {
+      return `${distance} km away`;
+    } else {
+      return 'Set your location';
+    }
+};
+
 const populateDistance = async () => {
     // Get the User Location Data
     const getLocationAuthUser = await locationStore.GetUserLocation();
 
-    if (postData.value) {
+    if (postData.value != 'No Data Found') {
         postData.value.forEach((post) => {
             if (post.posts && post.posts.length > 0) {
                 // Calculate distance for each nested post
@@ -216,8 +224,9 @@ onBeforeUnmount(() => {
                                 <path
                                     d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                             </svg>
-                            <p @click="goToPage('/location')" class="text-clr-primary cursor-pointer hover:underline">{{
-                                post.distance }} km away</p>
+                            <p @click="goToPage('/location')" class="text-clr-primary cursor-pointer hover:underline">
+                                {{ displayDistance(post.distance) }}
+                            </p>
                         </div>
                         <!-- Item Location -->
                         <div class="flex items-center gap-1 mt-2 pb-4">
