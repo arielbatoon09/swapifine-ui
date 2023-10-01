@@ -20,7 +20,17 @@ const filteredDistancePost = ref([]);
 const recentViewed = ref([]);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 const filterModal = ref(false);
+const distance = ref(10);
+const kilometersList = ref([1,2,5,6,10,20,40,60,80,250,500]);
 let resizeListener = null;
+
+const formFilterData = ref({
+    sortDate: '',
+    category: '',
+    item_condition: '',
+    item_for_type: '',
+    distance: '',
+});
 
 const initRender = async () => {
     // Update slides per view and Resize Event listener
@@ -36,6 +46,9 @@ const initRender = async () => {
     // Get All Posted Items
     const postResponse = await postStore.GetAllPostItem();
     postData.value = postResponse.data;
+
+    // Test Console Browse Data
+    console.log(postData.value);
 
     // Init the distance inside the postData.value
     await populateDistance();
@@ -153,6 +166,11 @@ const populateDistance = async () => {
     };
 };
 
+const handleCustomFilter = () => {
+    console.log(formFilterData.value.sortDate + ', ' + formFilterData.value.category + ', '
+    + formFilterData.value.item_condition + ', '+ formFilterData.value.item_for_type + ', '+ formFilterData.value.distance);
+};
+
 // Filter post to specfically view the local areas
 const filterAndPopulateDistance = async () => {
     // Populate distances for all posts
@@ -161,7 +179,7 @@ const filterAndPopulateDistance = async () => {
     // Filter posts below 10 kilometers
     if (postData.value !== 'No Data Found') {
         filteredDistancePost.value = postData.value.filter((post) => {
-            return !isNaN(post.distance) && post.distance < 10;
+            return !isNaN(post.distance) && post.distance < distance.value;
         });
 
         // Check if there are posts available within the user's distance
@@ -277,21 +295,18 @@ onBeforeUnmount(() => {
                         <div class="px-2 flex-1">
                             <f7-list style="margin: -12px -12px;">
                                 <!-- Sort By Date -->
-                                <f7-list-input outline label="Sort by Date" floating-label type="select">
-                                    <option value="New">Latest Post</option>
-                                    <option value="New">Old Post</option>
+                                <f7-list-input v-model:value="formFilterData.sortDate" outline label="Sort by Date" floating-label type="select">
+                                    <option value="7">Latest Post</option>
+                                    <option value="30">Old Post</option>
                                 </f7-list-input>
 
                                 <!-- Filter by Category -->
-                                <f7-list-input outline label="Filter by category" floating-label type="select">
-                                    <option value="New">Vehicles</option>
-                                    <option value="Used - Like New">Clothes</option>
-                                    <option value="Used - Good">Tools</option>
-                                    <option value="Used - Fair">Equiptment</option>
+                                <f7-list-input v-model:value="formFilterData.category" outline label="Filter by category" floating-label type="select">
+                                    <option v-for="category in categories" :key="category.id" :value="category.category_name">{{ category.category_name }}</option>
                                 </f7-list-input>
 
                                 <!-- Item Condition -->
-                                <f7-list-input outline label="Item Condition" floating-label type="select">
+                                <f7-list-input v-model:value="formFilterData.item_condition" outline label="Item Condition" floating-label type="select">
                                     <option value="New">New</option>
                                     <option value="Used - Like New">Used - Like New</option>
                                     <option value="Used - Good">Used - Good</option>
@@ -299,24 +314,21 @@ onBeforeUnmount(() => {
                                 </f7-list-input>
 
                                 <!-- Item Condition -->
-                                <f7-list-input outline label="Item For" floating-label type="select">
-                                    <option value="New">For Sale</option>
-                                    <option value="Used - Like New">For Swap</option>
-                                    <option value="Used - Good">For Swap and Sale</option>
+                                <f7-list-input v-model:value="formFilterData.item_for_type" outline label="Item For" floating-label type="select">
+                                    <option value="For Sale">For Sale</option>
+                                    <option value="For Swap">For Swap</option>
+                                    <option value="For Swap and Sale">For Swap and Sale</option>
                                 </f7-list-input>
 
                                 <!-- Distance -->
-                                <f7-list-input outline label="Distance" floating-label type="select">
-                                    <option value="New">6 kilometers</option>
-                                    <option value="Used - Like New">7 kilometers</option>
-                                    <option value="Used - Good">8 kilometers</option>
-                                    <option value="Used - Fair">9 kilometers</option>
+                                <f7-list-input v-model:value="formFilterData.distance" outline label="Distance" floating-label type="select">
+                                    <option v-for="kilometer in kilometersList" :value="kilometer">{{ kilometer == 1 ? kilometer +' kilometer' : kilometer +' kilometers' }}</option>
                                 </f7-list-input>
                             </f7-list>
                         </div>
                         <!-- Footer Filter Modal -->
-                        <div class="p-2">
-                            <f7-button large fill class="primary-button">Search</f7-button>
+                        <div class="p-2 border-t">
+                            <f7-button @click="handleCustomFilter" large fill class="primary-button">Search</f7-button>
                         </div>
                     </div>
                 </div>
