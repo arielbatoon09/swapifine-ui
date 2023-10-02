@@ -173,6 +173,15 @@ const populateDistance = async () => {
 const handleCustomFilter = () => {
     const newFilterData = formFilterData.value;
 
+    // Log the filter values
+    console.log(
+        newFilterData.sortDate + ', ' +
+        newFilterData.category + ', ' +
+        newFilterData.item_condition + ', ' +
+        newFilterData.item_for_type + ', ' +
+        newFilterData.distance
+    );
+
     // Update the filter state in the Pinia store
     filterStore.setFilter(newFilterData);
 
@@ -183,27 +192,14 @@ const handleCustomFilter = () => {
 
 // To get all filter filter values as an object
 const filterValues = computed(() => {
-    const sortDate = filterStore.sortDate;
-
-    let sortDateValue = null;
-    if (sortDate >= 1 && sortDate <= 29) {
-        sortDateValue = "Latest Post";
-    } else if (sortDate >= 30) {
-        sortDateValue = "Older Post";
-    } else {
-        sortDateValue = null;
-    }
-
     return {
-        'sortDate': sortDateValue,
+        'sortDate': filterStore.sortDate,
         'category_name': filterStore.category,
         'item_condition': filterStore.item_condition,
         'item_for_type': filterStore.item_for_type,
-        'Distance': filterStore.distance ? filterStore.distance + ' km away': '',
+        'Distance': filterStore.distance,
     };
 });
-
-
 
 // Filter post to specfically view the local areas
 const filterAndPopulateDistance = async () => {
@@ -284,8 +280,7 @@ onBeforeUnmount(() => {
                     <div class="flex">
                         <div v-for="(filter, key) in filterValues" :key="key" class="cursor-pointer">
                             <template v-if="filter && filter !== 'undefined'">
-                                <div
-                                    class="w-[200px] mr-2 rounded-full bg-gray-100 hover:bg-gray-200 py-2 px-3 flex items-center">
+                                <div class="w-[200px] mr-2 rounded-full bg-gray-100 hover:bg-gray-200 py-2 px-3 flex items-center">
                                     <div class="flex-1">
                                         <p class="text-clr-primary whitespace-nowrap overflow-ellipsis">{{ filter }}</p>
                                     </div>
@@ -328,7 +323,7 @@ onBeforeUnmount(() => {
                                 <f7-list-input v-model:value="formFilterData.sortDate" outline label="Sort by Date"
                                     floating-label type="select">
                                     <option value="7">Latest Post</option>
-                                    <option value="30">Older Post</option>
+                                    <option value="30">Old Post</option>
                                 </f7-list-input>
 
                                 <!-- Filter by Category -->
@@ -468,7 +463,6 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 100%;
 }
-
 // .grid-cols-auto-fill {
 //   grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
 // }
