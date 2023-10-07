@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
 import { usePostStore } from '../../js/post.store';
 import { useLocationStore } from '../../js/location.store';
 import { useFilterStore } from '../../js/filter.store';
@@ -18,12 +18,10 @@ const isClicked = ref(false);
 const slidesPerView = ref(6);
 const isLoadingItem = ref(false);
 const viewID = ref(0);
-const filteredDistancePost = ref([]);
 const recentViewed = ref([]);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 const filterModal = ref(false);
 const showFilterList = ref(false);
-const distance = ref(10);
 const kilometersList = ref([1, 2, 5, 6, 10, 20, 40, 60, 80, 250, 500]);
 let resizeListener = null;
 
@@ -40,6 +38,9 @@ const initRender = async () => {
     updateSlidesPerView();
     resizeListener = window.addEventListener('resize', updateSlidesPerView);
 
+    // Reset Filter State by Default
+    handleResetFilter();
+
     // Get All Categories
     categories.value = await postStore.GetCategoryList();
 
@@ -49,15 +50,6 @@ const initRender = async () => {
     // Get All Posted Items
     const postResponse = await postStore.GetAllPostItem();
     postData.value = postResponse.data;
-
-    // Test Console Browse Data
-    console.log(postData.value);
-
-    // Init the distance inside the postData.value
-    await populateDistance();
-
-    // Init the Group Distance Filter
-    await filterAndPopulateDistance();
 
     if (postData.value == 'No Data Found') {
         postData.value = null;
@@ -173,13 +165,67 @@ const populateDistance = async () => {
 const handleCustomFilter = () => {
     const newFilterData = formFilterData.value;
 
-    // Update the filter state in the Pinia store
-    filterStore.setFilter(newFilterData);
-
     if (newFilterData) {
+        // Update the filter state in the Pinia
+        filterStore.setFilter(newFilterData);
         showFilterList.value = true;
+        
+        filterModal.value = !filterModal.value;
     }
 };
+
+// Reset Click Filter
+const handleResetFilter = () => {
+    filterStore.sortDate = null;
+    filterStore.category = null;
+    filterStore.item_condition = null;
+    filterStore.item_for_type = null;
+    filterStore.distance = null;
+    // Form Filter
+    formFilterData.value.sortDate = null;
+    formFilterData.value.category = null;
+    formFilterData.value.item_condition = null;
+    formFilterData.value.item_for_type = null;
+    formFilterData.value.distance = null;
+    
+    showFilterList.value = false;
+};
+
+// Remove Filter
+const removeFilter = (filterType) => {
+
+    switch (filterType) {
+        case "sortDate":
+            filterStore.sortDate = null;
+            formFilterData.value.sortDate = null;
+            break;
+        case "category_name":
+            filterStore.category = null;
+            formFilterData.value.category = null;
+            break;
+        case "item_condition":
+            filterStore.item_condition = null;
+            formFilterData.value.item_condition = null;
+            break;
+        case "item_for_type":
+            filterStore.item_for_type = null;
+            formFilterData.value.item_for_type = null;
+            break;
+        case "Distance":
+            filterStore.distance = null;
+            formFilterData.value.distance = null;
+            break;
+    }
+};
+
+
+const isShowClearFilter = computed(() => {
+    if (formFilterData.value !== null) {
+        return Object.values(formFilterData.value).every(value => value === null);
+    }
+    return false;
+});
+
 
 // To get all filter filter values as an object
 const filterValues = computed(() => {
@@ -199,38 +245,64 @@ const filterValues = computed(() => {
         'category_name': filterStore.category,
         'item_condition': filterStore.item_condition,
         'item_for_type': filterStore.item_for_type,
-        'Distance': filterStore.distance ? filterStore.distance + ' km away': '',
+        'Distance': filterStore.distance ? filterStore.distance + ' km away' : '',
     };
 });
 
-
-
-// Filter post to specfically view the local areas
-const filterAndPopulateDistance = async () => {
+const filteredPost = computed(() => {
     // Populate distances for all posts
-    await populateDistance();
+    populateDistance();
 
-    // Filter posts below 10 kilometers
-    if (postData.value !== 'No Data Found') {
-        filteredDistancePost.value = postData.value.filter((post) => {
-            return !isNaN(post.distance) && post.distance < distance.value;
+    // Current Post Data List
+    const data = postData.value;
+
+    // Data state from Filter Store
+    const { category, sortDate, item_condition, item_for_type, distance } = filterStore;
+
+    // Filter posts below the selected distance
+    if (data !== 'No Data Found') {
+        const filteredPosts = data.filter((post) => {
+            if (sortDate !== null) {
+                // Calculate the date threshold based on the number of days
+                const postedDate = new Date(post.created_at);
+                const currentDate = new Date();
+                const timeDifference = currentDate - postedDate;
+                const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+
+                // To distinguish the sortDate value
+                let operator;
+                if (sortDate == 7) {
+                    operator = '<';
+                } else if (sortDate == 30) {
+                    operator = '>=';
+                }
+
+                return (
+                    (!category || post.category_name === category) &&
+                    (!sortDate || (operator === '<' ? daysDifference < sortDate : daysDifference >= sortDate)) &&
+                    (!item_condition || post.condition === item_condition) &&
+                    (!item_for_type || post.item_for_type === item_for_type) &&
+                    (!distance || post.distance <= distance)
+                );
+            } else {
+                // When sortDate is not specified, don't filter by date
+                return (
+                    (!category || post.category_name === category) &&
+                    (!item_condition || post.condition === item_condition) &&
+                    (!item_for_type || post.item_for_type === item_for_type) &&
+                    (!distance || post.distance <= distance)
+                );
+            }
         });
 
-        // Check if there are posts available within the user's distance
-        return filteredDistancePost.value.length > 0;
+        return filteredPosts;
     }
+});
 
-    // No data found
-    return false;
-};
-
-// OnMounted
 onMounted(async () => {
-    // Mount and Render
     initRender();
 });
 
-// BeforeMount
 onBeforeUnmount(() => {
     if (resizeListener) {
         window.removeEventListener('resize', updateSlidesPerView);
@@ -271,7 +343,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <!-- Custom Select Filter -->
-                <div @click="toggleFilterModal" class="flex items-center gap-2 cursor-pointer w-28">
+                <div @click="toggleFilterModal" class="flex items-center gap-2 cursor-pointer w-28 mb-3">
                     <svg class="w-[20px] h-[20px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         fill="none" viewBox="0 0 20 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -280,16 +352,18 @@ onBeforeUnmount(() => {
                     <p class="text-clr-primary hover:text-cyan-800 hover:underline">Select Filter</p>
                 </div>
                 <!-- Display Filtered List -->
-                <div class="mt-6" v-if="showFilterList">
-                    <div class="flex">
+                <div v-show="filterValues">
+                    <div class="flex flex-wrap gap-2">
                         <div v-for="(filter, key) in filterValues" :key="key" class="cursor-pointer">
                             <template v-if="filter && filter !== 'undefined'">
                                 <div
-                                    class="w-[200px] mr-2 rounded-full bg-gray-100 hover:bg-gray-200 py-2 px-3 flex items-center">
+                                    class="w-full flex items-center rounded-full bg-gray-100 hover:bg-gray-200 py-2 px-3 mr-2">
                                     <div class="flex-1">
                                         <p class="text-clr-primary whitespace-nowrap overflow-ellipsis">{{ filter }}</p>
                                     </div>
-                                    <svg class="w-[16px] h-[16px] text-clr-primary hover:text-cyan-700" aria-hidden="true"
+                                    <!-- Clear Filter Tag -->
+                                    <svg @click="removeFilter(key)"
+                                        class="w-[16px] h-[16px] text-clr-primary hover:text-cyan-700" aria-hidden="true"
                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                             stroke-width="1.5" d="m13 7-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -303,7 +377,7 @@ onBeforeUnmount(() => {
                 <div v-show="filterModal"
                     class="fixed top-0 left-0 flex items-center justify-center w-full h-full z-50 bg-gray-700 bg-opacity-70">
                     <div class="flex flex-col justify-between bg-white bg-opacity-100 md:rounded-lg shadow-lg 
-                            h-screen w-full md:h-[550px] md:w-[600px] overflow-y-auto overflow-x-hidden">
+                            h-screen w-full md:h-[600px] md:w-[600px] overflow-y-auto overflow-x-hidden">
                         <!-- Header Filter Modal -->
                         <div class="flex justify-between items-center mb-4 border-b border-gray-200 px-4 pb-4 pt-4">
                             <div class="flex-1 -mr-6">
@@ -366,13 +440,16 @@ onBeforeUnmount(() => {
                         <!-- Footer Filter Modal -->
                         <div class="p-2 border-t">
                             <f7-button @click="handleCustomFilter" large fill class="primary-button">Search</f7-button>
+                            <p v-if="!isShowClearFilter" class="cursor-pointer pt-2 mb-3 text-center text-red-500"
+                                @click="handleResetFilter">Clear Filter
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Item Lists -->
             <div v-if="!isLoadingItem" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 mb-12">
-                <div v-for="post in filteredDistancePost" class="w-full border border-gray-200 rounded-lg hover:shadow">
+                <div v-for="post in filteredPost" class="w-full border border-gray-200 rounded-lg hover:shadow">
                     <!-- Post-Image-Slider -->
                     <div class="w-full h-52 overflow-hidden rounded-t-lg">
                         <swiper-container :pagination="true" :space-between="0" :slides-per-view="1">
@@ -454,9 +531,6 @@ onBeforeUnmount(() => {
             </div>
             <div v-else class="mt-6 mb-12 flex items-center justify-center">
                 <f7-preloader />
-            </div>
-            <div v-if="!postData" class="border border-gray-300 rounded-lg px-6 py-8 mb-12">
-                There's no available post right now. Please try again!
             </div>
         </SecondaryLayout>
     </f7-page>

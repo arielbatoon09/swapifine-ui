@@ -18,7 +18,7 @@ const isClicked = ref(false);
 const slidesPerView = ref(6);
 const isLoadingItem = ref(false);
 const viewID = ref(0);
-const filteredDistancePost = ref([]);
+const filteredPost = ref([]);
 const recentViewed = ref([]);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 const filterModal = ref(false);
@@ -50,14 +50,8 @@ const initRender = async () => {
     const postResponse = await postStore.GetAllPostItem();
     postData.value = postResponse.data;
 
-    // Test Console Browse Data
-    console.log(postData.value);
-
-    // Init the distance inside the postData.value
-    await populateDistance();
-
     // Init the Group Distance Filter
-    await filterAndPopulateDistance();
+    await customFilter();
 
     if (postData.value == 'No Data Found') {
         postData.value = null;
@@ -173,15 +167,6 @@ const populateDistance = async () => {
 const handleCustomFilter = () => {
     const newFilterData = formFilterData.value;
 
-    // Log the filter values
-    console.log(
-        newFilterData.sortDate + ', ' +
-        newFilterData.category + ', ' +
-        newFilterData.item_condition + ', ' +
-        newFilterData.item_for_type + ', ' +
-        newFilterData.distance
-    );
-
     // Update the filter state in the Pinia store
     filterStore.setFilter(newFilterData);
 
@@ -192,41 +177,53 @@ const handleCustomFilter = () => {
 
 // To get all filter filter values as an object
 const filterValues = computed(() => {
+    const sortDate = filterStore.sortDate;
+    const data = postData.value;
+    console.log(data);
+
+    let sortDateValue = null;
+    if (sortDate >= 1 && sortDate <= 29) {
+        sortDateValue = "Latest Post";
+    } else if (sortDate >= 30) {
+        sortDateValue = "Older Post";
+    } else {
+        sortDateValue = null;
+    }
+
     return {
-        'sortDate': filterStore.sortDate,
+        'sortDate': sortDateValue,
         'category_name': filterStore.category,
         'item_condition': filterStore.item_condition,
         'item_for_type': filterStore.item_for_type,
-        'Distance': filterStore.distance,
+        'Distance': filterStore.distance ? filterStore.distance + ' km away': '',
     };
 });
 
+
+
 // Filter post to specfically view the local areas
-const filterAndPopulateDistance = async () => {
+const customFilter = async () => {
     // Populate distances for all posts
     await populateDistance();
 
     // Filter posts below 10 kilometers
     if (postData.value !== 'No Data Found') {
-        filteredDistancePost.value = postData.value.filter((post) => {
+        filteredPost.value = postData.value.filter((post) => {
             return !isNaN(post.distance) && post.distance < distance.value;
         });
 
         // Check if there are posts available within the user's distance
-        return filteredDistancePost.value.length > 0;
+        return filteredPost.value.length > 0;
     }
 
     // No data found
     return false;
 };
 
-// OnMounted
 onMounted(async () => {
-    // Mount and Render
     initRender();
 });
 
-// BeforeMount
 onBeforeUnmount(() => {
     if (resizeListener) {
         window.removeEventListener('resize', updateSlidesPerView);
@@ -280,7 +277,8 @@ onBeforeUnmount(() => {
                     <div class="flex">
                         <div v-for="(filter, key) in filterValues" :key="key" class="cursor-pointer">
                             <template v-if="filter && filter !== 'undefined'">
-                                <div class="w-[200px] mr-2 rounded-full bg-gray-100 hover:bg-gray-200 py-2 px-3 flex items-center">
+                                <div
+                                    class="w-[200px] mr-2 rounded-full bg-gray-100 hover:bg-gray-200 py-2 px-3 flex items-center">
                                     <div class="flex-1">
                                         <p class="text-clr-primary whitespace-nowrap overflow-ellipsis">{{ filter }}</p>
                                     </div>
@@ -323,7 +321,7 @@ onBeforeUnmount(() => {
                                 <f7-list-input v-model:value="formFilterData.sortDate" outline label="Sort by Date"
                                     floating-label type="select">
                                     <option value="7">Latest Post</option>
-                                    <option value="30">Old Post</option>
+                                    <option value="30">Older Post</option>
                                 </f7-list-input>
 
                                 <!-- Filter by Category -->
@@ -367,7 +365,7 @@ onBeforeUnmount(() => {
             </div>
             <!-- Item Lists -->
             <div v-if="!isLoadingItem" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 mb-12">
-                <div v-for="post in filteredDistancePost" class="w-full border border-gray-200 rounded-lg hover:shadow">
+                <div v-for="post in filteredPost" class="w-full border border-gray-200 rounded-lg hover:shadow">
                     <!-- Post-Image-Slider -->
                     <div class="w-full h-52 overflow-hidden rounded-t-lg">
                         <swiper-container :pagination="true" :space-between="0" :slides-per-view="1">
@@ -463,6 +461,7 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 100%;
 }
+
 // .grid-cols-auto-fill {
 //   grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
 // }
