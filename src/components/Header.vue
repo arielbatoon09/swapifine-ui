@@ -8,11 +8,12 @@ import TestProfile from '../assets/profile/test_profile.jpg';
 const authStore = useAuthStore();
 const toggleDropDown = ref(false);
 
-// Redirection to Home Page
-const goToHome = () => {
-    f7.views.main.router.navigate('/home', {
-        animate: false,
-    });
+// Redirection to other Page
+const goToPage = (route) => {
+  const animate = window.innerWidth <= 1023;
+  f7.views.main.router.navigate(route, {
+    animate: animate,
+  });
 };
 
 // Logout Trigger
@@ -30,7 +31,7 @@ const handleLogout = async () => {
         <div class="max-w-screen-2xl mx-auto flex flex-row justify-between items-center">
             <!-- Logo -->
             <div>
-                <div @click="goToHome" class="cursor-pointer"><img :src="SwapifineLogo" alt="..."></div>
+                <div @click="goToPage('/home')" class="cursor-pointer"><img :src="SwapifineLogo" alt="..."></div>
             </div>
             <!-- Global Search -->
             <div class="w-1/2 mx-8 relative flex">
@@ -79,8 +80,8 @@ const handleLogout = async () => {
                             <div class="w-3 h-3 bg-red-400 border-2 border-white rounded-full"></div>
                         </div>
                     </div>
-                    <!-- Message -->
-                    <div class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
+                    <!-- Inbox Chat -->
+                    <div @click="goToPage('/inbox')"  class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"

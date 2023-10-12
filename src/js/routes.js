@@ -9,7 +9,7 @@ import VerifyEmailPage from '../pages/auth/verify-email.vue';
 import NotFoundPage from '../pages/404.vue';
 // User Pages
 import HomePage from '../pages/Authenticated/HomePage.vue';
-import ChatPage from '../pages/Authenticated/ChatPage.vue';
+import InboxPage from '../pages/Authenticated/InboxPage.vue';
 import NotificationPage from '../pages/Authenticated/NotificationPage.vue';
 import StorePage from '../pages/Authenticated/StorePage.vue';
 import PostItemPage from '../pages/Authenticated/PostItemPage.vue';
@@ -48,8 +48,8 @@ const routes = [
     protectedRoute: true,
   },
   {
-    path: '/chat',
-    component: ChatPage,
+    path: '/inbox',
+    component: InboxPage,
     protectedRoute: true,
   },
   {
