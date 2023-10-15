@@ -145,7 +145,7 @@ const handleLogout = async () => {
                     </svg>
                 </div>
                 <!-- Hamburger -->
-                <div @click="handleLogout"
+                <div @click="goToPage('/inbox')"
                     class="cursor-pointer hover:bg-gray-100 active:bg-gray-100 focus:bg-gray-100 p-2 rounded-full">
                     <svg class="w-[24px] h-[24px] text-gray-800 dark:text-white" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
