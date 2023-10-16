@@ -98,26 +98,26 @@ const routes = [
   },
 ];
 
-// BeforeEnter function to handle protectedRoute
-function beforeEnter(context) {
-  const authStore = useAuthStore();
-  const routeTo = context.to.route.protectedRoute;
-  if (routeTo) { // Check if the route is protected
-    if (!authStore.isAuthenticated) {
-      f7.views.main.router.navigate('/');
-      context.reject(); // Abort route loading
-       // This navigation triggers the beforeEnter function again
-    } else {
-      context.resolve();
-    }    
-  } else {
-    context.resolve(); // Proceed to the route
-  }
-}
+// // BeforeEnter function to handle protectedRoute
+// function beforeEnter(context) {
+//   const authStore = useAuthStore();
+//   const routeTo = context.to.route.protectedRoute;
+//   if (routeTo) { // Check if the route is protected
+//     if (!authStore.isAuthenticated) {
+//       f7.views.main.router.navigate('/');
+//       context.reject();
+//        // This navigation triggers the beforeEnter function again
+//     } else {
+//       context.resolve();
+//     }    
+//   } else {
+//     context.resolve(); // Proceed to the route
+//   }
+// }
 
-// Apply the beforeEnter function to all routes
-for (const route of routes) {
-  route.beforeEnter = beforeEnter;
-}
+// // Apply the beforeEnter function to all routes
+// for (const route of routes) {
+//   route.beforeEnter = beforeEnter;
+// }
 
 export default routes;

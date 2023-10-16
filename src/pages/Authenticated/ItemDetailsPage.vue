@@ -1,11 +1,63 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { f7 } from 'framework7-vue';
+import { ref } from 'vue';
 import { usePostStore } from '../../js/post.store';
+import { useInboxStore } from '../../js/inbox.store';
 import TertiaryLayout from '../../Layout/TertiaryLayout.vue';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 
 const currentPage = 'view-item';
 const postStore = usePostStore();
+const inboxStore = useInboxStore();
+const isRequest = ref(false);
+const toastWithButton = ref(null);
+
+console.log(postStore.getItemDetails);
+
+const doHandleTapToInquire = async (id, post_user_id) => {
+    // Init Loading Request
+    isRequest.value = true;
+
+    const response = await inboxStore.TapToInquire(id, post_user_id);
+
+    if (response.status != 'error') {
+        
+        if (!toastWithButton.value) {
+            toastWithButton.value = f7.toast.create({
+                text: response.message,
+                position: 'top',
+                closeButton: true,
+                closeButtonText: 'Okay',
+                closeButtonColor: 'green',
+                closeTimeout: 3000,
+            });
+            goToPage('/inbox');
+        }
+
+    } else {
+        if (!toastWithButton.value) {
+            toastWithButton.value = f7.toast.create({
+                text: response.message,
+                position: 'top',
+                closeButton: true,
+                closeButtonText: 'Okay',
+                closeButtonColor: 'red',
+                closeTimeout: 3000,
+            });
+        }
+    }
+
+    toastWithButton.value.open();
+    isRequest.value = false;
+}
+
+// Redirection to other Page
+const goToPage = (route) => {
+  const animate = window.innerWidth <= 1023;
+  f7.views.main.router.navigate(route, {
+    animate: animate,
+  });
+};
 
 </script>
 
@@ -40,11 +92,12 @@ const postStore = usePostStore();
                         <!-- Left -->
                         <div class="left-product-details grid grid-cols-1 gap-6">
                             <!-- Post-Image-Slider -->
-                            <div class="w-full h-auto lg:h-[500px] overflow-hidden bg-gray-100 border border-gray-200 rounded-md">
-                                <swiper-container :pagination="true" :space-between="0" :slides-per-view="1" class="h-auto lg:h-[500px] object-cover">
+                            <div
+                                class="w-full h-auto lg:h-[500px] overflow-hidden bg-gray-100 border border-gray-200 rounded-md">
+                                <swiper-container :pagination="true" :space-between="0" :slides-per-view="1"
+                                    class="h-auto lg:h-[500px] object-cover">
                                     <swiper-slide v-for="image in postStore.getItemDetails.images">
-                                        <img class="w-full h-full"
-                                            :src="image.img_file_path">
+                                        <img class="w-full h-full" :src="image.img_file_path">
                                     </swiper-slide>
                                 </swiper-container>
                             </div>
@@ -57,7 +110,8 @@ const postStore = usePostStore();
                                     </div>
                                     <!-- Vendor User Info -->
                                     <div class="profile">
-                                        <p class="cursor-pointer profile-name hover:underline text-lg">{{ postStore.getItemDetails.fullname }}</p>
+                                        <p class="cursor-pointer profile-name hover:underline text-lg">{{
+                                            postStore.getItemDetails.fullname }}</p>
                                         <!-- Verified Indicator -->
                                         <div class="flex flex-row items-center gap-1">
                                             <span class="profile-verified-label">Verified</span>
@@ -116,14 +170,17 @@ const postStore = usePostStore();
                                 <!-- Product About -->
                                 <div class="product-about">
                                     <!-- Title -->
-                                    <h2 class="text-xl font-semibold w-full lg:w-[500px]">{{ postStore.getItemDetails.item_name }}</h2>
-                                    <p class="text-gray-500 mt-1">Available Stocks - {{ postStore.getItemDetails.item_stocks }}pcs.
-                                         • ₱{{ postStore.getItemDetails.item_cash_value }}
+                                    <h2 class="text-xl font-semibold w-full lg:w-[500px]">{{
+                                        postStore.getItemDetails.item_name }}</h2>
+                                    <p class="text-gray-500 mt-1">Available Stocks - {{ postStore.getItemDetails.item_stocks
+                                    }}pcs.
+                                        • ₱{{ postStore.getItemDetails.item_cash_value }}
                                     </p>
                                     <!-- Condition -->
                                     <div class="mt-4">
                                         <h3 class="text-lg font-semibold ">Condition</h3>
-                                        <p class="w-full lg:w-[500px] text-gray-500 text-md">{{ postStore.getItemDetails.condition }}</p>
+                                        <p class="w-full lg:w-[500px] text-gray-500 text-md">{{
+                                            postStore.getItemDetails.condition }}</p>
                                     </div>
                                     <!-- Description -->
                                     <div class="mt-4">
@@ -145,7 +202,8 @@ const postStore = usePostStore();
                                 <!-- Product Item For -->
                                 <div class="product-item-for">
                                     <!-- For Sale -->
-                                    <div class="flex items-center gap-4 mt-4" v-show="postStore.getItemDetails.item_for_type == 'For Sale'">
+                                    <div class="flex items-center gap-4 mt-4"
+                                        v-show="postStore.getItemDetails.item_for_type == 'For Sale'">
                                         <div class="bg-blue-100 p-2 rounded">
                                             <svg class="w-[32px] h-[32px] text-gray-700" aria-hidden="true"
                                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
@@ -160,7 +218,8 @@ const postStore = usePostStore();
                                         </div>
                                     </div>
                                     <!-- For Swap -->
-                                    <div class="flex items-center gap-4 mt-4" v-show="postStore.getItemDetails.item_for_type == 'For Swap'">
+                                    <div class="flex items-center gap-4 mt-4"
+                                        v-show="postStore.getItemDetails.item_for_type == 'For Swap'">
                                         <div class="bg-blue-100 p-2 rounded">
                                             <svg class="w-[32px] h-[32px] text-gray-700" aria-hidden="true"
                                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 15">
@@ -175,7 +234,8 @@ const postStore = usePostStore();
                                         </div>
                                     </div>
                                     <!-- For Swap and Sale -->
-                                    <div class="flex items-center gap-4 mt-4" v-show="postStore.getItemDetails.item_for_type == 'For Swap and Sale'">
+                                    <div class="flex items-center gap-4 mt-4"
+                                        v-show="postStore.getItemDetails.item_for_type == 'For Swap and Sale'">
                                         <div class="bg-blue-100 p-2 rounded">
                                             <svg class="w-[32px] h-[32px] text-gray-700" aria-hidden="true"
                                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -193,7 +253,9 @@ const postStore = usePostStore();
                                 <!-- Product CTA -->
                                 <div class="mt-6 lg:mt-14 flex gap-4 flex-wrap sm:flex-nowrap">
                                     <div class="w-full sm:w-auto">
-                                        <f7-button class="primary-button" large fill>Send offer</f7-button>
+                                        <f7-button preloader :loading="isRequest" class="primary-button" large fill
+                                            @click="doHandleTapToInquire(postStore.getItemDetails.id, postStore.getItemDetails.user_id)">Tap
+                                            to Inquire</f7-button>
                                     </div>
                                     <div
                                         class="cursor-pointer w-full sm:w-auto flex items-center justify-center gap-4 bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg">

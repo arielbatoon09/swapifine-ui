@@ -25,6 +25,7 @@
     "framework7-vue": "^8.3.0",
     "material-icons": "^1.13.10",
     "pinia": "^2.1.6",
+    "pusher-js": "^8.3.0",
     "skeleton-elements": "^4.0.1",
     "vue": "^3.2.36",
     "vue-cookies": "^1.8.3"
