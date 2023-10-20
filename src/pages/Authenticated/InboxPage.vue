@@ -1,24 +1,46 @@
 <script setup>
 import { f7 } from 'framework7-vue';
+import InboxLayout from '../../Layout/InboxLayout.vue';
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { useAuthStore } from '../../js/auth.store';
+import { useInboxStore } from '../../js/inbox.store';
 import ContactIllustration from '../../assets/illustrations/select_chat.svg';
 import ContactList from '../../components/Chat/Contact.vue';
 import ComposeMessage from '../../components/Chat/Composemessage.vue';
 import CTAAction from '../../components/Chat/CTAAction.vue';
 import Conversation from '../../components/Chat/Conversation.vue';
 
+const authStore = useAuthStore();
+const inboxStore = useInboxStore();
 const isChatSidebarOpen = ref(true);
+const inboxID = ref(null);
+const messages = ref([]);
 let resizeListener = null;
 
 const initRender = async () => {
   updateSidebarByBreakpoint();
   resizeListener = window.addEventListener('resize', updateSidebarByBreakpoint);
-
 };
 
 const updateSidebarByBreakpoint = () => {
   return window.innerWidth <= 1023 ? isChatSidebarOpen.value = false : isChatSidebarOpen.value = true;
 };
+
+// To open certain chat
+const inboxState = computed(() => {
+  if (inboxStore.stateInitChat) {
+    return inboxID.value = inboxStore.stateInitChat;
+  }
+  return false;
+});
+
+// Get the Chat Data by specific Inbox Id
+const GetChatMessages = computed(() => {
+  messages.value = inboxStore.stateMessageData;
+  // console.log(messages.value);
+
+  return messages.value;
+});
 
 const isChatSidebarToggle = () => {
   isChatSidebarOpen.value = !isChatSidebarOpen.value;
@@ -38,13 +60,12 @@ onBeforeUnmount(() => {
 
 <template>
   <f7-page class="inbox-container">
-    <div class="flex h-screen w-full overflow-hidden">
-
+    <InboxLayout>
       <!-- Contact List Component -->
       <ContactList :showContact="isChatSidebarOpen" />
 
       <!-- Main Chat Area -->
-      <div class="flex-1">
+      <div v-if="inboxState" class="flex-1">
         <!-- Toggler -->
         <div class="bg-white p-4 text-gray-700 border-b border-gray-300 shadow flex flex-row gap-2">
           <!-- Toggle Sidebar - Desktop -->
@@ -72,7 +93,6 @@ onBeforeUnmount(() => {
               </button>
             </div>
           </f7-button>
-
           <!-- Post Header Name -->
           <div class="w-fit">
             <div class="flex items-center gap-2">
@@ -82,9 +102,11 @@ onBeforeUnmount(() => {
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                   d="M12 9V4a3 3 0 0 0-6 0v5m9.92 10H2.08a1 1 0 0 1-1-1.077L2 6h14l.917 11.923A1 1 0 0 1 15.92 19Z" />
               </svg>
-
-              <h1 class="text-clr-primary text-base lg:text-xl font-semibold"><span>Ariel Batoon • </span>Onhand New
-                Arrival</h1>
+              <h1 class="text-clr-primary text-base lg:text-xl font-semibold" v-if="GetChatMessages">
+                <span>{{ authStore.user?.fullname == GetChatMessages[0].from_user_fullname ?
+                  GetChatMessages[0].to_user_fullname : GetChatMessages[0].from_user_fullname }} • </span>
+                {{ GetChatMessages[0].post_item_title }}
+              </h1>
             </div>
           </div>
           <!-- More Options Dropdown -->
@@ -108,7 +130,7 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- No Selected Contacts -->
-      <div class="flex-1 bg-gray-200 hidden">
+      <div v-else class="flex-1 bg-gray-200">
         <!-- Toggler -->
         <div class="bg-white p-4 text-gray-700 border-b border-gray-300 shadow flex flex-row gap-2">
           <!-- Toggle Sidebar - Desktop -->
@@ -143,8 +165,7 @@ onBeforeUnmount(() => {
           <img width="200" :src="ContactIllustration">
         </div>
       </div>
-
-    </div>
+    </InboxLayout>
   </f7-page>
 </template>
 

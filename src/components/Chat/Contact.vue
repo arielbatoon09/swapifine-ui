@@ -1,39 +1,82 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, onMounted, computed } from 'vue';
+import { reactive, onMounted, computed, watchEffect } from 'vue';
+import { ref, onValue } from "firebase/database";
+import { useAuthStore } from '../../js/auth.store';
 import { useInboxStore } from '../../js/inbox.store';
 import SearchContact from './Search.vue';
+import firebasedb from '../../js/firebasedb.js';
 
 defineProps({
     showContact: Boolean,
 });
 
+const authStore = useAuthStore();
 const inboxStore = useInboxStore();
-const inboxData = ref([]);
+const db = firebasedb;
+const inboxData = reactive({ "datas": null });
+const hasMessages = reactive({ bool: false });
 
-const initRender = async () => {
-
-    // Get All Inbox Contact List
-    const inboxResponse = await inboxStore.GetAllContacts();
-    inboxData.value = inboxResponse;
-    console.log(inboxData.value);
-};
-
-const doHandleUpdateIsReadStatus = async (id, is_read) => {
-    if (is_read == 0) {
-        const response = await inboxStore.UpdateIsReadStatus(id);
-        console.log(response);
-        
-    }
-};
-
-const isReadState = computed(() => {
-  return inboxData.value.map((item) => {
-    item.is_read = item.is_read === 0;
-    return item;
-  });
+const conversation = reactive({
+    "message": null,
 });
 
+const initGetMsgData = async () => {
+    const inboxResponse = await inboxStore.GetAllContacts();
+    inboxData.datas = inboxResponse.data;
+    const origInboxData = inboxData.datas;
+
+    const messagesRef = ref(db, 'messages');
+    const messages = [];
+
+    onValue(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (!data) {
+            conversation.message = null;
+            return;
+        }
+
+        Object.keys(data).forEach(key => {
+            messages.push({
+                id: key,
+                msg_inbox_key: data[key].msg_inbox_key,
+                from_id: data[key].from_id,
+                to_id: data[key].to_id,
+                message: data[key].message,
+            });
+        });
+
+        if (origInboxData.length < 0) {
+            messages.forEach(msg => {
+                const matchingInbox = origInboxData.find(inbox => inbox.msg_inbox_key === msg.msg_inbox_key);
+
+                if (matchingInbox) {
+                    const latestMessage = msg.message;
+                    matchingInbox.latest_message = latestMessage;
+                }
+            });
+        }
+    });
+};
+
+// const arrangeInbox = computed(() => inboxData.data.slice().reverse());
+const arrangeInbox = computed(() => inboxData.datas);
+
+const doHandleUpdateIsReadStatus = async (msg_inbox_key, id, auth_id, read_by_sender, read_by_receiver) => {
+    // Set State for Inbox Key
+    inboxStore.SetMsgInboxKey(msg_inbox_key);
+
+    // Store state
+    await inboxStore.GetChatDetails(id);
+
+    if (read_by_sender == 0 || read_by_receiver == 0) {
+        await inboxStore.UpdateIsReadStatus(id, auth_id);
+
+        // Re-render the inbox data
+        const inboxResponse = await inboxStore.GetAllContacts();
+        inboxData.datas = inboxResponse.data;
+    }
+};
 
 const goToPage = (route) => {
     const animate = window.innerWidth <= 1023;
@@ -43,7 +86,17 @@ const goToPage = (route) => {
 };
 
 onMounted(async () => {
-    initRender();
+    initGetMsgData();
+});
+
+watchEffect(async () => {
+    const inboxResponse = await inboxStore.GetAllContacts();
+    if (inboxResponse.status != 'error') {
+        inboxData.datas = inboxResponse.data;
+        hasMessages.bool = true;
+    } else {
+        hasMessages.bool = 'empty';
+    }
 });
 </script>
 
@@ -68,20 +121,31 @@ onMounted(async () => {
             <SearchContact />
 
             <!-- Contact List -->
-            <div @click="doHandleUpdateIsReadStatus(inbox.id, inbox.is_read)" v-for="inbox in inboxData"
+            <div v-if="hasMessages.bool && hasMessages.bool != 'empty'" v-for="inbox in arrangeInbox"
+                @click="doHandleUpdateIsReadStatus(inbox.msg_inbox_key, inbox.id, authStore.user?.id, inbox.read_by_sender, inbox.read_by_receiver)"
                 class="flex items-center mb-2 cursor-pointer p-2 rounded-md relative"
-                :class="!inbox.is_read ? 'bg-sky-50 hover:bg-sky-100' : 'hover:bg-gray-100'">
+                :class="inbox.read_by_sender === 0 ? 'bg-sky-50 hover:bg-sky-100' : 'hover:bg-gray-100'">
                 <div class="w-12 h-12 bg-gray-300 rounded-full mr-3">
                     <img :src="inbox.img_thumbnail" alt="User Avatar" class="w-12 h-12 rounded-full">
                 </div>
                 <div class="flex-1 truncate">
-                    <h2 class="text-lg font-semibold truncate pr-8">{{ inbox.fullname }} • {{ inbox.item_name }}</h2>
+                    <h2 class="text-lg font-semibold truncate pr-8">{{ authStore.user?.fullname == inbox.from_user_fullname
+                        ? inbox.to_user_fullname : inbox.from_user_fullname }} • {{ inbox.item_name }}</h2>
                     <p class="text-gray-600 truncate">{{ inbox.latest_message }}</p>
                 </div>
                 <!-- Is Read Indicator -->
-                <div v-show="!inbox.is_read" class="absolute top-6 right-2">
+                <div v-show="inbox.read_by_sender == 0" class="absolute top-6 right-2">
                     <div class="w-3 h-3 bg-cyan-700 rounded-full"></div>
                 </div>
+            </div>
+
+            <div v-else v-show="hasMessages.bool != 'empty'" class="flex flex-col items-center justify-center">
+                <f7-preloader />
+                <p class="mt-2">Loading...</p>
+            </div>
+
+            <div class="flex justify-center" v-show="hasMessages.bool == 'empty'">
+                <p>No Chat List Found.</p>
             </div>
         </div>
 
@@ -113,7 +177,8 @@ onMounted(async () => {
                 <SearchContact />
 
                 <!-- Contact List -->
-                <div v-for="inbox in inboxData" class="flex items-center mb-2 cursor-pointer p-2 rounded-md relative"
+                <div @click="doHandleUpdateIsReadStatus(inbox.id, inbox.is_read)" v-for="inbox in arrangeInbox"
+                    class="panel-close flex items-center mb-2 cursor-pointer p-2 rounded-md relative"
                     :class="inbox.is_read == 0 ? 'bg-sky-50 hover:bg-sky-100' : 'hover:bg-gray-100'">
                     <div class="w-12 h-12 bg-gray-300 rounded-full mr-3">
                         <img :src="inbox.img_thumbnail" alt="User Avatar" class="w-12 h-12 rounded-full">

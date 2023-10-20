@@ -1,86 +1,91 @@
 <script setup>
-import { reactive, onMounted, computed, watchEffect } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
 import { useInboxStore } from '../../js/inbox.store';
-import { ref, push, onValue } from "firebase/database";
+import { push, onValue } from "firebase/database";
 import firebasedb from '../../js/firebasedb.js';
 
 const db = firebasedb;
 const authStore = useAuthStore();
-const inboxStore = useInboxStore();
+const conversation = ref([]);
 
-const conversation = reactive({
-    "message": null,
-});
+const initRender = async () => {
 
-const initGetMsgData = async (stateMessageData) => {
     const messagesRef = ref(db, 'messages');
-    const MsgInboxKey = stateMessageData.map(msg => msg.msg_inbox_key);
-
-    const inboxResponse = await inboxStore.GetAllContacts();
-    const origInboxData = inboxResponse.data;
-
     onValue(messagesRef, (snapshot) => {
         const data = snapshot.val();
-        if (!data) {
-            conversation.message = null;
-            return;
-        }
+        const messages = [];
 
-        const filteredMessages = Object.keys(data)
-            .filter(key => data[key].msg_inbox_key === MsgInboxKey[0])
-            .map(key => ({
+        Object.keys(data).forEach(key => {
+            messages.push({
                 id: key,
                 msg_inbox_key: data[key].msg_inbox_key,
                 from_id: data[key].from_id,
-                to_id: data[key].to_id,
+                to_id: data[key].tod_id,
                 message: data[key].message,
-                created_at: formatMsgCreatedAt(data[key].created_at),
-            }));
-
-        conversation.message = filteredMessages.reverse();
+            })
+        });
+        // Set the data
+        // conversation.value = messages;
     });
 };
 
-// Calculate the created_at date to ago
-const formatMsgCreatedAt = (created_at) => {
-    const now = new Date();
-    const messageTime = new Date(created_at);
-    const timeDiffInSeconds = Math.floor((now - messageTime) / 1000);
+// Get Messages
+// const GetChatMessages = computed(() => {
 
-    if (timeDiffInSeconds >= 86400) {
-        const daysAgo = Math.floor(timeDiffInSeconds / 86400);
-        return `${daysAgo} ${daysAgo === 1 ? 'day' : 'days'} ago`;
-    } else if (timeDiffInSeconds >= 3600) {
-        const hoursAgo = Math.floor(timeDiffInSeconds / 3600);
-        return `${hoursAgo} ${hoursAgo === 1 ? 'hour' : 'hours'} ago`;
-    } else if (timeDiffInSeconds >= 60) {
-        const minutesAgo = Math.floor(timeDiffInSeconds / 60);
-        return `${minutesAgo} ${minutesAgo === 1 ? 'minute' : 'minutes'} ago`;
-    } else {
-        return `${timeDiffInSeconds} ${timeDiffInSeconds === 1 ? 'second' : 'seconds'} ago`;
-    }
+//     messages.value = inboxStore.stateMessage;
+//     console.log(messages.value);
+
+//     // return formatMsgCreatedAt(messages.value);
+// });
+
+// Format Msg Created At Date
+const formatMsgCreatedAt = (messages) => {
+    const now = new Date();
+
+    return messages.map((message) => {
+        const messageTime = new Date(message.created_at);
+        const timeDiffInSeconds = Math.floor((now - messageTime) / 1000);
+
+        if (timeDiffInSeconds >= 86400) {
+            const daysAgo = Math.floor(timeDiffInSeconds / 86400);
+            return {
+                ...message,
+                created_at: `${daysAgo} ${daysAgo === 1 ? 'day' : 'days'} ago`,
+            };
+        } else if (timeDiffInSeconds >= 3600) {
+            const hoursAgo = Math.floor(timeDiffInSeconds / 3600);
+            return {
+                ...message,
+                created_at: `${hoursAgo} ${hoursAgo === 1 ? 'hour' : 'hours'} ago`,
+            };
+        } else if (timeDiffInSeconds >= 60) {
+            const minutesAgo = Math.floor(timeDiffInSeconds / 60);
+            return {
+                ...message,
+                created_at: `${minutesAgo} ${minutesAgo === 1 ? 'minute' : 'minutes'} ago`,
+            };
+        } else {
+            return {
+                ...message,
+                created_at: `${timeDiffInSeconds} ${timeDiffInSeconds === 1 ? 'second' : 'seconds'} ago`,
+            };
+        }
+    });
 };
 
 // On component mount, connect to Pusher
 onMounted(() => {
-    // 
-});
-
-watchEffect(() => {
-    const stateMessageData = inboxStore.stateMessageData;
-
-    if (stateMessageData && stateMessageData.length > 0) {
-        initGetMsgData(stateMessageData);
-    }
+    initRender();
 });
 </script>
 
 <template>
     <div class="h-screen flex flex-col-reverse overflow-y-auto p-4 pb-[13.5rem] sm:pb-[12rem] lg:pb-[12rem]">
         <!-- Conversation -->
-        <div class="flex mb-4" :class="message.from_id == authStore.user?.id ? 'justify-end' : 'justify-start'"
-            v-for="message in conversation.message" :key="message.key">
+        <div class="flex mb-4"
+            :class="message.from_id == authStore.user?.id ? 'justify-end' : 'justify-start'"
+            v-for="message in conversation">
             <div v-show="message.from_id != authStore.user?.id"
                 class="w-9 h-9 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
                 <img src="https://placehold.co/200x/ffa8e4/ffffff.svg?text=ʕ•́ᴥ•̀ʔ&font=Lato" alt="User Avatar"

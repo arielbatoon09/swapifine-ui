@@ -1,14 +1,65 @@
 <script setup>
+import { reactive, onMounted, computed, watchEffect } from 'vue';
+import { useInboxStore } from '../../js/inbox.store';
+import { useAuthStore } from '../../js/auth.store';
+import { ref, push } from "firebase/database";
+import firebasedb from '../../js/firebasedb.js';
 
-
+const authStore = useAuthStore();
+const inboxStore = useInboxStore();
+const db = firebasedb;
 defineProps({
     showContact: Boolean,
+});
+
+const msgForm = reactive({
+    "message": null,
+});
+
+
+const initRender = async () => {
+    // 
+};
+
+const handleSendMessage = async () => {
+    const { message } = msgForm;
+    const messagesRef = ref(db, 'messages');
+    const currentDateTime = new Date().toISOString();
+
+    // Get State Message Data
+    const stateMessageData = inboxStore.stateMessageData;
+
+    const newMessage = {
+        msg_inbox_key: stateMessageData[0].msg_inbox_key,
+        from_id: authStore.user?.id,
+        to_id: stateMessageData[0].to_user_id,
+        message,
+        created_at: currentDateTime,
+    };
+
+    if (msgForm.message != null && msgForm.message != '') {
+        // Push to Firebase Real-time DB
+        push(messagesRef, newMessage)
+            .then(() => {
+                msgForm.message = '';
+            })
+            .catch(error => {
+                console.error('Error sending the message:', error);
+            });
+
+        // Save to main DB
+        await inboxStore.ComposeMessage(newMessage);
+    }
+};
+
+onMounted(async () => {
+    initRender();
 });
 
 </script>
 
 <template>
-    <footer class="bg-white border-t border-gray-300 p-4 absolute bottom-0"
+    <div class="bg-white border-t border-gray-300 p-4 absolute bottom-0"
         :class="showContact ? 'w-full lg:w-3/4' : 'w-full'">
         <div class="flex items-center">
             <!-- Add Image Attachment -->
@@ -24,11 +75,12 @@ defineProps({
                 </svg>
             </div>
             <!-- Add Message -->
-            <input placeholder="Type a message..." class="w-full p-2 rounded-full border border-gray-400 bg-gray-100" />
+            <input v-model="msgForm.message" @keydown.enter="handleSendMessage" placeholder="Type a message..."
+                class="w-full p-2 rounded-full border border-gray-400 bg-gray-100" />
             <!-- Send Message Event -->
             <div class="ml-4 flex gap-2">
-                <button class="bg-clr-primary text-white px-4 py-2 rounded-md">Send</button>
+                <button @click="handleSendMessage" class="bg-clr-primary text-white px-4 py-2 rounded-md">Send</button>
             </div>
         </div>
-    </footer>
+    </div>
 </template>
