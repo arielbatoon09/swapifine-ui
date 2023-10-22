@@ -59,6 +59,10 @@ const initGetMsgData = async () => {
     });
 };
 
+const refreshMessagesList = () => {
+    initGetMsgData();
+};
+
 // const arrangeInbox = computed(() => inboxData.data.slice().reverse());
 const arrangeInbox = computed(() => inboxData.datas);
 
@@ -120,6 +124,16 @@ watchEffect(async () => {
             <!-- Search Contact -->
             <SearchContact />
 
+            <!-- Refresh Contact States -->
+            <div class="ml-4 mb-3 flex flex-row items-center gap-2">
+                <svg class="w-[14px] h-[14px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 18 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                </svg>
+                <span @click="refreshMessagesList" class="cursor-pointer font-medium">Refresh Messages</span>
+            </div>
+
             <!-- Contact List -->
             <div v-if="hasMessages.bool && hasMessages.bool != 'empty'" v-for="inbox in arrangeInbox"
                 @click="doHandleUpdateIsReadStatus(inbox.msg_inbox_key, inbox.id, authStore.user?.id, inbox.read_by_sender, inbox.read_by_receiver)"
@@ -176,25 +190,45 @@ watchEffect(async () => {
                 <!-- Search Contact -->
                 <SearchContact />
 
+                <!-- Refresh Contact States -->
+                <div class="ml-4 mb-3 flex flex-row items-center gap-2">
+                    <svg class="w-[14px] h-[14px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 18 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                    </svg>
+                    <span @click="refreshMessagesList" class="cursor-pointer font-medium">Refresh Messages</span>
+                </div>
+
                 <!-- Contact List -->
-                <div @click="doHandleUpdateIsReadStatus(inbox.id, inbox.is_read)" v-for="inbox in arrangeInbox"
+                <div v-if="hasMessages.bool && hasMessages.bool != 'empty'" v-for="inbox in arrangeInbox"
+                    @click="doHandleUpdateIsReadStatus(inbox.msg_inbox_key, inbox.id, authStore.user?.id, inbox.read_by_sender, inbox.read_by_receiver)"
                     class="panel-close flex items-center mb-2 cursor-pointer p-2 rounded-md relative"
-                    :class="inbox.is_read == 0 ? 'bg-sky-50 hover:bg-sky-100' : 'hover:bg-gray-100'">
+                    :class="inbox.read_by_sender === 0 ? 'bg-sky-50 hover:bg-sky-100' : 'hover:bg-gray-100'">
                     <div class="w-12 h-12 bg-gray-300 rounded-full mr-3">
                         <img :src="inbox.img_thumbnail" alt="User Avatar" class="w-12 h-12 rounded-full">
                     </div>
                     <div class="flex-1 truncate">
-                        <h2 class="text-lg font-semibold truncate pr-8">{{ inbox.item_name }}</h2>
+                        <h2 class="text-lg font-semibold truncate pr-8">{{ authStore.user?.fullname ==
+                            inbox.from_user_fullname
+                            ? inbox.to_user_fullname : inbox.from_user_fullname }} • {{ inbox.item_name }}</h2>
                         <p class="text-gray-600 truncate">{{ inbox.latest_message }}</p>
                     </div>
                     <!-- Is Read Indicator -->
-                    <div v-show="inbox.is_read == 0" class="absolute top-6 right-2">
+                    <div v-show="inbox.read_by_sender == 0" class="absolute top-6 right-2">
                         <div class="w-3 h-3 bg-cyan-700 rounded-full"></div>
                     </div>
+                </div>
+
+                <div v-else v-show="hasMessages.bool != 'empty'" class="flex flex-col items-center justify-center">
+                    <f7-preloader />
+                    <p class="mt-2">Loading...</p>
+                </div>
+
+                <div class="flex justify-center" v-show="hasMessages.bool == 'empty'">
+                    <p>No Chat List Found.</p>
                 </div>
             </div>
         </f7-panel>
     </div>
 </template>
-
-<style scoped lang="scss"></style>

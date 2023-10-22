@@ -16,11 +16,6 @@ const msgForm = reactive({
     "message": null,
 });
 
-
-const initRender = async () => {
-    // 
-};
-
 const handleSendMessage = async () => {
     const { message } = msgForm;
     const messagesRef = ref(db, 'messages');
@@ -51,10 +46,6 @@ const handleSendMessage = async () => {
         await inboxStore.ComposeMessage(newMessage);
     }
 };
-
-onMounted(async () => {
-    initRender();
-});
 
 </script>
 

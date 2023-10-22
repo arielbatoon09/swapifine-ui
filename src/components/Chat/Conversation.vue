@@ -37,7 +37,6 @@ const initGetMsgData = async (stateMessageData) => {
                 message: data[key].message,
                 created_at: formatMsgCreatedAt(data[key].created_at),
             }));
-
         conversation.message = filteredMessages.reverse();
     });
 };

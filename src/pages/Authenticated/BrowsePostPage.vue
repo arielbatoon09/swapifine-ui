@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { usePostStore } from '../../js/post.store';
 import { useLocationStore } from '../../js/location.store';
 import { useFilterStore } from '../../js/filter.store';

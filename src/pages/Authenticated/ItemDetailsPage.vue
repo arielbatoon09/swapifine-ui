@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref } from 'vue';
+import { reactive } from 'vue';
 import { usePostStore } from '../../js/post.store';
 import { useInboxStore } from '../../js/inbox.store';
 import TertiaryLayout from '../../Layout/TertiaryLayout.vue';
@@ -9,19 +9,21 @@ import TestProfile from '../../assets/profile/test_profile.jpg';
 const currentPage = 'view-item';
 const postStore = usePostStore();
 const inboxStore = useInboxStore();
-const isRequest = ref(false);
-const toastWithButton = ref(null);
+const isRequest = reactive({ bool: false });
+const toastWithButton = reactive({ value: null });
 
 console.log(postStore.getItemDetails);
 
 const doHandleTapToInquire = async (id, post_user_id) => {
     // Init Loading Request
-    isRequest.value = true;
+    isRequest.bool = true;
 
     const response = await inboxStore.TapToInquire(id, post_user_id);
 
+
+
     if (response.status != 'error') {
-        
+
         if (!toastWithButton.value) {
             toastWithButton.value = f7.toast.create({
                 text: response.message,
@@ -48,15 +50,16 @@ const doHandleTapToInquire = async (id, post_user_id) => {
     }
 
     toastWithButton.value.open();
-    isRequest.value = false;
-}
+    isRequest.bool = false;
+};
+
 
 // Redirection to other Page
 const goToPage = (route) => {
-  const animate = window.innerWidth <= 1023;
-  f7.views.main.router.navigate(route, {
-    animate: animate,
-  });
+    const animate = window.innerWidth <= 1023;
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
 };
 
 </script>
@@ -253,7 +256,7 @@ const goToPage = (route) => {
                                 <!-- Product CTA -->
                                 <div class="mt-6 lg:mt-14 flex gap-4 flex-wrap sm:flex-nowrap">
                                     <div class="w-full sm:w-auto">
-                                        <f7-button preloader :loading="isRequest" class="primary-button" large fill
+                                        <f7-button preloader :loading="isRequest.bool" class="primary-button" large fill
                                             @click="doHandleTapToInquire(postStore.getItemDetails.id, postStore.getItemDetails.user_id)">Tap
                                             to Inquire</f7-button>
                                     </div>

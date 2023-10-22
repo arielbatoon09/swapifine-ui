@@ -3,14 +3,15 @@ import { f7 } from 'framework7-vue';
 import InboxLayout from '../../Layout/InboxLayout.vue';
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
+import { usePostStore } from '../../js/post.store';
 import { useInboxStore } from '../../js/inbox.store';
 import ContactIllustration from '../../assets/illustrations/select_chat.svg';
 import ContactList from '../../components/Chat/Contact.vue';
 import ComposeMessage from '../../components/Chat/Composemessage.vue';
-import CTAAction from '../../components/Chat/CTAAction.vue';
 import Conversation from '../../components/Chat/Conversation.vue';
 
 const authStore = useAuthStore();
+const postStore = usePostStore();
 const inboxStore = useInboxStore();
 const isChatSidebarOpen = ref(true);
 const inboxID = ref(null);
@@ -20,6 +21,28 @@ let resizeListener = null;
 const initRender = async () => {
   updateSidebarByBreakpoint();
   resizeListener = window.addEventListener('resize', updateSidebarByBreakpoint);
+};
+
+// Redirection to View item Details Page
+const goToPostDetails = async () => {
+  // Retrieving specific data from Messages Controller
+  const getPostData = Object.keys(messages.value)
+    .map(key => ({
+      post_item_id: messages.value[key].post_item_id,
+      post_item_key: messages.value[key].post_item_key,
+    }));
+
+  const PostItemKey = getPostData[0].post_item_key;
+  const PostItemId = getPostData[0].post_item_id;
+
+  const route = `/view/item/${PostItemId}`;
+  const animate = window.innerWidth <= 1023;
+
+  await postStore.GetPostDetails(PostItemKey);
+
+  f7.views.main.router.navigate(route, {
+    animate: animate,
+  });
 };
 
 const updateSidebarByBreakpoint = () => {
@@ -120,7 +143,14 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- CTA Action Component -->
-        <CTAAction />
+        <div class="flex gap-2 bg-gray-100 shadow">
+          <div
+            class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-4 rounded font-medium w-full text-center">
+            Open Transaction</div>
+          <div @click="goToPostDetails"
+            class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-4 rounded font-medium w-full text-center">
+            Item Details</div>
+        </div>
 
         <!-- Conversation Component -->
         <Conversation />
