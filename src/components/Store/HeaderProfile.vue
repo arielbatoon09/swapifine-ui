@@ -82,13 +82,16 @@ const handleImageUpload = (event) => {
 
             <!-- CTA Buttons -->
             <div class="flex flex-row gap-4">
-                <div class="flex flex-row items-center gap-4">
-                    <div @click="goToPage('/post/item')" class="cursor-pointer bg-gray-100 py-2 px-4 rounded-md font-medium">
+                <div class="flex flex-row items-center gap-2">
+                    <f7-button tooltip="Post new item" @click="goToPage('/post/item')" class="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md font-medium">
                         <span>Post Item</span>
-                    </div>
-                    <div class="cursor-pointer bg-gray-100 py-2 px-4 rounded-md font-medium">
+                    </f7-button>
+                    <f7-button tooltip="Withdraw Credits" @click="goToPage('/buy-credits')" class="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md font-medium">
+                        <span>Withdraw</span>
+                    </f7-button>
+                    <f7-button tooltip="Edit Profile" @click="goToPage('/settings')" class="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md font-medium">
                         <span>Edit Profile</span>
-                    </div>
+                    </f7-button>
                 </div>
             </div>
 
@@ -101,7 +104,7 @@ const handleImageUpload = (event) => {
                     </svg>
                     <span>Track Orders</span>
                 </div>
-                <div class="flex gap-1 items-center cursor-pointer">
+                <div @click="goToPage('/buy-credits')" class="flex gap-1 items-center cursor-pointer">
                     <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         fill="none" viewBox="0 0 20 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"

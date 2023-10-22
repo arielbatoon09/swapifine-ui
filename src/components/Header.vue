@@ -9,7 +9,7 @@ const authStore = useAuthStore();
 const dropdownProfile = ref(false);
 
 const toggleDropdown = () => {
-  dropdownProfile.value = !dropdownProfile.value;
+    dropdownProfile.value = !dropdownProfile.value;
 };
 
 // Redirection to other Page
@@ -19,7 +19,7 @@ const goToPage = (route) => {
         animate: animate,
     });
 
-    dropdownProfile.value = !dropdownProfile.value;
+    dropdownProfile.value = false;
 };
 
 // Logout Trigger
@@ -45,8 +45,8 @@ const handleLogout = async () => {
                 <input placeholder="What items are you looking for?" class="border rounded-l-md px-4 py-3 flex-1" />
                 <div
                     class="absolute bg-gray-800 hover:bg-gray-700 cursor-pointer text-white rounded-r-md px-4 py-3 top-0 right-0 flex items-center h-full">
-                    <svg class="text-white w-5 h-5 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 20 20">
+                    <svg class="text-white w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 20 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                     </svg>
@@ -54,50 +54,63 @@ const handleLogout = async () => {
             </div>
             <!-- Navbar -->
             <nav class="flex flex-row items-center gap-6 relative">
-                <!-- Orders Tracker CTA -->
-                <div class="cursor-pointer flex flex-row whitespace-nowrap items-center gap-2 hover:bg-gray-100 rounded-lg p-3">
-                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 18 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M12 9V4a3 3 0 0 0-6 0v5m9.92 10H2.08a1 1 0 0 1-1-1.077L2 6h14l.917 11.923A1 1 0 0 1 15.92 19Z" />
-                    </svg>
-                    <span>Track Orders</span>
+                <!-- Orders Tracker & Post Item CTA -->
+                <div class="flex gap-4">
+                    <!-- Orders Tracker -->
+                    <f7-button tooltip="Track your orders"
+                        class="cursor-pointer flex flex-row whitespace-nowrap items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-full p-2">
+                        <svg class="w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                            <path
+                                d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
+                        </svg>
+                    </f7-button>
+                    <!-- Post Item -->
+                    <f7-button tooltip="Post new item" @click="goToPage('/post/item')"
+                        class="cursor-pointer flex flex-row whitespace-nowrap items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-full p-2">
+                        <svg class="w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M9.546.5a9.5 9.5 0 1 0 9.5 9.5 9.51 9.51 0 0 0-9.5-9.5ZM13.788 11h-3.242v3.242a1 1 0 1 1-2 0V11H5.304a1 1 0 0 1 0-2h3.242V5.758a1 1 0 0 1 2 0V9h3.242a1 1 0 1 1 0 2Z" />
+                        </svg>
+                    </f7-button>
                 </div>
                 <!-- Icons Menu -->
                 <div class="nav-menu-icons flex flex-row items-center gap-2">
                     <!-- Notification -->
-                    <div class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
-                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 21">
+                    <f7-button tooltip="Notification" class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
+                        <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 16 21">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                 d="M8 3.464V1.1m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175C15 15.4 15 16 14.462 16H1.538C1 16 1 15.4 1 14.807c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 8 3.464ZM4.54 16a3.48 3.48 0 0 0 6.92 0H4.54Z" />
                         </svg>
                         <!-- Alert Indication -->
-                        <div class="absolute top-0 right-1">
+                        <div class="absolute top-0 right-2">
                             <div class="w-3 h-3 bg-red-400 border-2 border-white rounded-full"></div>
                         </div>
-                    </div>
+                    </f7-button>
                     <!-- Inbox Chat -->
-                    <div @click="goToPage('/inbox')"
+                    <f7-button tooltip="Messages" @click="goToPage('/inbox')"
                         class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
-                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
+                        <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 20 18">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                 d="M16 5h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-2v3l-4-3H8m4-13H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h2v3l4-3h4a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z" />
                         </svg>
                         <!-- Alert Indication -->
-                        <div class="absolute top-0 right-1">
+                        <div class="absolute top-0 right-2">
                             <div class="w-3 h-3 bg-red-400 border-2 border-white rounded-full"></div>
                         </div>
-                    </div>
-                    <!-- Favorites -->
-                    <div class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full">
-                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">
+                    </f7-button>
+                    <!-- My Store -->
+                    <f7-button tooltip="View Store" @click="goToPage('/store')"
+                        class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full">
+                        <svg class="w-[24px] h-[24px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            width="21" height="20" fill="none" viewBox="0 0 21 20">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M11 4C5.5-1.5-1.5 5.5 4 11l7 7 7-7c5.458-5.458-1.542-12.458-7-7Z" />
+                                d="M3.308 9a2.257 2.257 0 0 0 2.25-2.264 2.25 2.25 0 0 0 4.5 0 2.25 2.25 0 0 0 4.5 0 2.25 2.25 0 1 0 4.5 0C19.058 5.471 16.956 1 16.956 1H3.045S1.058 5.654 1.058 6.736A2.373 2.373 0 0 0 3.308 9Zm0 0a2.243 2.243 0 0 0 1.866-1h.767a2.242 2.242 0 0 0 3.733 0h.767a2.242 2.242 0 0 0 3.733 0h.767a2.247 2.247 0 0 0 1.867 1A2.22 2.22 0 0 0 18 8.649V19H9v-7H5v7H2V8.524c.37.301.83.469 1.308.476ZM12 12h3v3h-3v-3Z" />
                         </svg>
-                    </div>
+                    </f7-button>
                 </div>
 
                 <!-- Profile Dropdown -->
@@ -137,7 +150,7 @@ const handleLogout = async () => {
                             </svg>
                             <span class="text-sm text-gray-700">My Store</span>
                         </li>
-                        <li @click="goToPage('/store')"
+                        <li @click="goToPage('/buy-credits')"
                             class="cursor-pointer w-full flex flex-row items-center gap-2 hover:bg-gray-100 rounded px-4 py-2">
                             <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -147,7 +160,7 @@ const handleLogout = async () => {
                             </svg>
                             <span class="text-sm text-gray-700">Buy Credits</span>
                         </li>
-                        <li @click="goToPage('/store')"
+                        <li @click="goToPage('/settings')"
                             class="cursor-pointer w-full flex flex-row items-center gap-2 hover:bg-gray-100 rounded px-4 py-2">
                             <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true" viewBox="0 0 20 18" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -192,8 +205,8 @@ const handleLogout = async () => {
             <div class="flex flex-row items-center gap-1">
                 <!-- Search -->
                 <div class="cursor-pointer hover:bg-gray-100 active:bg-gray-100 focus:bg-gray-100 p-2 rounded-full">
-                    <svg class="w-[24px] h-[24px] text-gray-800 dark:text-white" aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <svg class="w-[24px] h-[24px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 20 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                     </svg>
@@ -201,13 +214,12 @@ const handleLogout = async () => {
                 <!-- Hamburger -->
                 <div @click="goToPage('/store')"
                     class="cursor-pointer hover:bg-gray-100 active:bg-gray-100 focus:bg-gray-100 p-2 rounded-full">
-                    <svg class="w-[24px] h-[24px] text-gray-800 dark:text-white" aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <svg class="w-[24px] h-[24px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 17 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M1 1h15M1 7h15M1 13h15" />
                     </svg>
                 </div>
             </div>
         </div>
-    </header>
-</template>
+</header></template>

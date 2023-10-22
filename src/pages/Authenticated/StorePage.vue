@@ -16,14 +16,14 @@ const currentPage = 'store';
         <h1 class="font-semibold text-lg">My Store</h1>
       </template>
       <div class="-mt-6 lg:mt-0"></div>
-      <section class="-mb-8 lg:max-w-screen-xl mx-auto">
+      <section class="lg:max-w-screen-xl mx-auto">
         <!-- Header Profile -->
         <HeaderProfile />
 
         <!-- Feeds -->
-        <div class="flex flex-col justify-center -mt-4 lg:mt-0">
+        <div class="flex flex-col justify-center lg:mt-0">
           <!-- Tab Bar -->
-          <f7-toolbar position="bottom" tabbar>
+          <f7-toolbar position="bottom" tabbar class="z-0">
             <f7-link tab-link="#posts" tab-link-active>
               <div class="flex gap-2 items-center">
                 <svg class="w-[14px] h-[14px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -59,17 +59,17 @@ const currentPage = 'store';
           <!-- Tabs Content -->
           <f7-tabs>
             <!-- Posts -->
-            <f7-tab id="posts" class="page-content -mt-7" tab-active>
+            <f7-tab id="posts" class="page-content mt-2" tab-active>
               <PostContainer />
             </f7-tab>
 
             <!-- Wishlist -->
-            <f7-tab id="wishlist" class="page-content -mt-7">
+            <f7-tab id="wishlist" class="page-content mt-2">
               <WishlistContainer />
             </f7-tab>
 
             <!-- Ratings -->
-            <f7-tab id="ratings" class="page-content">
+            <f7-tab id="ratings" class="page-content mt-2">
               <RatingsContainer />
             </f7-tab>
           </f7-tabs>

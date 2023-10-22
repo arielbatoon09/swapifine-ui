@@ -16,8 +16,9 @@ import PostItemPage from '../pages/Authenticated/PostItemPage.vue';
 import BrowseItemPage from '../pages/Authenticated/BrowsePostPage.vue';
 import ItemDetailsPage from '../pages/Authenticated/ItemDetailsPage.vue';
 import SearchPage from '../pages/Authenticated/SearchPage.vue';
-import ProfilePage from '../pages/Authenticated/ProfilePage.vue';
+import SettingsPage from '../pages/Authenticated/SettingsPage.vue';
 import LocationPage from '../pages/Authenticated/LocationPage.vue';
+import BuyCreditsPage from '../pages/Authenticated/BuyCreditsPage.vue';
 
 const isLoggedIn = useCookies.get('isLoggedIn');
 
@@ -88,8 +89,13 @@ const routes = [
     protectedRoute: true,
   },
   {
-    path: '/profile',
-    component: ProfilePage,
+    path: '/settings',
+    component: SettingsPage,
+    protectedRoute: true,
+  },
+  {
+    path: '/buy-credits',
+    component: BuyCreditsPage,
     protectedRoute: true,
   },
   {
