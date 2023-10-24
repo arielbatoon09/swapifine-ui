@@ -19,6 +19,8 @@ import SearchPage from '../pages/Authenticated/SearchPage.vue';
 import SettingsPage from '../pages/Authenticated/SettingsPage.vue';
 import LocationPage from '../pages/Authenticated/LocationPage.vue';
 import BuyCreditsPage from '../pages/Authenticated/BuyCreditsPage.vue';
+import OrderPage from '../pages/Authenticated/OrderPage.vue';
+import OrderDetailsPage from '../pages/Authenticated/OrderDetailsPage.vue';
 
 const isLoggedIn = useCookies.get('isLoggedIn');
 
@@ -96,6 +98,16 @@ const routes = [
   {
     path: '/buy-credits',
     component: BuyCreditsPage,
+    protectedRoute: true,
+  },
+  {
+    path: '/order',
+    component: OrderPage,
+    protectedRoute: true,
+  },
+  {
+    path: '/view/order',
+    component: OrderDetailsPage.vue,
     protectedRoute: true,
   },
   {

@@ -26,7 +26,7 @@ const currentPage = 'buy-credits';
                                 <span>Process a payment with the vendors securely.</span>
                             </div>
                         </div>
-                        <div class="mb-6 grid gap-6 lg:grid-cols-2 md:mb-8 lg:grid-cols-3 lg:gap-x-8">
+                        <div class="mb-6 grid gap-6 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 lg:gap-x-8">
                             <!-- Plan A -->
                             <div class="flex flex-col gap-4 rounded-lg border p-4 pt-6 pb-6">
                                 <h3 class="text-center text-2xl font-semibold text-gray-800">Standard</h3>

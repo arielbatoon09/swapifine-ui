@@ -57,7 +57,7 @@ const handleLogout = async () => {
                 <!-- Orders Tracker & Post Item CTA -->
                 <div class="flex gap-4">
                     <!-- Orders Tracker -->
-                    <f7-button tooltip="Track your orders"
+                    <f7-button @click="goToPage('/order')" tooltip="Track your orders"
                         class="cursor-pointer flex flex-row whitespace-nowrap items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-full p-2">
                         <svg class="w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
@@ -78,7 +78,8 @@ const handleLogout = async () => {
                 <!-- Icons Menu -->
                 <div class="nav-menu-icons flex flex-row items-center gap-2">
                     <!-- Notification -->
-                    <f7-button tooltip="Notification" class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
+                    <f7-button tooltip="Notification"
+                        class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
                         <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 16 21">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -212,7 +213,7 @@ const handleLogout = async () => {
                     </svg>
                 </div>
                 <!-- Hamburger -->
-                <div @click="goToPage('/store')"
+                <div @click="goToPage('/order')"
                     class="cursor-pointer hover:bg-gray-100 active:bg-gray-100 focus:bg-gray-100 p-2 rounded-full">
                     <svg class="w-[24px] h-[24px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         fill="none" viewBox="0 0 17 14">
@@ -222,4 +223,5 @@ const handleLogout = async () => {
                 </div>
             </div>
         </div>
-</header></template>
+    </header>
+</template>

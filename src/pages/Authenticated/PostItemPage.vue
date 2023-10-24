@@ -110,29 +110,6 @@ const handlePostItem = async () => {
     console.error("Error:", error);
   }
 }
-//   const files = Array.from(event.target.files);
-
-//   // Filter files to only include JPG, JPEG, and PNG
-//   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-//   const selectedFiles = files.filter((file) => allowedTypes.includes(file.type));
-//   console.log('selected: '+selectedFiles);
-
-//   // Set the value to form.img_file_path
-//   // form.img_file_path = files;
-//   form.img_file_path = selectedFiles;
-
-
-//   // Display selected images
-//   selectedFiles.forEach((file) => {
-//     const reader = new FileReader();
-//     reader.onload = (e) => {
-//       selectedImages.value.push({ file, url: e.target.result });
-//       selectedImagesCount.value = selectedImages.value.length;
-//     };
-//     reader.readAsDataURL(file);
-//   });
-
-// };
 
 const handleImageChange = (event) => {
   const files = Array.from(event.target.files);

@@ -96,7 +96,7 @@ const handleImageUpload = (event) => {
             </div>
 
             <div class="flex flex-row gap-3">
-                <div class="flex gap-1 items-center cursor-pointer">
+                <div @click="goToPage('/order')" class="flex gap-1 items-center cursor-pointer">
                     <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         fill="none" viewBox="0 0 18 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
