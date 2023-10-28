@@ -59,11 +59,45 @@ const list = ref([1, 2, 3]);
                 <!-- Action Buttons -->
                 <div class="flex justify-end border-t py-4">
                     <div class="flex w-full md:w-min">
-                        <f7-button class="primary-button" fill>Rate Vendor</f7-button>
+                        <f7-button fill class="primary-button" popup-open=".popup-review">Provide ratings</f7-button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Modal Requirements Pop up -->
+        <f7-popup class="popup-review" swipe-to-close>
+            <f7-page>
+                <f7-navbar title="Rate Vendor">
+                    <f7-nav-right>
+                        <f7-link popup-close>Close</f7-link>
+                    </f7-nav-right>
+                </f7-navbar>
+
+                <!-- Form -->
+                <div class="px-2 flex-1">
+                    <f7-list>
+                        <!-- Payment Method -->
+                        <f7-list-input outline label="Rate the vendor" floating-label type="select">
+                            <option value="1">1 Star</option>
+                            <option value="2">2 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="5">5 Stars</option>
+                        </f7-list-input>
+
+                        <!-- Add Note -->
+                        <f7-list-input outline label="Provide comment" floating-label type="textarea"
+                            clear-button>
+                        </f7-list-input>
+
+                        <f7-block class="mt-2">
+                            <f7-button class="primary-button" preloader large fill>Proceed</f7-button>
+                        </f7-block>
+                    </f7-list>
+                </div>
+            </f7-page>
+        </f7-popup>        
 
         <!-- Show More Button -->
         <div class="mt-6 flex justify-center items-center">

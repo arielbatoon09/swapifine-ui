@@ -59,7 +59,7 @@ const list = ref([1, 2, 3]);
                 <!-- Action Buttons -->
                 <div class="flex justify-end border-t py-4">
                     <div class="flex w-full md:w-1/6">
-                        <f7-button class="primary-button" fill>Proceed review</f7-button>
+                        <f7-button class="primary-button" fill>Proceed to review</f7-button>
                     </div>
                 </div>
             </div>

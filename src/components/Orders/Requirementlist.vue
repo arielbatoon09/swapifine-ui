@@ -59,11 +59,48 @@ const list = ref([1, 2, 3]);
                 <!-- Action Buttons -->
                 <div class="flex justify-end border-t py-4">
                     <div class="flex w-full md:w-min">
-                        <f7-button class="primary-button" fill>Provide</f7-button>
+                        <f7-button fill class="primary-button" popup-open=".popup-requirements">Provide</f7-button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Modal Requirements Pop up -->
+        <f7-popup class="popup-requirements" swipe-to-close>
+            <f7-page>
+                <f7-navbar title="Add Details">
+                    <f7-nav-right>
+                        <f7-link popup-close>Close</f7-link>
+                    </f7-nav-right>
+                </f7-navbar>
+
+                <!-- Form -->
+                <div class="px-2 flex-1">
+                    <f7-list>
+                        <!-- Payment Method -->
+                        <f7-list-input outline label="Payment Method" floating-label type="select">
+                            <option value="cod">Cash on Delivery</option>
+                            <option value="ewallet">E-Wallet</option>
+                            <option value="credits">Wallet Credits</option>
+                        </f7-list-input>
+
+                        <!-- Address -->
+                        <f7-list-input outline label="Complete Address" floating-label type="text"
+                            clear-button>
+                        </f7-list-input>
+
+                        <!-- Add Note -->
+                        <f7-list-input outline label="Add Note (Optional)" floating-label type="textarea"
+                            clear-button>
+                        </f7-list-input>
+
+                        <f7-block class="mt-2">
+                            <f7-button class="primary-button" preloader large fill>Proceed</f7-button>
+                        </f7-block>
+                    </f7-list>
+                </div>
+            </f7-page>
+        </f7-popup>
 
         <!-- Show More Button -->
         <div class="mt-6 flex justify-center items-center">

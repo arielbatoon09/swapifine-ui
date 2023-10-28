@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
                                 </div> -->
                         </div>
                     </f7-link>
-                    <f7-link tab-link="#cancelled" tooltip="Cancelled Order">
+                    <f7-link tab-link="#cancelled" tooltip="Cancelled Orders">
                         <div class="relative p-2">
                             <span>Cancelled</span>
                             <!-- Number Indicator -->
