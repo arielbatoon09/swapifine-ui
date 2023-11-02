@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, onUnmounted } from 'vue';
+import { useTransactionStore } from '../../js/transaction.store';
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 import AllOrder from '../../components/Orders/All.vue';
 import InProgressOrder from '../../components/Orders/Inprogress.vue';
@@ -10,20 +11,57 @@ import ReviewOrder from '../../components/Orders/Review.vue';
 import CancelledOrder from '../../components/Orders/Cancelled.vue';
 
 const currentPage = 'orders';
+const transactionStore = useTransactionStore();
 const isScrollableTab = ref(false);
+const transactionData = ref([]);
+const isRequest = ref(false);
 let resizeListener = null;
+
+const initRenderData = async () => {
+    isRequest.value = true;
+    const response = await transactionStore.GetUserTransactions();
+    transactionData.value = response.data;
+    isRequest.value = false;
+};
 
 const checkScrollableTab = () => {
     isScrollableTab.value = window.innerWidth <= 992;
 };
 
+const refreshData = async () => {
+    isRequest.value = true;
+    const response = await transactionStore.GetUserTransactions();
+    transactionData.value = response.data;
+    isRequest.value = false;
+};
+
+// To Handle child action button
+const handleButtonEvent = () => {
+    const handleButtonClick = (event) => {
+        if (event.target.classList.contains('refresh-data')) {
+            initRenderData();
+        }
+    };
+
+    document.addEventListener('click', handleButtonClick);
+    onUnmounted(() => {
+        document.removeEventListener('click', handleButtonClick);
+    });
+};
+
 onMounted(async () => {
     resizeListener = window.addEventListener('resize', checkScrollableTab);
+
+    initRenderData();
+    
+    handleButtonEvent();
+
 });
+
 onBeforeUnmount(() => {
-  if (resizeListener) {
-    window.removeEventListener('resize', checkScrollableTab);
-  }
+    if (resizeListener) {
+        window.removeEventListener('resize', checkScrollableTab);
+    }
 });
 
 </script>
@@ -48,22 +86,23 @@ onBeforeUnmount(() => {
                         <div class="relative p-3">
                             <span>All</span>
                             <!-- Number Indicator -->
-                            <div class="absolute top-1 -right-2 z-0">
+                            <!-- <div v-show="transactionData.length > 0" class="absolute top-1 -right-2 z-0">
                                 <div class="p-2 bg-red-400 rounded-full w-2 h-2">
-                                    <span class="text-white absolute -top-[0.50px] left-[6px]">1</span>
+                                    <span class="text-white absolute -top-[0.50px] left-[5px]">{{ transactionData.length
+                                    }}</span>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </f7-link>
                     <f7-link tab-link="#in-progress" tooltip="Step 1">
                         <div class="relative p-2">
                             <span>In Progress</span>
                             <!-- Number Indicator -->
-                            <!-- <div class="absolute -top-4 -left-3 z-0">
-                                    <div class="p-2 bg-red-400 rounded-full w-2 h-2">
-                                        <span class="text-white absolute -top-[0.50px] left-[6px]">1</span>
-                                    </div>
-                                </div> -->
+                            <!-- <div v-show="transactionData.length > 0" class="absolute top-1 -right-2 z-0">
+                                <div class="p-2 bg-red-400 rounded-full w-2 h-2">
+                                    <span class="text-white absolute -top-[0.50px] left-[5px]">{{ InProgressLength }}</span>
+                                </div>
+                            </div> -->
                         </div>
                     </f7-link>
                     <f7-link tab-link="#requirements" tooltip="Step 2">
@@ -127,25 +166,96 @@ onBeforeUnmount(() => {
                 <f7-tabs>
                     <!-- All Orders List -->
                     <f7-tab id="all" class="page-content" tab-active>
-                        <AllOrder />
+                        <!-- Refresh Button -->
+                        <div class="mt-3 mb-6 flex gap-2 cursor-pointer">
+                            <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                            </svg>
+                            <span @click="refreshData" class="text-clr-primary">Refresh List</span>
+                        </div>
+                        <AllOrder :isRequest="isRequest" :data="transactionData" />
                     </f7-tab>
+
                     <f7-tab id="in-progress" class="page-content">
-                        <InProgressOrder />
+                        <!-- Refresh Button -->
+                        <div class="mt-3 mb-6 flex gap-2 cursor-pointer">
+                            <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                            </svg>
+                            <span @click="refreshData" class="text-clr-primary">Refresh List</span>
+                        </div>
+                        <InProgressOrder :isRequest="isRequest" :data="transactionData" />
                     </f7-tab>
                     <f7-tab id="requirements" class="page-content">
-                        <RequirementsOrder />
+                        <!-- Refresh Button -->
+                        <div class="mt-3 mb-6 flex gap-2 cursor-pointer">
+                            <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                            </svg>
+                            <span @click="refreshData" class="text-clr-primary">Refresh List</span>
+                        </div>
+                        <RequirementsOrder :isRequest="isRequest" :data="transactionData" />
                     </f7-tab>
                     <f7-tab id="to-deliver" class="page-content">
-                        <DeliverOrder />
+                        <!-- Refresh Button -->
+                        <div class="mt-3 mb-6 flex gap-2 cursor-pointer">
+                            <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                            </svg>
+                            <span @click="refreshData" class="text-clr-primary">Refresh List</span>
+                        </div>
+                        <DeliverOrder :isRequest="isRequest" :data="transactionData" />
                     </f7-tab>
                     <f7-tab id="completed" class="page-content">
-                        <CompletedOrder />
+                        <!-- Refresh Button -->
+                        <div class="mt-3 mb-6 flex gap-2 cursor-pointer">
+                            <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                            </svg>
+                            <span @click="refreshData" class="text-clr-primary">Refresh List</span>
+                        </div>
+                        <CompletedOrder :isRequest="isRequest" :data="transactionData" />
                     </f7-tab>
                     <f7-tab id="to-review" class="page-content">
-                        <ReviewOrder />
+                        <!-- Refresh Button -->
+                        <div class="mt-3 mb-6 flex gap-2 cursor-pointer">
+                            <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                            </svg>
+                            <span @click="refreshData" class="text-clr-primary">Refresh List</span>
+                        </div>
+                        <ReviewOrder :isRequest="isRequest" :data="transactionData" />
                     </f7-tab>
                     <f7-tab id="cancelled" class="page-content">
-                        <CancelledOrder />
+                        <!-- Refresh Button -->
+                        <div class="mt-3 mb-6 flex gap-2 cursor-pointer">
+                            <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97" />
+                            </svg>
+                            <span @click="refreshData" class="text-clr-primary">Refresh List</span>
+                        </div>
+                        <CancelledOrder :isRequest="isRequest" :data="transactionData" />
                     </f7-tab>
                 </f7-tabs>
             </section>

@@ -5,6 +5,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
 import { usePostStore } from '../../js/post.store';
 import { useInboxStore } from '../../js/inbox.store';
+import { useTransactionStore } from '../../js/transaction.store';
 import ContactIllustration from '../../assets/illustrations/select_chat.svg';
 import ContactList from '../../components/Chat/Contact.vue';
 import ComposeMessage from '../../components/Chat/Composemessage.vue';
@@ -13,10 +14,13 @@ import Conversation from '../../components/Chat/Conversation.vue';
 const authStore = useAuthStore();
 const postStore = usePostStore();
 const inboxStore = useInboxStore();
+const transactionStore = useTransactionStore();
+const toastWithButton = ref(null);
 const isChatSidebarOpen = ref(true);
 const inboxID = ref(null);
 const messages = ref([]);
 let resizeListener = null;
+
 
 const initRender = async () => {
   updateSidebarByBreakpoint();
@@ -43,6 +47,43 @@ const goToPostDetails = async () => {
   f7.views.main.router.navigate(route, {
     animate: animate,
   });
+};
+
+// Open Transactions
+const OpenTransactions = async (GetChatMessages) => {
+  const animate = window.innerWidth <= 1023;
+
+  const response = await transactionStore.OpenTransactions(GetChatMessages.to_user_id, GetChatMessages.msg_inbox_key);
+  if (response.status == 'success') {
+    toastWithButton.value = f7.toast.create({
+      text: response.message,
+      position: 'top',
+      closeButton: true,
+      closeButtonText: 'Okay',
+      closeButtonColor: 'green',
+      closeTimeout: 3000,
+    });
+
+    // If success
+    f7.views.main.router.navigate('/order', {
+      animate: animate,
+    });
+
+  } else {
+    toastWithButton.value = f7.toast.create({
+      text: response.message,
+      position: 'top',
+      closeButton: true,
+      closeButtonText: 'Okay',
+      closeButtonColor: 'red',
+      closeTimeout: 3000,
+    });
+  }
+
+  // Open the toast
+  if (toastWithButton.value) {
+    toastWithButton.value.open();
+  }
 };
 
 const updateSidebarByBreakpoint = () => {
@@ -144,12 +185,15 @@ onBeforeUnmount(() => {
 
         <!-- CTA Action Component -->
         <div class="flex gap-2 bg-gray-100 shadow">
-          <div
+          <div @click="OpenTransactions(GetChatMessages[0])"
             class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-4 rounded font-medium w-full text-center">
-            Open Transaction</div>
+            Open Transaction
+          </div>
+          
           <div @click="goToPostDetails"
             class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-4 rounded font-medium w-full text-center">
-            Item Details</div>
+            Item Details
+          </div>
         </div>
 
         <!-- Conversation Component -->

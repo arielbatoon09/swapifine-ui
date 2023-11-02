@@ -60,18 +60,27 @@ const handleLogout = async () => {
                     <f7-button @click="goToPage('/order')" tooltip="Track your orders"
                         class="cursor-pointer flex flex-row whitespace-nowrap items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-full p-2">
                         <svg class="w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
-                            <path
-                                d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 9V4a3 3 0 0 0-6 0v5m9.92 10H2.08a1 1 0 0 1-1-1.077L2 6h14l.917 11.923A1 1 0 0 1 15.92 19Z" />
+                        </svg>
+                    </f7-button>
+                    <!-- Checkout Tracker -->
+                    <f7-button @click="goToPage('/checkout')" tooltip="Checkout"
+                        class="cursor-pointer flex flex-row whitespace-nowrap items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-full p-2">
+                        <svg class="w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M6 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0h8m-8 0-1-4m9 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-9-4h10l2-7H3m2 7L3 4m0 0-.792-3H1" />
                         </svg>
                     </f7-button>
                     <!-- Post Item -->
                     <f7-button tooltip="Post new item" @click="goToPage('/post/item')"
                         class="cursor-pointer flex flex-row whitespace-nowrap items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-full p-2">
                         <svg class="w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M9.546.5a9.5 9.5 0 1 0 9.5 9.5 9.51 9.51 0 0 0-9.5-9.5ZM13.788 11h-3.242v3.242a1 1 0 1 1-2 0V11H5.304a1 1 0 0 1 0-2h3.242V5.758a1 1 0 0 1 2 0V9h3.242a1 1 0 1 1 0 2Z" />
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M10 5.757v8.486M5.757 10h8.486M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </f7-button>
                 </div>

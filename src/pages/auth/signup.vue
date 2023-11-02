@@ -1,7 +1,7 @@
 <script setup>
-import { useAuthStore } from '../../js/auth.store';
-import { ref } from 'vue';
 import { f7 } from 'framework7-vue';
+import { ref } from 'vue';
+import { useAuthStore } from '../../js/auth.store';
 import BtnBack from '../../assets/btn-back.svg';
 
 const authStore = useAuthStore();

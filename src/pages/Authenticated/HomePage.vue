@@ -1,9 +1,11 @@
 <script setup>
 import { f7 } from 'framework7-vue';
+import useCookies from 'vue-cookies'
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
 import { usePostStore } from '../../js/post.store';
 import { useLocationStore } from '../../js/location.store';
+import { useCreditsStore } from '../../js/credits.store';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 import PrimaryLayout from '../../Layout/PrimaryLayout.vue';
 import ListCategoryCarousel from '../../components/ListCategoryCarousel.vue';
@@ -16,12 +18,41 @@ const currentPage = 'home';
 const authStore = useAuthStore();
 const postStore = usePostStore();
 const locationStore = useLocationStore();
+const creditsStore = useCreditsStore();
+const toastWithButton = ref(null);
 const postData = ref([]);
 const isClicked = ref(false);
 const slidesPerView = ref(4);
 const viewID = ref(0);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
 let resizeListener = null;
+
+// Webhook Event for Checkout
+const initRenderCheckout = async () => {
+  const checkout_session_id = useCookies.get('CheckoutSession');
+  if (checkout_session_id) {
+    const response = await creditsStore.CompletePayment(checkout_session_id);
+
+    if (response.status == 'success') {
+      // Show the success toast
+      toastWithButton.value = f7.toast.create({
+        text: response.message,
+        position: 'top',
+        closeButton: true,
+        closeButtonText: 'Okay',
+        closeButtonColor: 'green',
+        closeTimeout: 3000,
+      });
+
+      useCookies.remove('CheckoutSession');
+    }
+
+    // Open the toast
+    if (toastWithButton.value) {
+      toastWithButton.value.open();
+    }
+  }
+};
 
 const initRender = async () => {
   updateSlidesPerView();
@@ -100,11 +131,11 @@ const calculateDistance = (userLatitude, userLongitude, postLatitude, postLongit
 
 // Check if the Distance is NaN
 const displayDistance = (distance) => {
-    if (!isNaN(distance)) {
-      return `${distance} km away`;
-    } else {
-      return 'Set your location';
-    }
+  if (!isNaN(distance)) {
+    return `${distance} km away`;
+  } else {
+    return 'Set your location';
+  }
 };
 
 const populateDistance = async () => {
@@ -123,8 +154,8 @@ const populateDistance = async () => {
 };
 
 onMounted(async () => {
-  // Mount and Render
   initRender();
+  initRenderCheckout();
 });
 
 onBeforeUnmount(() => {

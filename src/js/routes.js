@@ -21,6 +21,7 @@ import LocationPage from '../pages/Authenticated/LocationPage.vue';
 import BuyCreditsPage from '../pages/Authenticated/BuyCreditsPage.vue';
 import OrderPage from '../pages/Authenticated/OrderPage.vue';
 import OrderDetailsPage from '../pages/Authenticated/OrderDetailsPage.vue';
+import CheckoutPage from '../pages/Authenticated/CheckoutPage.vue';
 
 const isLoggedIn = useCookies.get('isLoggedIn');
 
@@ -107,7 +108,12 @@ const routes = [
   },
   {
     path: '/view/order',
-    component: OrderDetailsPage.vue,
+    component: OrderDetailsPage,
+    protectedRoute: true,
+  },
+  {
+    path: '/checkout',
+    component: CheckoutPage,
     protectedRoute: true,
   },
   {
