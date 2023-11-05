@@ -22,7 +22,10 @@ const paginatedData = computed(() => {
     const startIndex = (currentPage.value - 1) * itemsPerPage.value;
     const endIndex = startIndex + itemsPerPage.value;
     
-    return props.data.slice(startIndex, endIndex);
+    if (props.data != null) {
+        return props.data.slice(startIndex, endIndex);  
+    }
+    
 });
 
 const nextPage = () => {
