@@ -93,6 +93,19 @@ export const usePostStore = defineStore('post', {
             } catch (error) {
                 console.error(error);
             }
-        }
+        },
+        async AddWishList(post_item_id) {
+            try {
+                await this.getToken();
+
+                const response = await axios.post('/api/wishlist/add', {
+                    post_item_id: post_item_id,
+                });
+
+                return response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
     }
 })

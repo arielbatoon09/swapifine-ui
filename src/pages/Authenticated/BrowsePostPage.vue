@@ -81,6 +81,15 @@ const goToPostDetails = async (id) => {
     });
 };
 
+// Add to Wishlist
+const HandleWishlist = async (post_item_id) => {
+    await postStore.AddWishList(post_item_id);
+
+    // Rerender Data
+    const postResponse = await postStore.GetAllPostItem();
+    postData.value = postResponse.data;
+};
+
 // Redirection to other Page
 const goToPage = (route) => {
     const animate = window.innerWidth <= 1023;
@@ -455,7 +464,7 @@ onBeforeUnmount(() => {
                         <swiper-container :pagination="true" :space-between="0" :slides-per-view="1">
                             <swiper-slide v-for="image in post.images" :id="image.id">
                                 <img @click="goToPostDetails(post.id)"
-                                    class="w-full h-52 cursor-pointer hover:brightness-75 delay-75"
+                                    class="w-full h-52 cursor-pointer hover:brightness-75 delay-75 object-cover object-top"
                                     :src="image.img_file_path" alt="">
                             </swiper-slide>
                         </swiper-container>
@@ -490,16 +499,16 @@ onBeforeUnmount(() => {
                                 <h3 @click="goToPostDetails(post.id)"
                                     class="cursor-pointer text-lg font-medium hover:underline truncate">{{ post.item_name }}
                                 </h3>
-                                <!-- Add-To-Favorites -->
-                                <svg v-if="!isClicked" @click="isClicked = true"
-                                    class="cursor-pointer w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
+                                <!-- Add Wishlist -->
+                                <svg v-if="!post.added_user_wishlist" @click="HandleWishlist(post.id)"
+                                    class="cursor-pointer w-[24px] h-[24px] text-clr-primary shrink-0" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="1.5"
                                         d="M11 4C5.5-1.5-1.5 5.5 4 11l7 7 7-7c5.458-5.458-1.542-12.458-7-7Z" />
                                 </svg>
-                                <svg v-else @click="isClicked = false"
-                                    class="cursor-pointer w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
+                                <svg v-else @click="HandleWishlist(post.id)"
+                                    class="cursor-pointer w-[24px] h-[24px] text-clr-primary shrink-0" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
                                     <path
                                         d="M17.947 2.053a5.209 5.209 0 0 0-3.793-1.53A6.414 6.414 0 0 0 10 2.311 6.482 6.482 0 0 0 5.824.5a5.2 5.2 0 0 0-3.8 1.521c-1.915 1.916-2.315 5.392.625 8.333l7 7a.5.5 0 0 0 .708 0l7-7a6.6 6.6 0 0 0 2.123-4.508 5.179 5.179 0 0 0-1.533-3.793Z" />

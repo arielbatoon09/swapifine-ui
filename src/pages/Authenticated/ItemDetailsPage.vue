@@ -98,7 +98,7 @@ const goToPage = (route) => {
                             <div
                                 class="w-full h-auto lg:h-[500px] overflow-hidden bg-gray-100 border border-gray-200 rounded-md">
                                 <swiper-container :pagination="true" :space-between="0" :slides-per-view="1"
-                                    class="h-auto lg:h-[500px] object-cover">
+                                    class="h-auto lg:h-full object-cover object-top">
                                     <swiper-slide v-for="image in postStore.getItemDetails.images">
                                         <img class="w-full h-full" :src="image.img_file_path">
                                     </swiper-slide>
