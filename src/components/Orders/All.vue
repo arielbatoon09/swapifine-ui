@@ -1,6 +1,6 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
 import { usePostStore } from '../../js/post.store';
 
@@ -66,6 +66,10 @@ const doMoveToInbox = async () => {
         animate: animate,
     });
 };
+
+onMounted(() => {
+//  console.log(props.data);
+});
 </script>
 
 
@@ -85,7 +89,7 @@ const doMoveToInbox = async () => {
                                     stroke-width="1.5"
                                     d="M3.308 9a2.257 2.257 0 0 0 2.25-2.264 2.25 2.25 0 0 0 4.5 0 2.25 2.25 0 0 0 4.5 0 2.25 2.25 0 1 0 4.5 0C19.058 5.471 16.956 1 16.956 1H3.045S1.058 5.654 1.058 6.736A2.373 2.373 0 0 0 3.308 9Zm0 0a2.243 2.243 0 0 0 1.866-1h.767a2.242 2.242 0 0 0 3.733 0h.767a2.242 2.242 0 0 0 3.733 0h.767a2.247 2.247 0 0 0 1.867 1A2.22 2.22 0 0 0 18 8.649V19H9v-7H5v7H2V8.524c.37.301.83.469 1.308.476ZM12 12h3v3h-3v-3Z" />
                             </svg>
-                            <span class="text-base font-medium">{{ data.vendor_name }} <span class="text-gray-700 text-sm font-light">{{ data.vendor_id == authStore.user?.id ? '(You)' : ''}}</span></span>
+                            <span class="text-base font-medium">{{ data.vendor_name }}<span class="text-gray-700 text-sm font-light">{{ data.vendor_id == authStore.user?.id ? '(You)' : ''}}</span></span>
                         </div>
                         <!-- View Store CTA -->
                         <div class="cursor-pointer bg-clr-primary flex justify-center items-center gap-2 py-1 px-2 rounded">
@@ -108,7 +112,7 @@ const doMoveToInbox = async () => {
                             :src="data.thumbnail">
                     </div>
                     <div class="space-y-1">
-                        <h2 class="text-base font-semibold">{{ data.item_name }}</h2>
+                        <h2 class="text-base font-semibold">{{ data.buyer_name }} • {{ data.item_name }}</h2>
                         <p><span class="font-medium">Category:</span> {{ data.category_name }}</p>
                         <p><span class="font-medium">Price:</span> ₱{{ data.cash_value }}</p>
                     </div>

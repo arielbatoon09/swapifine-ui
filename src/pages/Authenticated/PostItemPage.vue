@@ -102,6 +102,21 @@ const handlePostItem = async () => {
 
       // Redirect the user to home page
       f7.views.main.router.navigate('/home');
+    } else {
+      // Show the toast
+      if (!toastWithButton.value) {
+        toastWithButton.value = f7.toast.create({
+          text: response.message,
+          position: 'top',
+          closeButton: true,
+          closeButtonText: 'Okay',
+          closeButtonColor: 'red',
+          closeTimeout: 3000,
+        });
+      }
+
+      // Open the toast
+      toastWithButton.value.open();
     }
 
     console.log(response);
@@ -277,8 +292,8 @@ const removeImage = (index) => {
                     <option value="For Swap">For Swap</option>
                     <option value="For Swap and Sale">For Swap and Sale</option>
                   </f7-list-input>
-                  <f7-list-input v-model:value="form.item_cash_value" outline label="₱ Cash Value" floating-label type="text"
-                    clear-button>
+                  <f7-list-input v-model:value="form.item_cash_value" outline label="₱ Cash Value" floating-label
+                    type="text" clear-button>
                   </f7-list-input>
                 </f7-list>
                 <!-- Next Step -->

@@ -21,6 +21,7 @@ const initRenderData = async () => {
     isRequest.value = true;
     const response = await transactionStore.GetUserTransactions();
     transactionData.value = response.data;
+    console.log(transactionData.value);
     isRequest.value = false;
 };
 

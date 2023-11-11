@@ -179,7 +179,7 @@ const doMoveToInbox = async () => {
                             :src="data.thumbnail">
                     </div>
                     <div class="space-y-1">
-                        <h2 class="text-base font-semibold">{{ data.item_name }}</h2>
+                        <h2 class="text-base font-semibold">{{ data.buyer_name }} • {{ data.item_name }}</h2>
                         <p><span class="font-medium">Category:</span> {{ data.category_name }}</p>
                         <p><span class="font-medium">Price:</span> ₱{{ data.cash_value }}</p>
                     </div>
