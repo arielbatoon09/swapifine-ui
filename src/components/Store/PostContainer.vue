@@ -8,35 +8,30 @@ const data = ref([]);
 const isOpenModal = ref(false);
 const popup = ref(null);
 const imageID = ref(null);
+const photos = ref([]);
+const thumbs = ref([]);
 
 const initRender = async () => {
-    // Get All Posted Items
     const myPost = await mystoreStore.GetPostByUserID();
     data.value = myPost.data;
 
     console.log(data.value);
 };
 
-const openPopup = (id) => {
-    imageID.value = id;
-    popup.value.open();
+// Open Photos Browser
+const openPopup = async (id) => {
+    const response = await mystoreStore.GetPostImagesByID(id);
     
-};
-
-const photos = computed(() => {
-    const filteredData = data.value.filter(item => item.id === imageID.value);
-
-    return filteredData.map(item => ({
-        url: item.thumbnail,
-        caption: item.item_name
+    const newImages = response.data.map(image => ({
+        url: image.images,
+        caption: image.caption,
     }));
-});
 
-const thumbs = ref([
-    SampleProduct,
-    SampleProduct,
-    SampleProduct,
-]);
+    photos.value.splice(0, photos.value.length, ...newImages);
+    thumbs.value.splice(0, thumbs.value.length, ...newImages);
+
+    popup.value.open();
+};
 
 const toggleModal = () => {
     isOpenModal.value = !isOpenModal.value;
@@ -87,9 +82,8 @@ onMounted(() => {
             </div>
             <!-- Preview Image -->
             <img :src="data.thumbnail" @click="openPopup(data.id)" :key="data.id"
-                class="cursor-pointer h-full w-full object-cover object-center transition duration-200 group-hover:brightness-75 scale-110 z-0" 
-                />
-                
+                class="cursor-pointer h-full w-full object-cover object-center transition duration-200 group-hover:brightness-75 scale-110 z-0" />
+
         </div>
 
         <!-- Photo Browser -->

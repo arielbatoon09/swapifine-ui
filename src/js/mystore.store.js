@@ -18,6 +18,14 @@ export const useMystoreStore = defineStore('mystore', {
 
             const response = await axios.get('/api/mystore/user-post');
             return response.data;
+        },
+        async GetPostImagesByID(id) {
+            this.getToken();
+
+            const response = await axios.post('/api/mystore/getPostImagesByID', {
+                id: id,
+            });
+            return response.data;
         }
     },
 });
