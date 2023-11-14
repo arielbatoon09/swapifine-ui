@@ -1,8 +1,16 @@
 <script setup>
+import { f7 } from 'framework7-vue';
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 
 const currentPage = 'settings';
 
+// Redirection to other Page
+const goToPage = (route) => {
+  const animate = window.innerWidth <= 1023;
+  f7.views.main.router.navigate(route, {
+    animate: animate,
+  });
+};
 </script>
 <template>
     <f7-page class="settings-container">
@@ -22,7 +30,7 @@ const currentPage = 'settings';
                         </div>
                         <f7-block class="mt-4">
                             <div class="w-32">
-                                <f7-button class="primary-button" large fill>Verify Now</f7-button>
+                                <f7-button @click="goToPage('/verification')" class="primary-button" large fill>Verify Now</f7-button>
                             </div>
                         </f7-block>
                     </div>
