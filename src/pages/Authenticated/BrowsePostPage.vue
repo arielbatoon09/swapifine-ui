@@ -50,6 +50,7 @@ const initRender = async () => {
     // Get All Posted Items
     const postResponse = await postStore.GetAllPostItem();
     postData.value = postResponse.data;
+    console.log(postData.value);
 
     if (postData.value == 'No Data Found') {
         postData.value = null;

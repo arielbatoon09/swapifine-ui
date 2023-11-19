@@ -26,6 +26,12 @@ export const useMystoreStore = defineStore('mystore', {
                 id: id,
             });
             return response.data;
-        }
+        },
+        async GetWishlistByUserID() {
+            this.getToken();
+
+            const response = await axios.get('/api/mystore/user-wishlist');
+            return response.data;
+        },
     },
 });
