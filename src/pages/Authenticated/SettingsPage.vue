@@ -27,6 +27,7 @@ const goToPage = (route) => {
                         <div class="px-4">
                             <h2 class="font-semibold text-xl">Verify Account</h2>
                             <p class="text-sm text-gray-500">Vendors must complete a verification process to be able to post items.</p>
+                            <p class="text-gray-500 font-medium">Status: <span class="text-orange-500">Pending</span></p>
                         </div>
                         <f7-block class="mt-4">
                             <div class="w-32">

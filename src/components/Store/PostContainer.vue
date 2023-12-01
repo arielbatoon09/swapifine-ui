@@ -1,27 +1,28 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useMystoreStore } from '../../js/mystore.store';
-import SampleProduct from '../../assets/products/sample2.jpg';
 
 const mystoreStore = useMystoreStore();
 const data = ref([]);
 const isOpenModal = ref(false);
 const popup = ref(null);
-const imageID = ref(null);
 const photos = ref([]);
 const thumbs = ref([]);
+const isLoading = ref(false);
 
 const initRender = async () => {
+    isLoading.value = true;
     const myPost = await mystoreStore.GetPostByUserID();
     data.value = myPost.data;
 
+    isLoading.value = false;
     console.log(data.value);
 };
 
 // Open Photos Browser
 const openPopup = async (id) => {
     const response = await mystoreStore.GetPostImagesByID(id);
-    
+
     const newImages = response.data.map(image => ({
         url: image.images,
         caption: image.caption,
@@ -88,5 +89,9 @@ onMounted(() => {
 
         <!-- Photo Browser -->
         <f7-photo-browser ref="popup" :photos="photos" :thumbs="thumbs" type="popup" />
+    </div>
+
+    <div v-show="isLoading" class="flex justify-center p-40">
+        <f7-preloader />
     </div>
 </template>

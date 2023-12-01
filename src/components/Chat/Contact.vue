@@ -138,7 +138,7 @@ watchEffect(async () => {
             <div v-if="hasMessages.bool && hasMessages.bool != 'empty'" v-for="inbox in arrangeInbox"
                 @click="doHandleUpdateIsReadStatus(inbox.msg_inbox_key, inbox.id, authStore.user?.id, inbox.read_by_sender, inbox.read_by_receiver)"
                 class="flex items-center mb-2 cursor-pointer p-2 rounded-md relative"
-                :class="inbox.read_by_sender === 0 ? 'bg-sky-50 hover:bg-sky-100' : 'hover:bg-gray-100'">
+                :class="inbox.read_by_sender === 0 ? 'bg-white hover:bg-gray-100' : 'hover:bg-gray-100'">
                 <div class="w-12 h-12 bg-gray-300 rounded-full mr-3">
                     <img :src="inbox.img_thumbnail" alt="User Avatar" class="w-12 h-12 rounded-full">
                 </div>
@@ -148,9 +148,9 @@ watchEffect(async () => {
                     <p class="text-gray-600 truncate">{{ inbox.latest_message }}</p>
                 </div>
                 <!-- Is Read Indicator -->
-                <div v-show="inbox.read_by_sender == 0" class="absolute top-6 right-2">
+                <!-- <div v-show="inbox.read_by_sender == 0" class="absolute top-6 right-2">
                     <div class="w-3 h-3 bg-cyan-700 rounded-full"></div>
-                </div>
+                </div> -->
             </div>
 
             <div v-else v-show="hasMessages.bool != 'empty'" class="flex flex-col items-center justify-center">
@@ -215,9 +215,9 @@ watchEffect(async () => {
                         <p class="text-gray-600 truncate">{{ inbox.latest_message }}</p>
                     </div>
                     <!-- Is Read Indicator -->
-                    <div v-show="inbox.read_by_sender == 0" class="absolute top-6 right-2">
+                    <!-- <div v-show="inbox.read_by_sender == 0" class="absolute top-6 right-2">
                         <div class="w-3 h-3 bg-cyan-700 rounded-full"></div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div v-else v-show="hasMessages.bool != 'empty'" class="flex flex-col items-center justify-center">

@@ -228,9 +228,7 @@ const removeImage = (index) => {
                     </label>
                     <!-- Wrap the file input in a div -->
                     <div style="display: none;">
-                      <!-- <input type="file" id="images" name="images[]" multiple accept="image/*" ref="fileInput"
-                        @change="handleImageChange" />
-                    </div> -->
+
                       <input type="file" id="images" name="images[]" multiple ref="fileInput"
                         @change="handleImageChange" />
                     </div>

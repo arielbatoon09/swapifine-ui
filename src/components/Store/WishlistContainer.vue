@@ -1,43 +1,36 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useMystoreStore } from '../../js/mystore.store';
-import SampleProduct from '../../assets/products/sample2.jpg';
-import SampleProduct3 from '../../assets/products/sample3.jpg';
 
 const mystoreStore = useMystoreStore();
 const data = ref([]);
-const imgSample = ref([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 const popup = ref(null);
-const photos = ref([
-    {
-        url: SampleProduct,
-        caption: 'Post Title'
-    },
-    {
-        url: SampleProduct,
-        caption: 'Post Title'
-    },
-    {
-        url: SampleProduct,
-        caption: 'Post Title'
-    },
-]);
-
-const thumbs = ref([
-    SampleProduct,
-    SampleProduct,
-    SampleProduct,
-]);
-
-const openPopup = () => {
-    popup.value.open();
-};
+const photos = ref([]);
+const thumbs = ref([]);
+const isLoading = ref(false);
 
 const initRender = async () => {
+    isLoading.value = true;
     const myPost = await mystoreStore.GetWishlistByUserID();
     data.value = myPost.data;
+    isLoading.value = false;
 
     console.log(data.value);
+};
+
+// Open Photos Browser
+const openPopup = async (id) => {
+    const response = await mystoreStore.GetWishlistImagesByID(id);
+
+    const newImages = response.data.map(image => ({
+        url: image.images,
+        caption: image.caption,
+    }));
+
+    photos.value.splice(0, photos.value.length, ...newImages);
+    thumbs.value.splice(0, thumbs.value.length, ...newImages);
+
+    popup.value.open();
 };
 
 onMounted(() => {
@@ -53,11 +46,16 @@ onMounted(() => {
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
         <!-- Images -->
         <div v-for="data in data" class="h-[300px] group relative overflow-hidden bg-gray-100">
-            <img :src="data.thumbnail" @click="openPopup" :key="data.id"
-                class="cursor-pointer h-full w-full object-cover object-center transition duration-200 group-hover:brightness-75 scale-110">
+            <!-- Preview Image -->
+            <img :src="data.thumbnail" @click="openPopup(data.id)" :key="data.id"
+                class="cursor-pointer h-full w-full object-cover object-center transition duration-200 group-hover:brightness-75 scale-110 z-0" />
         </div>
+
+        <!-- Photo Browser Popup -->
         <f7-photo-browser ref="popup" :photos="photos" :thumbs="thumbs" type="popup" />
     </div>
-    <!-- Photo Browser Popup -->
-    <f7-photo-browser :photos="photos" :thumbs="thumbs" type="popup" />
+
+    <div v-show="isLoading" class="flex justify-center p-40">
+        <f7-preloader />
+    </div>
 </template>

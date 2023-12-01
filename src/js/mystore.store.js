@@ -33,5 +33,20 @@ export const useMystoreStore = defineStore('mystore', {
             const response = await axios.get('/api/mystore/user-wishlist');
             return response.data;
         },
+        async GetWishlistImagesByID(id) {
+            this.getToken();
+
+            const response = await axios.post('/api/mystore/getWishlistImagesByID', {
+                id: id,
+            });
+
+            return response.data;
+        },
+        async GetRatingsByUserID() {
+            this.getToken();
+
+            const response = await axios.get('/api/mystore/user-ratings');
+            return response.data;
+        }
     },
 });

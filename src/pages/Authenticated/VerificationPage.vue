@@ -1,9 +1,128 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { f7 } from 'framework7-vue';
+import { useVerificationStore } from '../../js/verification.store';
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 import OnboardingIMG from '../../assets/illustrations/onboarding_verification_illus.svg';
 import DocumentIdIMG from '../../assets/illustrations/document_id_illustration.svg';
+
+const verificationStore = useVerificationStore();
+const fileInput = ref(null);
+const selectedImages = ref([]);
+const isRequest = ref(false);
+const toastWithButton = ref(null);
+
+const FormData = ref({
+  legal_name: null,
+  address: null,
+  city: null,
+  zip_code: null,
+  dob: null,
+  img_file_path: null,
+});
+
+const handlePostVerification = async () => {
+  // Init Loading Request
+  isRequest.value = true;
+
+  // Get Value of form data
+  const { legal_name, address, city, zip_code, dob } = FormData.value;
+
+  const originalDate = new Date(dob[0]);
+  const formattedDOB = originalDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  // Create an array to store file data
+  const files = [];
+
+  if (!FormData.value.img_file_path) {
+    return;
+  }
+
+  // Convert File objects to base64 encoded strings
+  for (const file of FormData.value.img_file_path) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    await new Promise((resolve) => {
+      reader.onload = (e) => {
+        files.push({ name: file.name, data: e.target.result });
+        resolve();
+      };
+    });
+  }
+
+  const response = await verificationStore.PostVerificationRequest(legal_name, address, city, zip_code, formattedDOB, files);
+
+  if (response) {
+    isRequest.value = false;
+  }
+
+  // Success State
+  if (response.status == 'success') {
+
+    // Show the toast
+    if (!toastWithButton.value) {
+      toastWithButton.value = f7.toast.create({
+        text: 'Sent verification successfully!',
+        position: 'top',
+        closeButton: true,
+        closeButtonText: 'Okay',
+        closeButtonColor: 'green',
+        closeTimeout: 3000,
+      });
+    }
+
+    // Open the toast
+    toastWithButton.value.open();
+
+    // Redirect the user to home page
+    f7.views.main.router.navigate('/home');
+  } else {
+    // Show the toast
+    if (!toastWithButton.value) {
+      toastWithButton.value = f7.toast.create({
+        text: response.message,
+        position: 'top',
+        closeButton: true,
+        closeButtonText: 'Okay',
+        closeButtonColor: 'red',
+        closeTimeout: 3000,
+      });
+    }
+
+    // Open the toast
+    toastWithButton.value.open();
+  }
+};
+
+const handleImageChange = (event) => {
+  const files = Array.from(event.target.files);
+
+  if (files.length == 0) {
+    return;
+  }
+
+  // Filter files to only include JPG, JPEG, and PNG
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  const selectedFiles = files.filter((file) => allowedTypes.includes(file.type));
+
+  // Initialize form.img_file_path as an empty array if it's not already an array
+  if (!Array.isArray(FormData.value.img_file_path)) {
+    FormData.value.img_file_path = [];
+  }
+
+  // Append selectedFiles to the existing form.img_file_path array
+  FormData.value.img_file_path = [...selectedFiles];
+
+  // Display selected images
+  selectedFiles.forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedImages.value.push({ file, url: e.target.result });
+    };
+    reader.readAsDataURL(file);
+  });
+};
 
 // Redirection to other Page
 const goToPage = (route) => {
@@ -63,15 +182,19 @@ const goToPage = (route) => {
                   <p class="text-gray-600">Ensure that the ID details match the data you input.</p>
                 </f7-block>
                 <f7-list>
-                  <f7-list-input outline label="Legal name" floating-label type="text" clear-button>
+                  <f7-list-input v-model:value="FormData.legal_name" outline label="Legal name" floating-label type="text"
+                    clear-button>
                   </f7-list-input>
-                  <f7-list-input outline label="Address" floating-label type="text" clear-button>
+                  <f7-list-input v-model:value="FormData.address" outline label="Address" floating-label type="text"
+                    clear-button>
                   </f7-list-input>
-                  <f7-list-input outline label="City" floating-label type="text" clear-button>
+                  <f7-list-input v-model:value="FormData.city" outline label="City" floating-label type="text"
+                    clear-button>
                   </f7-list-input>
-                  <f7-list-input outline label="ZIP Code" floating-label type="text" clear-button>
+                  <f7-list-input v-model:value="FormData.zip_code" outline label="ZIP Code" floating-label type="text"
+                    clear-button>
                   </f7-list-input>
-                  <f7-list-input outline placeholder="Date of Birth" type="datepicker" />
+                  <f7-list-input v-model:value="FormData.dob" outline placeholder="Date of Birth" type="datepicker" />
                 </f7-list>
                 <!-- Next Step -->
                 <f7-block class="flex flex-col gap-2 step-cta">
@@ -106,7 +229,7 @@ const goToPage = (route) => {
                     </div>
                     <!-- Upload ID -->
                     <div class="mt-4">
-                      <input type="file" />
+                      <input type="file" id="images" ref="fileInput" @change="handleImageChange" />
                     </div>
                   </div>
                 </f7-block>
@@ -114,7 +237,7 @@ const goToPage = (route) => {
                 <f7-block class="flex flex-col gap-2 pt-8 step-cta">
                   <!-- Publish Button -->
                   <f7-link>
-                    <f7-button large fill class="primary-button">Publish</f7-button>
+                    <f7-button preloader :loading="isRequest" @click="handlePostVerification" large fill class="primary-button">Publish</f7-button>
                   </f7-link>
                   <!-- Back Button -->
                   <f7-link tab-link="#step-2">

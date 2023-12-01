@@ -19,12 +19,17 @@ const toastWithButton = ref(null);
 const isChatSidebarOpen = ref(true);
 const inboxID = ref(null);
 const messages = ref([]);
+const getName = ref(null);
 let resizeListener = null;
 
 
 const initRender = async () => {
   updateSidebarByBreakpoint();
   resizeListener = window.addEventListener('resize', updateSidebarByBreakpoint);
+};
+
+const setName = (recipient) => {
+  getName.value = recipient;
 };
 
 // Redirection to View item Details Page
@@ -173,15 +178,51 @@ onBeforeUnmount(() => {
               </h1>
             </div>
           </div>
-          <!-- More Options Dropdown -->
+          <!-- Report User -->
           <div class="ml-auto">
-            <svg class="cursor-pointer w-[32px] h-[32px] text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full p-2"
-              aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 3">
-              <path
-                d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-            </svg>
+            <f7-button @click="setName(GetChatMessages[0].to_user_fullname)" tooltip="Report User" popup-open=".popup-report">
+              <svg class="w-[24px] h-[24px] text-gray-800 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 16 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M1 1v18M1 3.652v9c5.6-5.223 8.4 2.49 14-.08v-9c-5.6 2.57-8.4-5.143-14 .08Z" />
+              </svg>
+            </f7-button>
           </div>
         </div>
+
+        <!-- Report Popup Form -->
+        <f7-popup class="popup-report" swipe-to-close>
+          <f7-page>
+            <f7-navbar title="Report Form">
+              <f7-nav-right>
+                <f7-link popup-close>Close</f7-link>
+              </f7-nav-right>
+            </f7-navbar>
+
+            <div>
+              <f7-list>
+                <f7-block class="my-0">
+                  <p>User to Report:</p>
+                </f7-block>
+                <f7-list-input outline :label="getName" floating-label type="text" disabled>
+                </f7-list-input>
+
+                <f7-list-input outline label="Message" floating-label type="textarea" placeholder="Enter anything..." clear-button>
+                </f7-list-input>
+
+                <f7-block class="my-0 mt-3">
+                  <p>Proof of Report:</p>
+                  <input type="file" id="images" ref="fileInput" />
+                </f7-block>
+
+                <f7-block>
+                  <f7-button large fill class="primary-button">Submit</f7-button>
+                </f7-block>
+                
+              </f7-list>
+            </div>
+          </f7-page>
+        </f7-popup>
 
         <!-- CTA Action Component -->
         <div class="flex gap-2 bg-gray-100 shadow">
@@ -189,7 +230,7 @@ onBeforeUnmount(() => {
             class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-4 rounded font-medium w-full text-center">
             Open Transaction
           </div>
-          
+
           <div @click="goToPostDetails"
             class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-4 rounded font-medium w-full text-center">
             Item Details
