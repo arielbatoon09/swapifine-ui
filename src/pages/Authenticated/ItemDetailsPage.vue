@@ -11,16 +11,13 @@ const postStore = usePostStore();
 const inboxStore = useInboxStore();
 const isRequest = reactive({ bool: false });
 const toastWithButton = reactive({ value: null });
-
-console.log(postStore.getItemDetails);
+const addedWishlist = reactive({ bool: false });
 
 const doHandleTapToInquire = async (id, post_user_id) => {
     // Init Loading Request
     isRequest.bool = true;
 
     const response = await inboxStore.TapToInquire(id, post_user_id);
-
-
 
     if (response.status != 'error') {
 
@@ -36,21 +33,17 @@ const doHandleTapToInquire = async (id, post_user_id) => {
             goToPage('/inbox');
         }
 
-    } else {
-        if (!toastWithButton.value) {
-            toastWithButton.value = f7.toast.create({
-                text: response.message,
-                position: 'top',
-                closeButton: true,
-                closeButtonText: 'Okay',
-                closeButtonColor: 'red',
-                closeTimeout: 3000,
-            });
-        }
     }
 
     toastWithButton.value.open();
     isRequest.bool = false;
+};
+
+// Add to Wishlist
+const HandleWishlist = async (post_item_id) => {
+    const response = await postStore.AddWishList(post_item_id);
+    alert(response.message);
+    // addedWishlist.bool = response.status == 'added' ? true : false;
 };
 
 
@@ -260,7 +253,8 @@ const goToPage = (route) => {
                                             @click="doHandleTapToInquire(postStore.getItemDetails.id, postStore.getItemDetails.user_id)">Tap
                                             to Inquire</f7-button>
                                     </div>
-                                    <div
+                                    <!-- Add Wishlist -->
+                                    <div @click="HandleWishlist(postStore.getItemDetails.id)"
                                         class="cursor-pointer w-full sm:w-auto flex items-center justify-center gap-4 bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg">
                                         <svg class="w-6 h-6 text-clr-primary" aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">

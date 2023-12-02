@@ -4,6 +4,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { usePostStore } from '../../js/post.store';
 import { useLocationStore } from '../../js/location.store';
 import { useFilterStore } from '../../js/filter.store';
+import useCookies from 'vue-cookies'
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 import TestProfile from '../../assets/profile/test_profile.jpg';
 import TestIcon from '../../assets/icon-test.svg';
@@ -37,9 +38,13 @@ const initRender = async () => {
     // Update slides per view and Resize Event listener
     updateSlidesPerView();
     resizeListener = window.addEventListener('resize', updateSlidesPerView);
-
+    
+    
     // Reset Filter State by Default
     handleResetFilter();
+
+    // Filter Category
+    handleCookiesCategory();
 
     // Get All Categories
     categories.value = await postStore.GetCategoryList();
@@ -171,6 +176,29 @@ const populateDistance = async () => {
     };
 };
 
+// Process Category Filter in the Home Page
+const handleCookiesCategory = () => {
+    const newFilterData = formFilterData.value;
+
+    // get category cookies
+    newFilterData.category = useCookies.get('category');
+
+    if (newFilterData) {
+        // Update the filter state in the Pinia
+        filterStore.setFilter(newFilterData);
+    }
+};
+
+const setTopCategoryCookie = (category) => {
+    const newFilterData = formFilterData.value;
+    newFilterData.category = category;
+
+    if (newFilterData) {
+        // Update the filter state in the Pinia
+        filterStore.setFilter(newFilterData);
+    }
+}
+
 // Set Custom Filter value
 const handleCustomFilter = () => {
     const newFilterData = formFilterData.value;
@@ -179,7 +207,7 @@ const handleCustomFilter = () => {
         // Update the filter state in the Pinia
         filterStore.setFilter(newFilterData);
         showFilterList.value = true;
-        
+
         filterModal.value = !filterModal.value;
     }
 };
@@ -197,7 +225,7 @@ const handleResetFilter = () => {
     formFilterData.value.item_condition = null;
     formFilterData.value.item_for_type = null;
     formFilterData.value.distance = null;
-    
+
     showFilterList.value = false;
 };
 
@@ -342,9 +370,9 @@ onBeforeUnmount(() => {
                 <!-- Top Categories Filter -->
                 <div class="w-full mb-3">
                     <swiper-container :pagination="false" :space-between="14" :slides-per-view="slidesPerView">
-                        <swiper-slide v-for="category in categories" :key="category.id">
+                        <swiper-slide @click="setTopCategoryCookie(category.category_name)" v-for="category in categories" :key="category.id" >
                             <div class="cursor-pointer flex flex-row flex-nowrap whitespace-nowrap items-center gap-2 border-clr-primary 
-                                hover:bg-gray-100 py-3 px-3 rounded-full">
+                                hover:bg-gray-100 py-3 px-3 rounded-full" :class="formFilterData.category == category.category_name ? 'bg-cyan-50' : ''">
                                 <img :src="TestIcon">
                                 <span>{{ category.category_name }}</span>
                             </div>

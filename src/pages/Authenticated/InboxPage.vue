@@ -17,10 +17,19 @@ const inboxStore = useInboxStore();
 const transactionStore = useTransactionStore();
 const toastWithButton = ref(null);
 const isChatSidebarOpen = ref(true);
+const fileInput = ref(null);
+const selectedImages = ref([]);
 const inboxID = ref(null);
 const messages = ref([]);
 const getName = ref(null);
+const isRequest = ref(false);
 let resizeListener = null;
+
+const FormData = ref({
+  user_id: null,
+  message: null,
+  proof_img_path: null,
+});
 
 
 const initRender = async () => {
@@ -28,8 +37,109 @@ const initRender = async () => {
   resizeListener = window.addEventListener('resize', updateSidebarByBreakpoint);
 };
 
-const setName = (recipient) => {
+const setName = (recipient, userID) => {
   getName.value = recipient;
+  FormData.value.user_id = userID;
+};
+
+const handleReportUser = async () => {
+  // Init Loading Request
+  isRequest.value = true;
+
+  const { user_id, message } = FormData.value;
+
+  // Create an array to store file data
+  const files = [];
+
+  if (!FormData.value.proof_img_path) {
+    return;
+  }
+
+  // Convert File objects to base64 encoded strings
+  for (const file of FormData.value.proof_img_path) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    await new Promise((resolve) => {
+      reader.onload = (e) => {
+        files.push({ name: file.name, data: e.target.result });
+        resolve();
+      };
+    });
+  }
+
+  const response = await authStore.reportUser(user_id, message, files);
+
+  if (response) {
+    isRequest.value = false;
+  }
+
+  // Success State
+  if (response.status == 'success') {
+
+    // Show the toast
+    if (!toastWithButton.value) {
+      toastWithButton.value = f7.toast.create({
+        text: 'Reported user successfully!',
+        position: 'top',
+        closeButton: true,
+        closeButtonText: 'Okay',
+        closeButtonColor: 'green',
+        closeTimeout: 3000,
+      });
+    }
+
+    // Open the toast
+    toastWithButton.value.open();
+    f7.popup.close('.popup-report');
+
+    // Redirect the user to home page
+    f7.views.main.router.navigate('/home');
+  } else {
+    // Show the toast
+    if (!toastWithButton.value) {
+      toastWithButton.value = f7.toast.create({
+        text: response.message,
+        position: 'top',
+        closeButton: true,
+        closeButtonText: 'Okay',
+        closeButtonColor: 'red',
+        closeTimeout: 3000,
+      });
+    }
+
+    // Open the toast
+    toastWithButton.value.open();
+  }
+};
+
+const handleImageChange = (event) => {
+  const files = Array.from(event.target.files);
+
+  if (files.length == 0) {
+    return;
+  }
+
+  // Filter files to only include JPG, JPEG, and PNG
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  const selectedFiles = files.filter((file) => allowedTypes.includes(file.type));
+
+  // Initialize form.proof_img_path as an empty array if it's not already an array
+  if (!Array.isArray(FormData.value.proof_img_path)) {
+    FormData.value.proof_img_path = [];
+  }
+
+  // Append selectedFiles to the existing form.proof_img_path array
+  FormData.value.proof_img_path = [...selectedFiles];
+
+  // Display selected images
+  selectedFiles.forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedImages.value.push({ file, url: e.target.result });
+    };
+    reader.readAsDataURL(file);
+  });
 };
 
 // Redirection to View item Details Page
@@ -180,7 +290,8 @@ onBeforeUnmount(() => {
           </div>
           <!-- Report User -->
           <div class="ml-auto">
-            <f7-button @click="setName(GetChatMessages[0].to_user_fullname)" tooltip="Report User" popup-open=".popup-report">
+            <f7-button @click="setName(GetChatMessages[0].to_user_fullname, GetChatMessages[0].id)" tooltip="Report User"
+              popup-open=".popup-report">
               <svg class="w-[24px] h-[24px] text-gray-800 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                 fill="none" viewBox="0 0 16 20">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -207,18 +318,20 @@ onBeforeUnmount(() => {
                 <f7-list-input outline :label="getName" floating-label type="text" disabled>
                 </f7-list-input>
 
-                <f7-list-input outline label="Message" floating-label type="textarea" placeholder="Enter anything..." clear-button>
+                <f7-list-input v-model:value="FormData.message" outline label="Message" floating-label type="textarea"
+                  placeholder="Enter anything..." clear-button>
                 </f7-list-input>
 
                 <f7-block class="my-0 mt-3">
                   <p>Proof of Report:</p>
-                  <input type="file" id="images" ref="fileInput" />
+                  <input @change="handleImageChange" type="file" id="images" ref="fileInput" />
                 </f7-block>
 
                 <f7-block>
-                  <f7-button large fill class="primary-button">Submit</f7-button>
+                  <f7-button preloader :loading="isRequest" @click="handleReportUser" large fill
+                    class="primary-button">Submit</f7-button>
                 </f7-block>
-                
+
               </f7-list>
             </div>
           </f7-page>

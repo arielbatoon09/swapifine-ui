@@ -72,6 +72,45 @@ export const useAuthStore = defineStore('auth', {
                 console.error(error);
             }
         },
+        async reportUser(user_id, message, proof_img_path) {
+            try {
+                await this.getToken();
+                const response = await axios.post('/api/report-user', {
+                    user_id: user_id,
+                    message: message,
+                    img_file_path: proof_img_path,
+                });
+
+                return response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async updateProfile(img_file_path) {
+            try {
+                await this.getToken();
+
+                const response = await axios.post('/api/mystore/updateProfile', {
+                    img_file_path: img_file_path,
+                });
+
+                return response.data;
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async getMyStoreDetails() {
+            try {
+                await this.getToken();
+                const response = await axios.get('/api/mystore/get-mystore-details');
+
+                return response.data;
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
         async logout() {
             try {
                 await axios.get('/api/logout');

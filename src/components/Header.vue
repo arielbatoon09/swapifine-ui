@@ -3,7 +3,7 @@ import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../js/auth.store';
 import SwapifineLogo from '../assets/swapifine-logo-text.png';
-import TestProfile from '../assets/profile/test_profile.jpg';
+import DefaultProfile from '../assets/profile/default-profile.png';
 
 const authStore = useAuthStore();
 const dropdownProfile = ref(false);
@@ -127,7 +127,7 @@ const handleLogout = async () => {
                 <div class="relative">
                     <div @click="toggleDropdown"
                         class="cursor-pointer hover:contrast-75 w-10 h-10 rounded-full overflow-hidden">
-                        <img class="w-full h-full object-cover" :src="TestProfile" />
+                        <img class="w-full h-full object-cover" :src="authStore.user?.profile_img ? authStore.user?.profile_img : DefaultProfile" />
                     </div>
                     <!-- Online-Indicator -->
                     <div class="absolute bottom-0 right-0">
@@ -141,7 +141,7 @@ const handleLogout = async () => {
                     <div class="flex flex-row items-center gap-3 border-b border-gray-200 py-6 px-5">
                         <div class="relative">
                             <div class="w-10 h-10 rounded-full overflow-hidden">
-                                <img class="w-full h-full object-cover" :src="TestProfile" />
+                                <img class="w-full h-full object-cover" :src="authStore.user?.profile_img ? authStore.user?.profile_img : DefaultProfile" />
                             </div>
                         </div>
                         <div class="flex flex-col">

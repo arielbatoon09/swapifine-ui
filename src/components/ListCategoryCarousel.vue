@@ -3,6 +3,7 @@ import { f7 } from 'framework7-vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { usePostStore } from '../js/post.store';
 import TestIcon from '../assets/icon-test.svg';
+import useCookies from 'vue-cookies'
 
 const postStore = usePostStore();
 const slidesPerView = ref(4);
@@ -20,14 +21,17 @@ const updateSlidesPerView = () => {
 };
 
 // Redirection to Post item Page
-const goToBrowse = () => {
+const goToBrowse = (category) => {
   const animate = window.innerWidth <= 1023;
   f7.views.main.router.navigate('/browse', {
     animate: animate,
   });
+
+  useCookies.set('category', category);
 };
 
 onMounted(async () => {
+  useCookies.remove('category');
   updateSlidesPerView();
   resizeListener = window.addEventListener('resize', updateSlidesPerView);
 
@@ -60,7 +64,7 @@ onBeforeUnmount(() => {
     </div>
     <!-- Slider Item Categories -->
     <swiper-container class="space-x-4 mt-5" :slides-per-view="slidesPerView">
-      <swiper-slide @click="goToBrowse" v-for="category in categories" :key="category.id"
+      <swiper-slide @click="goToBrowse(category.category_name)" v-for="category in categories" :key="category.id"
         class="cursor-pointer border border-gray-200 rounded-lg px-4 py-6 w-full md:w-1/2 lg:w-1/4 shadow hover:border-gray-700">
         <div class="flex flex-row items-center gap-4">
           <img class="bg-blue-200 p-2 rounded-md" :src="TestIcon">
