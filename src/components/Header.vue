@@ -40,6 +40,7 @@ const handleLogout = async () => {
             <div>
                 <div @click="goToPage('/home')" class="cursor-pointer"><img :src="SwapifineLogo" alt="..."></div>
             </div>
+            
             <!-- Global Search -->
             <div class="w-1/2 mx-8 relative flex">
                 <input placeholder="What items are you looking for?" class="border rounded-l-md px-4 py-3 flex-1" />
