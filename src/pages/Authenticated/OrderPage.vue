@@ -51,6 +51,7 @@ const handleButtonEvent = () => {
 };
 
 onMounted(async () => {
+    checkScrollableTab();
     resizeListener = window.addEventListener('resize', checkScrollableTab);
 
     initRenderData();

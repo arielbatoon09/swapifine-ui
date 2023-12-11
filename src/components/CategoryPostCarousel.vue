@@ -187,7 +187,7 @@ onBeforeUnmount(() => {
                     <!-- Profile -->
                     <div class="flex flex-row items-center gap-2">
                         <div class="w-10 h-10 rounded-full overflow-hidden">
-                            <img class="w-full h-full object-cover" :src="TestProfile" />
+                            <img class="w-full h-full object-cover" :src="post.vendor_profile" />
                         </div>
                         <!-- Post User Profile -->
                         <div class="profile">

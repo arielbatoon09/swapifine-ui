@@ -16,6 +16,7 @@ const inboxStore = useInboxStore();
 const db = firebasedb;
 const inboxData = reactive({ "datas": null });
 const hasMessages = reactive({ bool: false });
+const searchContact = reactive({ query: null });
 
 const conversation = reactive({
     "message": null,
@@ -24,7 +25,7 @@ const conversation = reactive({
 const initGetMsgData = async () => {
     const inboxResponse = await inboxStore.GetAllContacts();
     inboxData.datas = inboxResponse.data;
-    const origInboxData = inboxData.datas;
+    // const origInboxData = inboxData.datas;
 
     const messagesRef = ref(db, 'messages');
     const messages = [];
@@ -46,16 +47,16 @@ const initGetMsgData = async () => {
             });
         });
 
-        if (origInboxData.length < 0) {
-            messages.forEach(msg => {
-                const matchingInbox = origInboxData.find(inbox => inbox.msg_inbox_key === msg.msg_inbox_key);
+        // if (origInboxData.length < 0) {
+        //     messages.forEach(msg => {
+        //         const matchingInbox = origInboxData.find(inbox => inbox.msg_inbox_key === msg.msg_inbox_key);
 
-                if (matchingInbox) {
-                    const latestMessage = msg.message;
-                    matchingInbox.latest_message = latestMessage;
-                }
-            });
-        }
+        //         if (matchingInbox) {
+        //             const latestMessage = msg.message;
+        //             matchingInbox.latest_message = latestMessage;
+        //         }
+        //     });
+        // }
     });
 };
 
@@ -122,10 +123,24 @@ watchEffect(async () => {
         <!-- Contact List Desktop -->
         <div class="overflow-y-auto h-screen p-3 mb-9 pb-20">
             <!-- Search Contact -->
-            <SearchContact />
+            <!-- <div class="flex items-center">
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="z-50 w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                    </div>
+                    <input v-model="searchContact.query"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:sky-blue-800 focus:border-sky-800 block w-full ps-10 p-2.5"
+                        placeholder="Search contacts" 
+                    />
+                </div>
+            </div> -->
 
             <!-- Refresh Contact States -->
-            <div class="ml-4 mb-3 flex flex-row items-center gap-2">
+            <div class="ml-4 mb-3 flex flex-row items-center gap-2 mt-10">
                 <svg class="w-[14px] h-[14px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 18 20">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -137,7 +152,7 @@ watchEffect(async () => {
             <!-- Contact List -->
             <div v-if="hasMessages.bool && hasMessages.bool != 'empty'" v-for="inbox in arrangeInbox"
                 @click="doHandleUpdateIsReadStatus(inbox.msg_inbox_key, inbox.id, authStore.user?.id, inbox.read_by_sender, inbox.read_by_receiver)"
-                class="flex items-center mb-2 cursor-pointer p-2 rounded-md relative"
+                class="search-list searchbar-found flex items-center mb-2 cursor-pointer p-2 rounded-md relative search-list searchbar-found"
                 :class="inbox.read_by_sender === 0 ? 'bg-white hover:bg-gray-100' : 'hover:bg-gray-100'">
                 <div class="w-12 h-12 bg-gray-300 rounded-full mr-3">
                     <img :src="inbox.img_thumbnail" alt="User Avatar" class="w-12 h-12 rounded-full">
@@ -185,10 +200,10 @@ watchEffect(async () => {
                     </svg>
                 </f7-link>
             </div>
-            <div class="overflow-y-auto h-screen p-3 mb-9 pb-20">
+            <div class="overflow-y-auto h-screen p-2 mb-9 pb-20 mt-4">
 
                 <!-- Search Contact -->
-                <SearchContact />
+                <!-- <SearchContact /> -->
 
                 <!-- Refresh Contact States -->
                 <div class="ml-4 mb-3 flex flex-row items-center gap-2">

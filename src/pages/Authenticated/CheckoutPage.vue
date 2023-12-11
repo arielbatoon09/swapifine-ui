@@ -54,7 +54,6 @@ onMounted(() => {
     initGetCheckoutData();
 });
 
-
 </script>
 
 <template>

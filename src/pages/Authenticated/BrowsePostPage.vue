@@ -55,7 +55,7 @@ const initRender = async () => {
     // Get All Posted Items
     const postResponse = await postStore.GetAllPostItem();
     postData.value = postResponse.data;
-    console.log(postData.value);
+    console.log('Browse Default Data', postData.value);
 
     if (postData.value == 'No Data Found') {
         postData.value = null;
@@ -372,7 +372,7 @@ onBeforeUnmount(() => {
                     <swiper-container :pagination="false" :space-between="14" :slides-per-view="slidesPerView">
                         <swiper-slide @click="setTopCategoryCookie(category.category_name)" v-for="category in categories" :key="category.id" >
                             <div class="cursor-pointer flex flex-row flex-nowrap whitespace-nowrap items-center gap-2 border-clr-primary 
-                                hover:bg-gray-100 py-3 px-3 rounded-full" :class="formFilterData.category == category.category_name ? 'bg-cyan-50' : ''">
+                                hover:bg-gray-100 py-3 px-3 rounded-full" :class="formFilterData.category == category.category_name ? 'bg-sky-50' : ''">
                                 <img :src="TestIcon">
                                 <span>{{ category.category_name }}</span>
                             </div>
@@ -503,7 +503,7 @@ onBeforeUnmount(() => {
                         <!-- Vendor Profile -->
                         <div class="flex flex-row items-center gap-2">
                             <div class="w-10 h-10 rounded-full overflow-hidden">
-                                <img class="w-full h-full object-cover" :src="TestProfile" />
+                                <img class="w-full h-full object-cover" :src="post.vendor_profile" />
                             </div>
                             <!-- Vendor User Info -->
                             <div class="profile">

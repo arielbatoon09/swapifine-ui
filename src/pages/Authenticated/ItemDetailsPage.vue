@@ -4,7 +4,6 @@ import { reactive } from 'vue';
 import { usePostStore } from '../../js/post.store';
 import { useInboxStore } from '../../js/inbox.store';
 import TertiaryLayout from '../../Layout/TertiaryLayout.vue';
-import TestProfile from '../../assets/profile/test_profile.jpg';
 
 const currentPage = 'view-item';
 const postStore = usePostStore();
@@ -19,23 +18,22 @@ const doHandleTapToInquire = async (id, post_user_id) => {
 
     const response = await inboxStore.TapToInquire(id, post_user_id);
 
-    if (response.status != 'error') {
-
-        if (!toastWithButton.value) {
-            toastWithButton.value = f7.toast.create({
-                text: response.message,
-                position: 'top',
-                closeButton: true,
-                closeButtonText: 'Okay',
-                closeButtonColor: 'green',
-                closeTimeout: 3000,
-            });
-            goToPage('/inbox');
-        }
-
+    // Show the toast
+    if (!toastWithButton.value) {
+        toastWithButton.value = f7.toast.create({
+            text: response.message,
+            position: 'top',
+            closeButton: true,
+            closeButtonText: 'Okay',
+            closeButtonColor: response.status == 'success' ? 'green' : 'red',
+            closeTimeout: 3000,
+        });
     }
-
     toastWithButton.value.open();
+
+    if (response.status == 'success') {
+        f7.views.main.router.navigate('/inbox');
+    }
     isRequest.bool = false;
 };
 
@@ -102,28 +100,32 @@ const goToPage = (route) => {
                                 <!-- Vendor Profile -->
                                 <div class="flex flex-row items-center gap-2 mb-2">
                                     <div class="w-10 h-10 rounded-full overflow-hidden">
-                                        <img class="w-full h-full object-cover" :src="TestProfile" />
+                                        <img class="w-full h-full object-cover"
+                                            :src="postStore.getItemDetails.profile_img" />
                                     </div>
                                     <!-- Vendor User Info -->
                                     <div class="profile">
                                         <p class="cursor-pointer profile-name hover:underline text-lg">{{
                                             postStore.getItemDetails.fullname }}</p>
                                         <!-- Verified Indicator -->
-                                        <div class="flex flex-row items-center gap-1">
-                                            <span class="profile-verified-label">Verified</span>
-                                            <svg class="verified w-[18px] h-[18px] text-gray-800 dark:text-white"
-                                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                                viewBox="0 0 20 20">
+                                        <div v-if="postStore.getItemDetails.is_verified"
+                                            class="flex flex-row items-center gap-1">
+                                            <span class="profile-verified-label text-clr-primary">Verified Vendor</span>
+                                            <svg class="w-[18px] h-[18px] text-clr-primary" aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill="currentColor"
                                                     d="m18.774 8.245-.892-.893a1.5 1.5 0 0 1-.437-1.052V5.036a2.484 2.484 0 0 0-2.48-2.48H13.7a1.5 1.5 0 0 1-1.052-.438l-.893-.892a2.484 2.484 0 0 0-3.51 0l-.893.892a1.5 1.5 0 0 1-1.052.437H5.036a2.484 2.484 0 0 0-2.48 2.481V6.3a1.5 1.5 0 0 1-.438 1.052l-.892.893a2.484 2.484 0 0 0 0 3.51l.892.893a1.5 1.5 0 0 1 .437 1.052v1.264a2.484 2.484 0 0 0 2.481 2.481H6.3a1.5 1.5 0 0 1 1.052.437l.893.892a2.484 2.484 0 0 0 3.51 0l.893-.892a1.5 1.5 0 0 1 1.052-.437h1.264a2.484 2.484 0 0 0 2.481-2.48V13.7a1.5 1.5 0 0 1 .437-1.052l.892-.893a2.484 2.484 0 0 0 0-3.51Z" />
                                                 <path fill="#fff"
                                                     d="M8 13a1 1 0 0 1-.707-.293l-2-2a1 1 0 1 1 1.414-1.414l1.42 1.42 5.318-3.545a1 1 0 0 1 1.11 1.664l-6 4A1 1 0 0 1 8 13Z" />
                                             </svg>
                                         </div>
+                                        <div v-else class="flex flex-row items-center gap-1">
+                                            <span class="profile-verified-label text-clr-primary">Unverified Vendor</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Vendor Ratings -->
-                                <div>
+                                <!-- <div>
                                     <p class="text-yellow-400">High Rated Vendor</p>
                                     <div class="flex gap-0.5">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400"
@@ -156,7 +158,7 @@ const goToPage = (route) => {
                                                 d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                         <!-- Right -->
@@ -254,7 +256,7 @@ const goToPage = (route) => {
                                             to Inquire</f7-button>
                                     </div>
                                     <!-- Add Wishlist -->
-                                    <div @click="HandleWishlist(postStore.getItemDetails.id)"
+                                    <!-- <div @click="HandleWishlist(postStore.getItemDetails.id)"
                                         class="cursor-pointer w-full sm:w-auto flex items-center justify-center gap-4 bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg">
                                         <svg class="w-6 h-6 text-clr-primary" aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 19">
@@ -263,7 +265,7 @@ const goToPage = (route) => {
                                                 d="M11 4C5.5-1.5-1.5 5.5 4 11l7 7 7-7c5.458-5.458-1.542-12.458-7-7Z" />
                                         </svg>
                                         <p class="text-base text-clr-primary">Add to Wishlist</p>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>

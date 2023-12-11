@@ -155,7 +155,7 @@ onMounted(() => {
                         class="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md font-medium">
                         <span>Post Item</span>
                     </f7-button>
-                    <f7-button tooltip="Withdraw Credits" @click="goToPage('/buy-credits')"
+                    <f7-button tooltip="Withdraw Credits" @click="goToPage('/withdrawal')"
                         class="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md font-medium">
                         <span>Withdraw</span>
                     </f7-button>

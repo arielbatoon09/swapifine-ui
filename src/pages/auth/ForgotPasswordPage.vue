@@ -63,30 +63,28 @@ const handleLogin = async () => {
             <f7-link back class="mb-3">
               <img :src="BtnBack" alt="">
             </f7-link>
-            <h3 class="auth-title text-clr-primary text-3xl font-semibold w-5/6">Welcome back! Glad to see you, Again!
+            <h3 class="auth-title text-clr-primary text-3xl font-semibold w-5/6">Forgot Password?
             </h3>
+            <p class="mt-2 text-sm text-clr-primary">Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.</p>
           </f7-block>
           <!-- Form -->
           <form class="auth-form">
             <!-- Email -->
             <f7-list-input v-model:value="form.email" outline label="Email" floating-label type="email"
-              :error-message="error.invalidCredentials" error-message-force clear-button></f7-list-input>
-            <!-- Password -->
-            <f7-list-input v-model:value="form.password" outline label="Password" floating-label type="password"
-              :error-message="error.invalidCredentials" error-message-force clear-button></f7-list-input>
-            <!-- Remember Me -->
-            <f7-list-item checkbox title="Remember me" name="remember" class="auth-remember"></f7-list-item>
+              :error-message="error.invalidCredentials" error-message-force clear-button>
+            </f7-list-input>
+
             <!-- Submit button -->
             <f7-block>
-              <f7-button preloader :loading="isRequest" @click="handleLogin" class="auth-btn" large fill>Log
-                in</f7-button>
-              <!-- <a href="/forgot-password" class="auth-forgot flex justify-center mt-3">Forgot Password?</a> -->
+              <f7-button preloader :loading="isRequest" @click="handleLogin" class="auth-btn" large fill>
+                Reset Password
+            </f7-button>
             </f7-block>
           </form>
 
           <div class="flex items-center justify-center lg:bg-gray-100 lg:p-4 lg:mt-5">
-            <p class="text-center text-sm text-gray-500">Don't have an account? <a href="/signup"
-                class="text-clr-primary font-medium">Sign up</a>
+            <p class="text-center text-sm text-gray-500">Go back to <a href="/login"
+                class="text-clr-primary font-medium">Log in</a>
             </p>
           </div>
         </f7-list>

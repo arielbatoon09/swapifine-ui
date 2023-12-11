@@ -4,9 +4,9 @@ import { ref } from 'vue';
 import { useCreditsStore } from '../../js/credits.store';
 import SecondaryLayout from '../../Layout/SecondaryLayout.vue';
 
+const currentPage = 'buy-credits';
 const creditsStore = useCreditsStore();
 const isRequest = ref(false);
-const currentPage = 'buy-credits';
 const customAmt = ref(5000);
 const toastWithButton = ref(null);
 const form = ref({

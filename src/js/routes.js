@@ -6,6 +6,7 @@ import WelcomePage from '../pages/WelcomePage.vue';
 import RegisterPage from '../pages/auth/signup.vue';
 import LoginPage from '../pages/auth/login.vue';
 import VerifyEmailPage from '../pages/auth/verify-email.vue';
+import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage.vue';
 import NotFoundPage from '../pages/404.vue';
 // User Pages
 import HomePage from '../pages/Authenticated/HomePage.vue';
@@ -23,6 +24,7 @@ import OrderPage from '../pages/Authenticated/OrderPage.vue';
 import OrderDetailsPage from '../pages/Authenticated/OrderDetailsPage.vue';
 import CheckoutPage from '../pages/Authenticated/CheckoutPage.vue';
 import VerificationPage from '../pages/Authenticated/VerificationPage.vue';
+import WithdrawalPage from '../pages/Authenticated/WithdrawalPage.vue';
 
 const isLoggedIn = useCookies.get('isLoggedIn');
 
@@ -45,6 +47,11 @@ const routes = [
   {
     path: '/verify-email',
     component: VerifyEmailPage,
+    protectedRoute: false,
+  },
+  {
+    path: '/forgot-password',
+    component: ForgotPasswordPage,
     protectedRoute: false,
   },
   {
@@ -123,31 +130,36 @@ const routes = [
     protectedRoute: true,
   },
   {
+    path: '/withdrawal',
+    component: WithdrawalPage,
+    protectedRoute: true,
+  },
+  {
     path: '/(.*)',
     component: NotFoundPage,
   },
 ];
 
-// // BeforeEnter function to handle protectedRoute
-// function beforeEnter(context) {
-//   const authStore = useAuthStore();
-//   const routeTo = context.to.route.protectedRoute;
-//   if (routeTo) { // Check if the route is protected
-//     if (!authStore.isAuthenticated) {
-//       f7.views.main.router.navigate('/');
-//       context.reject();
-//        // This navigation triggers the beforeEnter function again
-//     } else {
-//       context.resolve();
-//     }    
-//   } else {
-//     context.resolve(); // Proceed to the route
-//   }
-// }
+// BeforeEnter function to handle protectedRoute
+function beforeEnter(context) {
+  const authStore = useAuthStore();
+  const routeTo = context.to.route.protectedRoute;
+  if (routeTo) { // Check if the route is protected
+    if (!authStore.isAuthenticated) {
+      f7.views.main.router.navigate('/');
+      context.reject();
+       // This navigation triggers the beforeEnter function again
+    } else {
+      context.resolve();
+    }    
+  } else {
+    context.resolve(); // Proceed to the route
+  }
+}
 
-// // Apply the beforeEnter function to all routes
-// for (const route of routes) {
-//   route.beforeEnter = beforeEnter;
-// }
+// Apply the beforeEnter function to all routes
+for (const route of routes) {
+  route.beforeEnter = beforeEnter;
+}
 
 export default routes;

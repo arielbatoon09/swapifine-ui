@@ -35,6 +35,8 @@ const initGetMsgData = async (stateMessageData) => {
                 from_id: data[key].from_id,
                 to_id: data[key].to_id,
                 message: data[key].message,
+                from_user_profile: data[key].from_user_profile,
+                to_user_profile: data[key].to_user_profile,
                 created_at: formatMsgCreatedAt(data[key].created_at),
             }));
         conversation.message = filteredMessages.reverse();
@@ -80,11 +82,10 @@ watchEffect(() => {
         <!-- Conversation -->
         <div class="flex mb-4" :class="message.from_id == authStore.user?.id ? 'justify-end' : 'justify-start'"
             v-for="message in conversation.message" :key="message.key">
-            <div v-show="message.from_id != authStore.user?.id"
+            <!-- <div v-show="message.from_id != authStore.user?.id"
                 class="w-9 h-9 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-                <img src="https://placehold.co/200x/ffa8e4/ffffff.svg?text=ʕ•́ᴥ•̀ʔ&font=Lato" alt="User Avatar"
-                    class="w-8 h-8 rounded-full">
-            </div>
+                <img :src="message.from_id !== authStore.user?.id ? message.to_user_profile : message.from_user_profile || 'fallback_image_url'" alt="User Avatar" class="w-8 h-8 rounded-full">
+            </div> -->
             <div class="flex flex-col max-w-96 text-white rounded-lg p-3 gap-3 w-full md:w-[600px] lg:w-[500px]"
                 :class="message.from_id == authStore.user?.id ? 'bg-clr-primary' : 'bg-gray-100'">
                 <p class="break-all" :class="message.from_id == authStore.user?.id ? 'text-white' : 'text-gray-700'">{{
@@ -98,11 +99,10 @@ watchEffect(() => {
                     <span class="text-gray-400">{{ message.created_at }}</span>
                 </div>
             </div>
-            <div v-show="message.from_id == authStore.user?.id"
+            <!-- <div v-show="message.from_id == authStore.user?.id"
                 class="w-9 h-9 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
-                <img src="https://placehold.co/200x/b7a8ff/ffffff.svg?text=ʕ•́ᴥ•̀ʔ&font=Lato" alt="My Avatar"
-                    class="w-8 h-8 rounded-full">
-            </div>
+                <img :src="message.from_id === authStore.user?.id ? message.from_user_profile : message.to_user_profile || 'fallback_image_url'" alt="My Avatar" class="w-8 h-8 rounded-full">
+            </div> -->
         </div>
     </div>
 </template>

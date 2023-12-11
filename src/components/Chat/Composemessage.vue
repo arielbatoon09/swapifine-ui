@@ -28,6 +28,8 @@ const handleSendMessage = async () => {
         msg_inbox_key: stateMessageData[0].msg_inbox_key,
         from_id: authStore.user?.id,
         to_id: stateMessageData[0].to_user_id,
+        from_user_profile: stateMessageData[0].from_user_profile,
+        to_user_profile: stateMessageData[0].to_user_profile,
         message,
         created_at: currentDateTime,
     };
@@ -54,7 +56,7 @@ const handleSendMessage = async () => {
         :class="showContact ? 'w-full lg:w-3/4' : 'w-full'">
         <div class="flex items-center">
             <!-- Add Image Attachment -->
-            <div class="mr-4">
+            <!-- <div class="mr-4">
                 <svg class="w-[24px] h-[24px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 20 18">
                     <path fill="currentColor"
@@ -64,7 +66,7 @@ const handleSendMessage = async () => {
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z" />
                 </svg>
-            </div>
+            </div> -->
             <!-- Add Message -->
             <input v-model="msgForm.message" @keydown.enter="handleSendMessage" placeholder="Type a message..."
                 class="w-full p-2 rounded-full border border-gray-400 bg-gray-100" />

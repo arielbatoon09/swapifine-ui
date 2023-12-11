@@ -115,6 +115,7 @@ export const useAuthStore = defineStore('auth', {
             try {
                 await axios.get('/api/logout');
                 useCookies.remove('isLoggedIn');
+                localStorage.removeItem('RecentViewed');
                 this.authUser = null;
                 location.reload();
                 f7.views.main.router.navigate('/');

@@ -47,6 +47,19 @@ export const useMystoreStore = defineStore('mystore', {
 
             const response = await axios.get('/api/mystore/user-ratings');
             return response.data;
-        }
+        },
+        async UnlistItem(post_item_id) {
+            try {
+                await this.getToken();
+
+                const response = await axios.post('/api/post/unlist', {
+                    id: post_item_id,
+                });
+
+                return response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
     },
 });
