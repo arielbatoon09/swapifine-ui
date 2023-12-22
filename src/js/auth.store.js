@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
         },
         async register(fullname, email, password, confirmPassword) {
             try {
-                await this.getToken();
+                // await this.getToken();
                 const response = await axios.post('/api/register', {
                     fullname: fullname,
                     email: email,
@@ -54,7 +54,7 @@ export const useAuthStore = defineStore('auth', {
         },
         async login(email, password) {
             try {
-                await this.getToken();
+                // await this.getToken();
                 const response = await axios.post('/api/login', {
                     email: email,
                     password: password
