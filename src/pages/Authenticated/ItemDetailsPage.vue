@@ -1,40 +1,129 @@
 <script setup>
 import { f7 } from 'framework7-vue';
+import { uuid } from 'vue-uuid';
 import { reactive } from 'vue';
+import { useAuthStore } from '../../js/auth.store';
 import { usePostStore } from '../../js/post.store';
 import { useInboxStore } from '../../js/inbox.store';
+import { useTransactionStore } from '../../js/transaction.store';
+import database from '../../js/firestore';
 import TertiaryLayout from '../../Layout/TertiaryLayout.vue';
+import { collection, query, serverTimestamp, addDoc, where, getDocs } from "firebase/firestore";
 
 const currentPage = 'view-item';
+const db = database;
 const postStore = usePostStore();
+const authStore = useAuthStore();
+const transactionStore = useTransactionStore();
 const inboxStore = useInboxStore();
 const isRequest = reactive({ bool: false });
 const toastWithButton = reactive({ value: null });
 const addedWishlist = reactive({ bool: false });
+console.log(postStore.getItemDetails);
 
-const doHandleTapToInquire = async (id, post_user_id) => {
-    // Init Loading Request
-    isRequest.bool = true;
 
-    const response = await inboxStore.TapToInquire(id, post_user_id);
+const doHandleTapToInquire = async (item_id, item_name, thumbnail, from_id, to_id, post_item_key, from_user_fullname, to_user_fullname) => {
+    const inboxQuery = collection(db, 'inbox');
+    const messageQuery = collection(db, 'message');
+    const secretKey = uuid.v1();
 
-    // Show the toast
-    if (!toastWithButton.value) {
-        toastWithButton.value = f7.toast.create({
-            text: response.message,
-            position: 'top',
-            closeButton: true,
-            closeButtonText: 'Okay',
-            closeButtonColor: response.status == 'success' ? 'green' : 'red',
-            closeTimeout: 3000,
+    const fetchQuery = await getDocs(
+        query(
+            inboxQuery,
+            where('from_id', '==', from_id),
+            where('post_item_key', '==', post_item_key)
+        )
+    );
+
+    if (!isEmpty(fetchQuery.docs)) {
+        initToast('red', "You have already inquired about this item!");
+        return;
+    }
+
+    try {
+        if (from_id === to_id) {
+            initToast('red', "You can't inquire with your own listing!");
+            return;
+        }
+
+        // Add new inbox
+        const response = await addDoc(inboxQuery, {
+            inbox_key: secretKey,
+            item_name: item_name,
+            from_user_fullname: from_user_fullname,
+            to_user_fullname: to_user_fullname,
+            from_id: from_id,
+            to_id: to_id,
+            post_item_key: post_item_key,
+            thumbnail: thumbnail,
+            created_at: serverTimestamp()
         });
-    }
-    toastWithButton.value.open();
 
-    if (response.status == 'success') {
-        f7.views.main.router.navigate('/inbox');
+        // Insert to MYSQL DB - Inbox Model
+        const responseInquire = await inboxStore.TapToInquire(item_id, secretKey, to_id);
+        console.log(responseInquire);
+
+        // Add to Notification
+        const messageNotif = 'sent you a message.';
+        doHandleNotification(messageNotif, to_id);
+
+        if (response.id) {
+            initToast('green', "Sent an inquiry!");
+
+            // Start a Chat
+            await addDoc(messageQuery, {
+                msg_inbox_key: secretKey,
+                from_user_fullname: from_user_fullname,
+                to_user_fullname: to_user_fullname,
+                from_id: from_id,
+                to_id: to_id,
+                message: "Hi, is this available? 🤝",
+                created_at: serverTimestamp()
+            });
+
+            f7.views.main.router.navigate('/inbox');
+        }
+
+    } catch (error) {
+        console.error('Error: Tap to Inquire ==> ', error);
     }
-    isRequest.bool = false;
+};
+
+const doHandleNotification = async (message, to_id) => {
+    const notificationQuery = collection(db, 'notification');
+
+    try {
+
+        // Add new inbox
+        const response = await addDoc(notificationQuery, {
+            notified_to_id: to_id,
+            notified_by_fullname: authStore.user?.fullname,
+            message: message,
+            is_read: false,
+            type: 'inbox',
+            created_at: serverTimestamp()
+        });
+
+        if (response.id) {
+            console.log('notified');
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const initToast = (color, text) => {
+    // Show the toast
+    const toast = f7.toast.create({
+        text: text,
+        position: 'top',
+        closeButton: true,
+        closeButtonText: 'Okay',
+        closeButtonColor: color,
+        closeTimeout: 3000,
+    });
+
+    toast.open();
 };
 
 // Add to Wishlist
@@ -42,6 +131,17 @@ const HandleWishlist = async (post_item_id) => {
     const response = await postStore.AddWishList(post_item_id);
     alert(response.message);
     // addedWishlist.bool = response.status == 'added' ? true : false;
+};
+
+// Set Vendor ID in Localstorage
+const setVendorID = (vendor_id) => {
+    localStorage.setItem('vendorID', vendor_id);
+
+    const route = `/view/store`;
+    const animate = window.innerWidth <= 1023;
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
 };
 
 
@@ -52,6 +152,12 @@ const goToPage = (route) => {
         animate: animate,
     });
 };
+
+const isEmpty = (obj) => {
+    return Object.keys(obj).length === 0;
+};
+
+
 
 </script>
 
@@ -105,7 +211,7 @@ const goToPage = (route) => {
                                     </div>
                                     <!-- Vendor User Info -->
                                     <div class="profile">
-                                        <p class="cursor-pointer profile-name hover:underline text-lg">{{
+                                        <p @click="setVendorID(postStore.getItemDetails.user_id)" class="cursor-pointer profile-name hover:underline text-lg">{{
                                             postStore.getItemDetails.fullname }}</p>
                                         <!-- Verified Indicator -->
                                         <div v-if="postStore.getItemDetails.is_verified"
@@ -252,8 +358,8 @@ const goToPage = (route) => {
                                 <div class="mt-6 lg:mt-14 flex gap-4 flex-wrap sm:flex-nowrap">
                                     <div class="w-full sm:w-auto">
                                         <f7-button preloader :loading="isRequest.bool" class="primary-button" large fill
-                                            @click="doHandleTapToInquire(postStore.getItemDetails.id, postStore.getItemDetails.user_id)">Tap
-                                            to Inquire</f7-button>
+                                            @click="doHandleTapToInquire(postStore.getItemDetails.id, postStore.getItemDetails.item_name, postStore.getItemDetails.thumbnail, authStore.user?.id, postStore.getItemDetails.user_id, postStore.getItemDetails.post_item_key, authStore.user?.fullname, postStore.getItemDetails.fullname)">
+                                            Tap to Inquire</f7-button>
                                     </div>
                                     <!-- Add Wishlist -->
                                     <!-- <div @click="HandleWishlist(postStore.getItemDetails.id)"

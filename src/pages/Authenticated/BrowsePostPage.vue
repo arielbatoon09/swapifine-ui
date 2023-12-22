@@ -24,6 +24,7 @@ const existingArrayRecent = localStorage.getItem('RecentViewed');
 const filterModal = ref(false);
 const showFilterList = ref(false);
 const kilometersList = ref([1, 2, 5, 6, 10, 20, 40, 60, 80, 250, 500]);
+const error = ref(false);
 let resizeListener = null;
 
 const formFilterData = ref({
@@ -59,6 +60,7 @@ const initRender = async () => {
 
     if (postData.value == 'No Data Found') {
         postData.value = null;
+        error.value = true;
     }
 
     // Cancel Preloader state
@@ -337,6 +339,17 @@ const filteredPost = computed(() => {
     }
 });
 
+// Set Vendor ID in Localstorage
+const setVendorID = (vendor_id) => {
+    localStorage.setItem('vendorID', vendor_id);
+
+    const route = `/view/store`;
+    const animate = window.innerWidth <= 1023;
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
+};
+
 onMounted(async () => {
     initRender();
 });
@@ -487,7 +500,7 @@ onBeforeUnmount(() => {
             </div>
             <!-- Item Lists -->
             <div v-if="!isLoadingItem" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 mb-12">
-                <div v-for="post in filteredPost" class="w-full border border-gray-200 rounded-lg hover:shadow">
+                <div v-if="!error" v-for="post in filteredPost" class="w-full border border-gray-200 rounded-lg hover:shadow">
                     <!-- Post-Image-Slider -->
                     <div class="w-full h-52 overflow-hidden rounded-t-lg">
                         <swiper-container :pagination="true" :space-between="0" :slides-per-view="1">
@@ -507,11 +520,11 @@ onBeforeUnmount(() => {
                             </div>
                             <!-- Vendor User Info -->
                             <div class="profile">
-                                <p class="cursor-pointer profile-name hover:underline text-lg">{{ post.fullname }}</p>
+                                <p @click="setVendorID(post.user_id)" class="cursor-pointer profile-name hover:underline text-lg">{{ post.fullname }}</p>
                                 <!-- Verified Indicator -->
                                 <div class="flex flex-row items-center gap-1">
-                                    <span class="profile-verified-label">Verified</span>
-                                    <svg class="verified w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+                                    <span class="profile-verified-label text-clr-primary">Verified Vendor</span>
+                                    <svg class="verified w-[18px] h-[18px] text-clr-primary dark:text-white" aria-hidden="true"
                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill="currentColor"
                                             d="m18.774 8.245-.892-.893a1.5 1.5 0 0 1-.437-1.052V5.036a2.484 2.484 0 0 0-2.48-2.48H13.7a1.5 1.5 0 0 1-1.052-.438l-.893-.892a2.484 2.484 0 0 0-3.51 0l-.893.892a1.5 1.5 0 0 1-1.052.437H5.036a2.484 2.484 0 0 0-2.48 2.481V6.3a1.5 1.5 0 0 1-.438 1.052l-.892.893a2.484 2.484 0 0 0 0 3.51l.892.893a1.5 1.5 0 0 1 .437 1.052v1.264a2.484 2.484 0 0 0 2.481 2.481H6.3a1.5 1.5 0 0 1 1.052.437l.893.892a2.484 2.484 0 0 0 3.51 0l.893-.892a1.5 1.5 0 0 1 1.052-.437h1.264a2.484 2.484 0 0 0 2.481-2.48V13.7a1.5 1.5 0 0 1 .437-1.052l.892-.893a2.484 2.484 0 0 0 0-3.51Z" />
@@ -565,6 +578,10 @@ onBeforeUnmount(() => {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div v-else>
+                    Error: No Data Found
                 </div>
             </div>
             <div v-else class="mt-6 mb-12 flex items-center justify-center">

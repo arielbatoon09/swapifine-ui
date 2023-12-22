@@ -92,6 +92,6 @@ export const useTransactionStore = defineStore('transaction', {
             } catch (error) {
                 console.error(error);
             }
-        }
+        },
     },
 });

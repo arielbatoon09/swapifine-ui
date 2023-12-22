@@ -9,10 +9,15 @@ const currentPage = 'checkout';
 const creditsStore = useCreditsStore();
 const checkoutData = ref([]);
 const isRequestLoad = ref(false);
+const error = ref(false);
 
 const initGetCheckoutData = async () => {
     isRequestLoad.value = true;
     const response = await creditsStore.GetAllCheckoutCredits();
+
+    if (response.data.length <= 0) {
+        return error.value = true;
+    }
 
     const getCheckoutData = Object.keys(response.data).map(key => ({
         purchase_name: response.data[key].purchase_name,
@@ -73,12 +78,12 @@ onMounted(() => {
                                 d="M6 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0h8m-8 0-1-4m9 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-9-4h10l2-7H3m2 7L3 4m0 0-.792-3H1" />
                         </svg>
                     </div>
-                    <h2 class="text-2xl font-semibold text-gray-600">Checkout List</h2>
+                    <h2 class="text-2xl font-semibold text-gray-600">Credits Transactions</h2>
                 </div>
 
                 <!-- Desktop Table -->
                 <div class="hidden md:block relative overflow-x-auto shadow-sm rounded">
-                    <table class="w-full text-sm text-left text-gray-500">
+                    <table v-if="!error" class="w-full text-sm text-left text-gray-500">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-200">
                             <tr>
                                 <th scope="col" class="px-6 py-3">
@@ -164,10 +169,27 @@ onMounted(() => {
                             </tr>
                         </tbody>
                     </table>
+                    <!-- If Error -->
+                    <table v-else class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr class="bg-white border-b">
+                                <th scope="row" class="px-6 py-12 font-medium text-gray-900 whitespace-nowrap text-center">
+                                    Error: Data Not Found
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Mobile Cards -->
-                <div class="flex flex-col gap-2 md:hidden">
+                <div v-if="!error" class="flex flex-col gap-2 md:hidden">
                     <div v-if="!isRequestLoad" v-for="list in checkoutData" class="bg-white p-6 rounded border border-gray-200">
                         <h3 class="text-gray-700 text-xl font-semibold mb-3">Order Details</h3>
                         <p class="text-base font-medium">Product name: <span class="font-normal">Credits - {{
@@ -196,6 +218,13 @@ onMounted(() => {
                     </div>
                     <div v-else class="bg-white p-6 rounded border border-gray-200 flex justify-center">
                         <f7-preloader />
+                    </div>
+                </div>
+                
+                <!-- If Error - Cards -->
+                <div v-else class="flex flex-col gap-2 md:hidden">
+                    <div class="bg-white p-6 rounded border border-gray-200">
+                        <h3 class="font-medium text-gray-900 whitespace-nowrap text-center">Error: Data Not Found</h3>
                     </div>
                 </div>
             </section>

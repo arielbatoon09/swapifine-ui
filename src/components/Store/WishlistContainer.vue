@@ -8,11 +8,18 @@ const popup = ref(null);
 const photos = ref([]);
 const thumbs = ref([]);
 const isLoading = ref(false);
+const error = ref(false);
 
 const initRender = async () => {
     isLoading.value = true;
     const myPost = await mystoreStore.GetWishlistByUserID();
     data.value = myPost.data;
+
+    if (data.value === 'No Data Found') {
+        error.value = true;
+    }
+
+
     isLoading.value = false;
 
     console.log(data.value);
@@ -43,12 +50,16 @@ onMounted(() => {
 
 <template>
     <!-- Wishlist List -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+    <div :class="!error ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-2' : ''">
         <!-- Images -->
-        <div v-for="data in data" class="h-[300px] group relative overflow-hidden bg-gray-100">
+        <div v-if="!error" v-for="data in data" class="h-[300px] group relative overflow-hidden bg-gray-100">
             <!-- Preview Image -->
             <img :src="data.thumbnail" @click="openPopup(data.id)" :key="data.id"
                 class="cursor-pointer h-full w-full object-cover object-center transition duration-200 group-hover:brightness-75 scale-110 z-0" />
+        </div>
+
+        <div v-else class="h-[300px] group relative overflow-hidden bg-gray-50 text-center flex justify-center items-center">
+            <span class="text-gray-500 text-base">Error: No Data Found</span>
         </div>
 
         <!-- Photo Browser Popup -->

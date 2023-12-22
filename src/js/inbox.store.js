@@ -36,13 +36,12 @@ export const useInboxStore = defineStore('inbox', {
                 console.error(error);
             }
         },
-        async TapToInquire(id, post_user_id) {
+        async TapToInquire(item_id, secretKey, to_id) {
             try {
-                await this.getToken();
-
                 const response = await axios.post('/api/inbox/inquire', {
-                    id: id,
-                    post_user_id: post_user_id,
+                    id: item_id,
+                    inbox_key: secretKey,
+                    to_id: to_id,
                 });
 
                 return response.data;

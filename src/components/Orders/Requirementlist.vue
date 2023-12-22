@@ -212,7 +212,6 @@ const doMoveToInbox = async () => {
                         <f7-list-input v-model:value="FormData.payment_method" outline label="Payment Method" floating-label
                             type="select">
                             <option value="cod">Cash on Delivery</option>
-                            <option value="ewallet">E-Wallet</option>
                             <option value="credits">Swapifine Credits</option>
                         </f7-list-input>
 

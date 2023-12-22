@@ -3,6 +3,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 // Import Framework7
 import Framework7 from 'framework7/lite-bundle';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 // Leaflet
 import L from "leaflet";
@@ -28,6 +29,7 @@ Framework7.use(Framework7Vue);
 
 // Init
 const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 const app = createApp(App);
 
 app.use(pinia);

@@ -61,5 +61,19 @@ export const useMystoreStore = defineStore('mystore', {
                 console.error(error);
             }
         },
+        async ViewVendorStore(id) {
+            try {
+                await this.getToken();
+
+                const response = await axios.post('/api/view/store', {
+                    id: id,
+                });
+
+                return response.data;
+
+            } catch (error) {
+
+            }
+        }
     },
 });

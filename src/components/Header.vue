@@ -1,16 +1,129 @@
 <script setup>
 import { f7 } from 'framework7-vue';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '../js/auth.store';
 import GlobalSearchModal from './GlobalSearchModal.vue';
 import SwapifineLogo from '../assets/swapifine-logo-text.png';
 import DefaultProfile from '../assets/profile/default-profile.png';
+import database from '../js/firestore';
+import { collection, query, orderBy, where, onSnapshot, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 const authStore = useAuthStore();
 const dropdownProfile = ref(false);
+const dropdownNotification = ref(false);
+const db = database;
+const notifData = ref([]);
+const notifCTAFilter = ref('all');
 
 const toggleDropdown = () => {
     dropdownProfile.value = !dropdownProfile.value;
+};
+
+const toggleDropdownNotif = () => {
+    dropdownNotification.value = !dropdownNotification.value;
+};
+
+const renderNotificationData = async () => {
+    try {
+        const notificationRef = collection(db, 'notification');
+
+        const notificationQuery = query(
+            notificationRef,
+            where('notified_to_id', '==', authStore.user?.id),
+            orderBy('created_at', 'desc')
+        );
+
+        onSnapshot(notificationQuery, (querySnapshot) => {
+            const listData = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                notified_by_fullname: doc.data().notified_by_fullname,
+                message: doc.data().message,
+                is_read: doc.data().is_read,
+                type: doc.data().type,
+                created_at: doc.data().created_at ? formatMsgCreatedAt(doc.data().created_at.toDate()) : ' ',
+            }));
+
+            notifData.value = listData;
+        });
+
+    } catch (error) {
+        console.error('Error fetching notification data:', error);
+    }
+};
+
+
+// Update Notification Record
+const updateNotificatioNIsRead = async (id) => {
+    const dataQuery = doc(db, 'notification', id);
+
+    const snapshot = await getDoc(dataQuery);
+
+    if (snapshot.exists()) {
+        const currentStatus = snapshot.data().is_read;
+
+        // Toggle the status
+        const newStatus = !currentStatus;
+
+        const newData = {
+            is_read: newStatus
+        };
+
+        await updateDoc(dataQuery, newData);
+
+    }
+};
+
+const updateNotificationIsReadFalse = async (id) => {
+    const dataQuery = doc(db, 'notification', id);
+    const newData = {
+        is_read: true
+    };
+
+    await updateDoc(dataQuery, newData);
+};
+
+const deleteNotificationData = async (id) => {
+    const querryData = doc(db, 'notification', id);
+    deleteDoc(querryData);
+};
+
+const renderNotifFilter = computed(() => {
+    if (!notifCTAFilter.value === 'all') {
+        return notifData.value;
+    }
+    const filteredData = notifData.value.filter(item => {
+        if (notifCTAFilter.value === 'all') {
+            return true;
+        } else if (notifCTAFilter.value === 'unread') {
+            return !item.is_read;
+        } else {
+            return item.is_read === notifCTAFilter.value;
+        }
+    });
+
+    return filteredData;
+});
+
+const notifFilter = (filter) => {
+    notifCTAFilter.value = filter;
+};
+
+// Identify where to route the user
+const identifyRedirection = (notif_type) => {
+    const animate = window.innerWidth <= 1023;
+    let route = null;
+
+    if (notif_type === 'inbox') {
+        route = '/inbox'
+    } else if (notif_type === 'transaction') {
+        route = '/order'
+    }
+
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
+
+    dropdownNotification.value = false;
 };
 
 // Redirection to other Page
@@ -31,6 +144,36 @@ const handleLogout = async () => {
         console.log("Error:", error);
     }
 };
+
+// Calculate the created_at date to ago
+const formatMsgCreatedAt = (created_at) => {
+    const now = new Date();
+    const messageTime = new Date(created_at);
+
+    // Check if created_at is a valid date
+    if (isNaN(messageTime.getTime())) {
+        return 'Invalid date';
+    }
+
+    const timeDiffInSeconds = Math.floor((now - messageTime) / 1000);
+
+    if (timeDiffInSeconds >= 86400) {
+        const daysAgo = Math.floor(timeDiffInSeconds / 86400);
+        return `${daysAgo} ${daysAgo === 1 ? 'day' : 'days'} ago`;
+    } else if (timeDiffInSeconds >= 3600) {
+        const hoursAgo = Math.floor(timeDiffInSeconds / 3600);
+        return `${hoursAgo} ${hoursAgo === 1 ? 'hour' : 'hours'} ago`;
+    } else if (timeDiffInSeconds >= 60) {
+        const minutesAgo = Math.floor(timeDiffInSeconds / 60);
+        return `${minutesAgo} ${minutesAgo === 1 ? 'minute' : 'minutes'} ago`;
+    } else {
+        return `${timeDiffInSeconds} ${timeDiffInSeconds === 1 ? 'second' : 'seconds'} ago`;
+    }
+};
+
+onMounted(() => {
+    renderNotificationData();
+});
 </script>
 <template>
     <!-- Desktop Header -->
@@ -38,7 +181,7 @@ const handleLogout = async () => {
         <div class="max-w-screen-2xl mx-auto flex flex-row justify-between items-center">
             <!-- Logo -->
             <div>
-                <div @click="goToPage('/home')" class="cursor-pointer"><img :src="SwapifineLogo" alt="..."></div>
+                <div @click="goToPage('/')" class="cursor-pointer"><img :src="SwapifineLogo" alt="..."></div>
             </div>
 
             <!-- Desktop Global Search Component -->
@@ -58,7 +201,7 @@ const handleLogout = async () => {
                         </svg>
                     </f7-button>
                     <!-- Checkout Tracker -->
-                    <f7-button @click="goToPage('/checkout')" tooltip="Checkout"
+                    <f7-button @click="goToPage('/checkout')" tooltip="Credits Transaction"
                         class="cursor-pointer flex flex-row whitespace-nowrap items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-full p-2">
                         <svg class="w-[24px] h-[24px] text-clr-primary" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
@@ -79,7 +222,7 @@ const handleLogout = async () => {
                 <!-- Icons Menu -->
                 <div class="nav-menu-icons flex flex-row items-center gap-2">
                     <!-- Notification -->
-                    <!-- <f7-button tooltip="Notification"
+                    <f7-button tooltip="Notification" @click="toggleDropdownNotif"
                         class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
                         <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 16 21">
@@ -90,7 +233,7 @@ const handleLogout = async () => {
                         <div class="absolute top-0 right-2">
                             <div class="w-3 h-3 bg-red-400 border-2 border-white rounded-full"></div>
                         </div>
-                    </f7-button> -->
+                    </f7-button>
                     <!-- Inbox Chat -->
                     <f7-button tooltip="Messages" @click="goToPage('/inbox')"
                         class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
@@ -194,19 +337,90 @@ const handleLogout = async () => {
                         </li>
                     </ul>
                 </div>
+
+                <!-- Notification Dropdown -->
+                <div v-if="dropdownNotification"
+                    class="bg-white text-base z-50 list-none divide-gray-100 rounded shadow absolute right-0 top-14 w-[400px] max-h-[500px] overflow-y-auto px-4 py-6">
+                    <h3 class="text-gray-800 font-semibold text-2xl">Notifications</h3>
+
+                    <!-- Filter Button -->
+                    <div v-if="notifData.length > 0" class="flex gap-2 items-center my-4">
+                        <f7-button @click="notifFilter('all')"
+                            :class="notifCTAFilter === 'all' ? 'border bg-clr-primary text-white hover:text-white' : 'border'">All</f7-button>
+                        <f7-button @click="notifFilter('unread')"
+                            :class="notifCTAFilter === 'unread' ? 'border bg-clr-primary text-white hover:text-white' : 'border'">Unread</f7-button>
+                    </div>
+
+                    <!-- List of Notification -->
+                    <ul class="flex flex-col gap-1">
+                        <li @click="updateNotificationIsReadFalse(notif.id)" v-if="notifData.length > 0"
+                            v-for="notif in renderNotifFilter" :key="notif.id"
+                            :class="notif.is_read ? 'bg-white hover:bg-gray-100' : 'bg-blue-50 hover:bg-gray-100'"
+                            class="cursor-pointer flex items-center gap-4 py-3 px-2 rounded -ml-2 border-b">
+                            <div class="p-2 bg-clr-primary rounded-full">
+                                <svg v-if="notif.type === 'inbox'" class="w-[20px] h-[20px] text-white" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                                    <path
+                                        d="M1 18h16a1 1 0 0 0 1-1v-6h-4.439a.99.99 0 0 0-.908.6 3.978 3.978 0 0 1-7.306 0 .99.99 0 0 0-.908-.6H0v6a1 1 0 0 0 1 1Z" />
+                                    <path
+                                        d="M4.439 9a2.99 2.99 0 0 1 2.742 1.8 1.977 1.977 0 0 0 3.638 0A2.99 2.99 0 0 1 13.561 9H17.8L15.977.783A1 1 0 0 0 15 0H3a1 1 0 0 0-.977.783L.2 9h4.239Z" />
+                                </svg>
+
+                                <svg v-if="notif.type === 'transaction'" class="w-[20px] h-[20px] text-white"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="1.5"
+                                        d="M12 9V4a3 3 0 0 0-6 0v5m9.92 10H2.08a1 1 0 0 1-1-1.077L2 6h14l.917 11.923A1 1 0 0 1 15.92 19Z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p>
+                                    <span class="font-semibold text-clr-primary">{{ notif.notified_by_fullname }}</span> 
+                                    <span class="ml-1 hover:underline" @click="identifyRedirection(notif.type)">{{ notif.message }}</span>
+                                </p>
+                                <p class="text-sm text-gray-600">{{ notif.created_at }}</p>
+
+                                <!-- Notification Action -->
+                                <div class="flex gap-2 mt-2">
+                                    <p @click="updateNotificationIsReadFalse(notif.id)" v-if="!notif.is_read"
+                                        class="text-sm text-gray-500 hover:text-cyan-900">Read</p>
+                                    <p @click="deleteNotificationData(notif.id)"
+                                        class="text-sm text-gray-500 hover:text-cyan-900">Remove</p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li v-else class="cursor-pointer flex items-center gap-4 hover:bg-gray-100 py-3 px-2 rounded -ml-2">
+                            No Notification
+                        </li>
+                    </ul>
+                </div>
             </nav>
         </div>
     </header>
 
     <!-- Mobile Header -->
     <header class="inline-block lg:hidden bg-white z-10 fixed w-full top-0 border-b border-gray-200 px-2 py-3">
-        <div class="max-w-screen-2xl mx-auto flex flex-row justify-between items-center">
+        <div class="max-w-screen-2xl mx-auto flex flex-row justify-between items-center relative">
             <!-- Logo -->
             <div>
                 <a href="/"><img :src="SwapifineLogo" width="150"></a>
             </div>
             <!-- Menu Buttons -->
             <div class="flex flex-row items-center gap-1">
+                <f7-button tooltip="Notification" @click="toggleDropdownNotif"
+                    class="nav-menu-icon-item cursor-pointer hover:bg-gray-100 p-2 rounded-full relative">
+                    <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 16 21">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M8 3.464V1.1m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175C15 15.4 15 16 14.462 16H1.538C1 16 1 15.4 1 14.807c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 8 3.464ZM4.54 16a3.48 3.48 0 0 0 6.92 0H4.54Z" />
+                    </svg>
+
+                    <div class="absolute top-0 right-2">
+                        <div class="w-3 h-3 bg-red-400 border-2 border-white rounded-full"></div>
+                    </div>
+                </f7-button>
+
                 <!-- Search -->
                 <div @click="goToPage('/search')"
                     class="cursor-pointer hover:bg-gray-100 active:bg-gray-100 focus:bg-gray-100 p-2 rounded-full">
@@ -227,7 +441,7 @@ const handleLogout = async () => {
                 </f7-button>
 
                 <f7-panel id="panel-menu" left cover container-el="#panel-page">
-                    <f7-page>
+                    <f7-page class="bg-white">
                         <f7-block strong-ios outline-ios>
                             <img class="mb-5" :src="SwapifineLogo" />
 
@@ -348,6 +562,70 @@ const handleLogout = async () => {
                     </f7-page>
                 </f7-panel>
             </div>
+
+            <!-- Notification Dropdown -->
+            <div v-if="dropdownNotification"
+                class="bg-white text-base z-50 list-none divide-gray-100 rounded absolute top-14 w-full h-screen overflow-y-auto px-4 py-6">
+                <h3 class="text-gray-800 font-semibold text-2xl">Notifications</h3>
+
+                <!-- Filter Button -->
+                <div v-if="notifData.length > 0" class="flex gap-2 items-center my-4">
+                    <f7-button @click="notifFilter('all')"
+                        :class="notifCTAFilter === 'all' ? 'border bg-clr-primary text-white hover:text-white' : 'border'">All</f7-button>
+                    <f7-button @click="notifFilter('unread')"
+                        :class="notifCTAFilter === 'unread' ? 'border bg-clr-primary text-white hover:text-white' : 'border'">Unread</f7-button>
+                </div>
+
+                <!-- List of Notification -->
+                <ul class="flex flex-col gap-1">
+                    <li @click="identifyRedirection(notif.type), updateNotificationIsReadFalse(notif.id)" v-if="notifData.length > 0"
+                        v-for="notif in renderNotifFilter" :key="notif.id"
+                        :class="notif.is_read ? 'bg-white hover:bg-gray-100' : 'bg-blue-50 hover:bg-gray-100'"
+                        class="cursor-pointer flex items-center gap-4 py-3 px-2 rounded -ml-2 border-b">
+                        <div class="p-2 bg-clr-primary rounded-full">
+                            <svg v-if="notif.type === 'inbox'" class="w-[20px] h-[20px] text-white" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                                <path
+                                    d="M1 18h16a1 1 0 0 0 1-1v-6h-4.439a.99.99 0 0 0-.908.6 3.978 3.978 0 0 1-7.306 0 .99.99 0 0 0-.908-.6H0v6a1 1 0 0 0 1 1Z" />
+                                <path
+                                    d="M4.439 9a2.99 2.99 0 0 1 2.742 1.8 1.977 1.977 0 0 0 3.638 0A2.99 2.99 0 0 1 13.561 9H17.8L15.977.783A1 1 0 0 0 15 0H3a1 1 0 0 0-.977.783L.2 9h4.239Z" />
+                            </svg>
+
+                            <svg v-if="notif.type === 'transaction'" class="w-[20px] h-[20px] text-white" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M12 9V4a3 3 0 0 0-6 0v5m9.92 10H2.08a1 1 0 0 1-1-1.077L2 6h14l.917 11.923A1 1 0 0 1 15.92 19Z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p>
+                                <span class="font-semibold text-clr-primary">{{ notif.notified_by_fullname }}</span> {{
+                                    notif.message }}
+                            </p>
+                            <p class="text-sm text-gray-600">{{ notif.created_at }}</p>
+
+                            <!-- Notification Action -->
+                            <div class="flex gap-2 mt-2">
+                                <p @click="updateNotificationIsReadFalse(notif.id)" v-if="!notif.is_read"
+                                    class="text-sm text-gray-500 hover:text-cyan-900">Read</p>
+                                <p @click="deleteNotificationData(notif.id)"
+                                    class="text-sm text-gray-500 hover:text-cyan-900">Remove</p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li v-else class="cursor-pointer flex items-center gap-4 hover:bg-gray-100 py-3 px-2 rounded -ml-2">
+                        No Notification
+                    </li>
+                </ul>
+            </div>
         </div>
     </header>
 </template>
+
+<style scoped lang="scss">
+.page-content {
+    background: #FFF;
+}
+</style>

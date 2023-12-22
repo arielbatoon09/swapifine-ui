@@ -7,23 +7,23 @@ const mystoreStore = useMystoreStore();
 const data = ref([]);
 const isLoading = ref(false);
 const error = ref(false);
+const getVendorID = localStorage.getItem('vendorID');
 
-const initRender = async () => {
+const renderData = async () => {
     isLoading.value = true;
-    const response = await mystoreStore.GetRatingsByUserID();
-    data.value = response.data;
+	const response = await mystoreStore.ViewVendorStore(getVendorID);
+	data.value = response;
 
-    if (data.value === 'No Data Found') {
+    if (data.value.ratingsData.length <= 0) {
         error.value = true;
     }
 
     isLoading.value = false;
-
-    console.log(data.value);
+	console.log(data.value);
 };
 
 onMounted(() => {
-    initRender();
+    renderData();
 });
 
 </script>
@@ -33,7 +33,7 @@ onMounted(() => {
     <!-- Ratings List -->
     <div :class="!error ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-2' : ''">
         <!-- Rate Box -->
-        <div v-if="!error" v-for="rating in data" class="border rounded">
+        <div v-if="!error" v-for="rating in data.ratingsData" class="border rounded">
             <div class="py-8 text-left px-4 m-2">
                 <div class="flex flex-col items-start gap-4">
                     <div class="w-20 h-20 overflow-hidden rounded-full bg-gray-100 shrink-0">

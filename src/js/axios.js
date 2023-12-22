@@ -3,6 +3,6 @@ import axios from 'axios';
 // BACKEND URLS and Credentials
 axios.defaults.withCredentials = true;
 // Localhost
-axios.defaults.baseURL = "http://127.0.0.1:8000";
+// axios.defaults.baseURL = "http://127.0.0.1:8000";
 // Production
-// axios.defaults.baseURL = "https://api.swapifine.com";
+axios.defaults.baseURL = "https://api.swapifine.com";

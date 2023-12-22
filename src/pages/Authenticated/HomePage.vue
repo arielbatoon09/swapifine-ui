@@ -25,6 +25,7 @@ const isClicked = ref(false);
 const slidesPerView = ref(4);
 const viewID = ref(0);
 const existingArrayRecent = localStorage.getItem('RecentViewed');
+const error = ref(false);
 let resizeListener = null;
 
 // Webhook Event for Checkout
@@ -62,11 +63,24 @@ const initRender = async () => {
   if (existingArrayRecent) {
     const response = await postStore.GetRecentViewedPost(existingArrayRecent);
     postData.value = response.data;
+
+    console.log(postData.value);
   }
 
   // Init the distance inside the postData.value
   populateDistance();
 
+};
+
+// Set Vendor ID in Localstorage
+const setVendorID = (vendor_id) => {
+    localStorage.setItem('vendorID', vendor_id);
+
+    const route = `/view/store`;
+    const animate = window.innerWidth <= 1023;
+    f7.views.main.router.navigate(route, {
+        animate: animate,
+    });
 };
 
 const updateSlidesPerView = () => {
@@ -183,7 +197,7 @@ onBeforeUnmount(() => {
             <p class="text-lg mt-1">Browse available items!</p>
           </div>
           <div class="hidden lg:block">
-            <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+            <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                 d="m1 9 4-4-4-4" />
@@ -200,7 +214,7 @@ onBeforeUnmount(() => {
             <p class="text-lg mt-1">Let's create a post now!</p>
           </div>
           <div class="hidden lg:block">
-            <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+            <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                 d="m1 9 4-4-4-4" />
@@ -217,7 +231,7 @@ onBeforeUnmount(() => {
             <p class="text-lg mt-1">Distance between items!</p>
           </div>
           <div class="hidden lg:block">
-            <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+            <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                 d="m1 9 4-4-4-4" />
@@ -263,12 +277,12 @@ onBeforeUnmount(() => {
                 </div>
                 <!-- Post User Profile -->
                 <div class="profile">
-                  <p class="profile-name cursor-pointer profile-name hover:underline text-lg">{{ post.fullname }}
+                  <p @click="setVendorID(post.user_id)" class="cursor-pointer hover:underline text-lg">{{ post.fullname }}
                   </p>
                   <!-- Verified Indicator -->
                   <div class="flex flex-row items-center gap-1">
-                    <span class="profile-verified-label">Verified</span>
-                    <svg class="verified w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+                    <span class="profile-verified-label text-clr-primary">Verified Vendor</span>
+                    <svg class="verified w-[18px] h-[18px] text-clr-primary" aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                       <path fill="currentColor"
                         d="m18.774 8.245-.892-.893a1.5 1.5 0 0 1-.437-1.052V5.036a2.484 2.484 0 0 0-2.48-2.48H13.7a1.5 1.5 0 0 1-1.052-.438l-.893-.892a2.484 2.484 0 0 0-3.51 0l-.893.892a1.5 1.5 0 0 1-1.052.437H5.036a2.484 2.484 0 0 0-2.48 2.481V6.3a1.5 1.5 0 0 1-.438 1.052l-.892.893a2.484 2.484 0 0 0 0 3.51l.892.893a1.5 1.5 0 0 1 .437 1.052v1.264a2.484 2.484 0 0 0 2.481 2.481H6.3a1.5 1.5 0 0 1 1.052.437l.893.892a2.484 2.484 0 0 0 3.51 0l.893-.892a1.5 1.5 0 0 1 1.052-.437h1.264a2.484 2.484 0 0 0 2.481-2.48V13.7a1.5 1.5 0 0 1 .437-1.052l.892-.893a2.484 2.484 0 0 0 0-3.51Z" />
@@ -289,7 +303,7 @@ onBeforeUnmount(() => {
                 </div>
                 <!-- Item Distance -->
                 <div class="flex items-center gap-1 mt-1">
-                  <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+                  <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
                     <path
                       d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
@@ -300,7 +314,7 @@ onBeforeUnmount(() => {
                 </div>
                 <!-- Item Location -->
                 <div class="flex items-center gap-1 mt-2 pb-4">
-                  <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+                  <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
                     <path
                       d="M7 0a7 7 0 0 0-1 13.92V19a1 1 0 1 0 2 0v-5.08A7 7 0 0 0 7 0Zm0 5.5A1.5 1.5 0 0 0 5.5 7a1 1 0 0 1-2 0A3.5 3.5 0 0 1 7 3.5a1 1 0 0 1 0 2Z" />

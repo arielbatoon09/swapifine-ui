@@ -151,17 +151,11 @@ const routes = [
 function beforeEnter(context) {
   const authStore = useAuthStore();
   const routeTo = context.to.route.protectedRoute;
-
   if (routeTo) { // Check if the route is protected
     if (!authStore.isAuthenticated) {
-      if (context.to.path !== '/') {
-        // Check if you're not already on the target route
-        f7.views.main.router.navigate('/');
-        context.reject();
-        // This navigation triggers the beforeEnter function again
-      } else {
-        context.reject(); // If already on the target route, reject without navigating
-      }
+      f7.views.main.router.navigate('/');
+      context.reject();
+       // This navigation triggers the beforeEnter function again
     } else {
       context.resolve();
     }    

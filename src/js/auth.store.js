@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', {
             return state.authUser !== null;
         },
     },
+    persist: true,
     actions: {
         async getToken() {
             await axios.get('/sanctum/csrf-cookie');
@@ -116,6 +117,7 @@ export const useAuthStore = defineStore('auth', {
                 await axios.get('/api/logout');
                 useCookies.remove('isLoggedIn');
                 localStorage.removeItem('RecentViewed');
+                localStorage.removeItem('vendorID');
                 this.authUser = null;
                 location.reload();
                 f7.views.main.router.navigate('/');

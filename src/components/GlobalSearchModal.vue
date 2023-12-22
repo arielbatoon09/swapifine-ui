@@ -11,11 +11,16 @@ const textToShow = ref(false);
 const notFound = ref(false);
 const viewID = ref(0);
 const toastWithButton = ref(null);
+const error = ref(false);
 
 const renderData = async () => {
     // Get All Posted Items
     const postResponse = await postStore.GetAllPostItem();
     postData.value = postResponse.data;
+
+    if (postData.value === 'No Data Found') {
+        return error.value = true;
+    }
     console.log('Search', postData.value);
 };
 
@@ -109,10 +114,13 @@ onMounted(() => {
                 <li v-if="notFound" class="p-2 text-gray-700">
                     Nothing found
                 </li>
-                <li @click="setPostData(data)" v-for="data in filteredSearch"
+                <li v-if="!error" @click="setPostData(data)" v-for="data in filteredSearch"
                     class="cursor-pointer hover:bg-gray-100 p-2 text-gray-700 rounded flex items-center gap-3">
                     <img class="rounded-full w-8 h-8 object-cover" :src="data.images[0].img_file_path">
                     <p>{{ data.item_name }}</p>
+                </li>
+                <li v-else>
+                    Error
                 </li>
             </ul>
         </div>

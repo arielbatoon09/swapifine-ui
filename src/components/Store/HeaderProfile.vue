@@ -2,20 +2,25 @@
 import { f7 } from 'framework7-vue';
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../../js/auth.store';
-import TestProfile from '../../assets/profile/test_profile.jpg';
 
 const authStore = useAuthStore();
 const UpdateProfile = ref(null);
 const fileInput = ref(null);
 const data = ref([]);
+const isLoading = ref(false);
+const updateProfileLoading = ref(false);
 
 const FormData = ref({
     img_file_path: null,
 });
 
 const renderData = async () => {
+    isLoading.value = true;
+
     const response = await authStore.getMyStoreDetails();
     data.value = response.data;
+
+    isLoading.value = false;
     console.log(data.value);
 };
 
@@ -48,7 +53,9 @@ const handleUpdateImage = async () => {
         });
     }
 
+    updateProfileLoading.value = true;
     const response = await authStore.updateProfile(files);
+    updateProfileLoading.value = false;
 
     console.log(response);
 }
@@ -82,7 +89,7 @@ const handleImageUpload = (event) => {
             };
             reader.readAsDataURL(file);
         });
-        
+
         // Upload Image
         handleUpdateImage();
     });
@@ -97,22 +104,25 @@ onMounted(() => {
     <!-- Header Profile -->
     <div class="mb-12 flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-20">
         <!-- Profile Image -->
-        <div class="relative w-32 h-32 lg:w-48 lg:h-48 overflow-hidden rounded-full hover:brightness-75 bg-gray-100">
-            <!-- <f7-preloader class="absolute right-20 top-20 z-[99999]" /> -->
+        <div v-show="!isLoading"
+            class="relative w-32 h-32 lg:w-48 lg:h-48 overflow-hidden rounded-full hover:brightness-75 bg-gray-100">
+            <f7-preloader v-show="updateProfileLoading" class="absolute right-20 top-20 z-[99999]" />
             <label for="file-input" class="w-full h-full">
-                <img v-if="!UpdateProfile" :src="data.profile_img" class="cursor-pointer w-full h-full object-cover">
-                <img v-else :src="UpdateProfile" class="cursor-pointer w-full h-full object-cover">
+                <img v-if="!UpdateProfile" :src="data.profile_img" class="cursor-pointer w-full h-full object-cover"
+                    :class="updateProfileLoading ? 'brightness-50' : 'brightness-100'">
+                <img v-else :src="UpdateProfile" class="cursor-pointer w-full h-full object-cover"
+                    :class="updateProfileLoading ? 'brightness-50' : 'brightness-100'">
             </label>
             <input id="file-input" type="file" class="hidden" @change="handleImageUpload" ref="fileInput">
         </div>
 
         <!-- User Profile Data -->
-        <div class="flex flex-col items-center lg:items-start gap-5">
+        <div v-show="!isLoading" class="flex flex-col items-center lg:items-start gap-5">
             <!-- User Information -->
             <div>
                 <h2 class="text-2xl font-semibold">{{ data.fullname }}</h2>
                 <!-- Verified Indicator -->
-                <div v-if="data.is_verified" class="flex flex-row items-center gap-1">
+                <div v-if="data.is_verified" class="flex flex-row justify-center lg:justify-start items-center gap-1">
                     <span class="text-clr-primary font-medium">Verified Vendor</span>
                     <svg class="w-[18px] h-[18px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor" viewBox="0 0 20 20">
@@ -122,7 +132,7 @@ onMounted(() => {
                             d="M8 13a1 1 0 0 1-.707-.293l-2-2a1 1 0 1 1 1.414-1.414l1.42 1.42 5.318-3.545a1 1 0 0 1 1.11 1.664l-6 4A1 1 0 0 1 8 13Z" />
                     </svg>
                 </div>
-                <div v-else class="flex flex-row items-center gap-1">
+                <div v-else class="flex flex-row items-center justify-center lg:justify-start gap-1">
                     <span class="text-clr-primary font-medium">Unverified Vendor</span>
                 </div>
             </div>
@@ -185,5 +195,73 @@ onMounted(() => {
                 </div>
             </div>
         </div>
+
+        <div v-show="isLoading"
+            class="relative w-32 h-32 lg:w-48 lg:h-48 overflow-hidden rounded-full hover:brightness-75 bg-gray-100">
+            <f7-preloader v-show="isLoading" class="absolute right-20 top-20 z-[99999]" />
+            <label for="file-input" class="w-full h-full">
+                <img class="cursor-pointer w-full h-full object-cover bg-gray-50">
+            </label>
+        </div>
+
+        <div v-show="isLoading" class="flex flex-col items-center lg:items-start gap-5">
+            <!-- User Information -->
+            <div class="animate-pulse">
+                <h2 class="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></h2>
+                <!-- Verified Indicator -->
+                <div class="flex flex-row items-center justify-center lg:justify-start gap-1 animate-pulse">
+                    <span class="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></span>
+                </div>
+            </div>
+
+            <!-- Data Statistic Number -->
+            <div class="flex flex-row flex-nowrap gap-8 animate-pulse">
+                <!-- Total Post -->
+                <div class="flex flex-col items-center text-base">
+                    <span class="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></span>
+                    <span class="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></span>
+                </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-row gap-4">
+                <div class="flex flex-row items-center gap-2">
+                    <f7-button tooltip="Post new item" @click="goToPage('/post/item')"
+                        class="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md font-medium">
+                        <span>Post Item</span>
+                    </f7-button>
+                    <f7-button tooltip="Withdraw Credits" @click="goToPage('/withdrawal')"
+                        class="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md font-medium">
+                        <span>Withdraw</span>
+                    </f7-button>
+                    <f7-button tooltip="Edit Profile" @click="goToPage('/settings')"
+                        class="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md font-medium">
+                        <span>Edit Profile</span>
+                    </f7-button>
+                </div>
+            </div>
+
+            <div class="flex flex-row gap-3">
+                <div @click="goToPage('/order')" class="flex gap-1 items-center cursor-pointer">
+                    <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 18 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 9V4a3 3 0 0 0-6 0v5m9.92 10H2.08a1 1 0 0 1-1-1.077L2 6h14l.917 11.923A1 1 0 0 1 15.92 19Z" />
+                    </svg>
+                    <span>Track Orders</span>
+                </div>
+                <div @click="goToPage('/buy-credits')" class="flex gap-1 items-center cursor-pointer">
+                    <svg class="w-[16px] h-[16px] text-clr-primary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M11.905 1.316 15.633 6M18 10h-5a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h5m0-5a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1m0-5V7a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1v-3m-6.367-9L7.905 1.316 2.352 6h9.281Z" />
+                    </svg>
+                    <span>Buy Credits</span>
+                </div>
+            </div>
+        </div>
+
+
+
     </div>
 </template>
