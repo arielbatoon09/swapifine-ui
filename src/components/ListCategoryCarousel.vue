@@ -50,13 +50,13 @@ onBeforeUnmount(() => {
   <div class="border border-gray-300 rounded-lg px-6 py-8">
     <h3 class="text-xl font-semibold">What are you looking for?</h3>
     <div class="flex items-center gap-1 mt-2">
-      <svg class="w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+      <svg class="w-[18px] h-[18px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
         fill="none" viewBox="0 0 20 20">
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
           d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
       </svg>
       <span class="text-clr-primary font-medium">Swipe it now</span>
-      <svg class="ml-2 w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+      <svg class="ml-2 w-[18px] h-[18px] text-gray-800" aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8"
           d="M1 5h12m0 0L9 1m4 4L9 9" />
