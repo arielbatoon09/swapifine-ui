@@ -112,7 +112,7 @@ const handleCheckout = async () => {
                         <div class="mb-4 md:mb-8 xl:mb-12 text-center">
                             <h2 class="mb-2 text-2xl font-bold lg:text-3xl">Buy Credits</h2>
                             <div class="flex justify-center gap-2">
-                                <svg class="w-[18px] h-[18px] text-gray-700 dark:text-white" aria-hidden="true"
+                                <svg class="w-[18px] h-[18px] text-gray-700" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="1.5"

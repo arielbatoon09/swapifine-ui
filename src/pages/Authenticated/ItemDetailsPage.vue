@@ -175,13 +175,13 @@ const isEmpty = (obj) => {
                     <!-- Breadcrumps -->
                     <div class="mb-4 hidden lg:flex gap-4 items-center">
                         <f7-link class="text-gray-500" href="/" :animate="false">Home</f7-link>
-                        <svg class="w-[14px] h-[14px] text-gray-800 dark:text-white" aria-hidden="true"
+                        <svg class="w-[14px] h-[14px] text-gray-800" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                                 d="m1 9 4-4-4-4" />
                         </svg>
                         <f7-link class="text-gray-500" href="/browse" :animate="false">Browse</f7-link>
-                        <svg class="w-[14px] h-[14px] text-gray-800 dark:text-white" aria-hidden="true"
+                        <svg class="w-[14px] h-[14px] text-gray-800" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                                 d="m1 9 4-4-4-4" />

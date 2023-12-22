@@ -374,7 +374,7 @@ onBeforeUnmount(() => {
             <div class="categories-filter relative">
                 <div class="flex items-center mb-2">
                     <p class="text-clr-primary font-medium text-lg">Top Categories</p>
-                    <svg class="ml-2 w-[18px] h-[18px] text-gray-800 dark:text-white" aria-hidden="true"
+                    <svg class="ml-2 w-[18px] h-[18px] text-gray-800" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8"
                             d="M1 5h12m0 0L9 1m4 4L9 9" />
@@ -524,7 +524,7 @@ onBeforeUnmount(() => {
                                 <!-- Verified Indicator -->
                                 <div class="flex flex-row items-center gap-1">
                                     <span class="profile-verified-label text-clr-primary">Verified Vendor</span>
-                                    <svg class="verified w-[18px] h-[18px] text-clr-primary dark:text-white" aria-hidden="true"
+                                    <svg class="verified w-[18px] h-[18px] text-clr-primary" aria-hidden="true"
                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill="currentColor"
                                             d="m18.774 8.245-.892-.893a1.5 1.5 0 0 1-.437-1.052V5.036a2.484 2.484 0 0 0-2.48-2.48H13.7a1.5 1.5 0 0 1-1.052-.438l-.893-.892a2.484 2.484 0 0 0-3.51 0l-.893.892a1.5 1.5 0 0 1-1.052.437H5.036a2.484 2.484 0 0 0-2.48 2.481V6.3a1.5 1.5 0 0 1-.438 1.052l-.892.893a2.484 2.484 0 0 0 0 3.51l.892.893a1.5 1.5 0 0 1 .437 1.052v1.264a2.484 2.484 0 0 0 2.481 2.481H6.3a1.5 1.5 0 0 1 1.052.437l.893.892a2.484 2.484 0 0 0 3.51 0l.893-.892a1.5 1.5 0 0 1 1.052-.437h1.264a2.484 2.484 0 0 0 2.481-2.48V13.7a1.5 1.5 0 0 1 .437-1.052l.892-.893a2.484 2.484 0 0 0 0-3.51Z" />

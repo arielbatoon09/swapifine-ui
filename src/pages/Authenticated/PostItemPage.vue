@@ -212,7 +212,7 @@ const removeImage = (index) => {
                   <div v-show="selectedImagesCount < 10" class="mt-4">
                     <label for="images"
                       class="cursor-pointer py-16 border border-gray-200 hover:bg-gray-100 duration-75 delay-75 ease-in rounded-md flex flex-col justify-center items-center">
-                      <svg class="w-[48px] h-[48px] text-gray-800 dark:text-white" aria-hidden="true"
+                      <svg class="w-[48px] h-[48px] text-gray-800" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
                         <path fill="currentColor"
                           d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z" />
