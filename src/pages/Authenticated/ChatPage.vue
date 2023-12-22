@@ -310,8 +310,11 @@ const handleImageChange = (event) => {
 
 // Report User
 const handleReportUser = async () => {
+    const { inboxData } = FormData.value;
     const { message } = ReportForm.value;
+    
     const loggedUserID = authStore.user?.id;
+    const reportedUser = inboxData.to_id === loggedUserID ? inboxData.from_id : inboxData.to_id;
     // Create an array to store file data
     const files = [];
 
@@ -332,7 +335,7 @@ const handleReportUser = async () => {
         });
     }
     // Request
-    const response = await authStore.reportUser(loggedUserID, message, files);
+    const response = await authStore.reportUser(reportedUser, message, files);
 
     // Show the toast
     const toast = f7.toast.create({

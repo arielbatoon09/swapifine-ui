@@ -254,7 +254,7 @@ const removeImage = (index) => {
                     clear-button></f7-list-input>
                   <f7-list-input v-model:value="form.item_description" outline label="Description" floating-label
                     type="textarea" clear-button></f7-list-input>
-                  <f7-list-input v-model:value="form.item_stocks" outline label="Stocks (Qty)" floating-label type="text"
+                  <f7-list-input v-model:value="form.item_stocks" outline label="Stocks (Qty)" floating-label type="number"
                     clear-button></f7-list-input>
                 </f7-list>
                 <!-- Next Step -->
@@ -291,7 +291,7 @@ const removeImage = (index) => {
                     <option value="For Swap and Sale">For Swap and Sale</option>
                   </f7-list-input>
                   <f7-list-input v-model:value="form.item_cash_value" outline label="₱ Cash Value" floating-label
-                    type="text" clear-button>
+                    type="number" clear-button>
                   </f7-list-input>
                 </f7-list>
                 <!-- Next Step -->
